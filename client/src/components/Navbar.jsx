@@ -10,6 +10,7 @@ const navLinks = [
   { path: "/services", label: "Services" },
   { path: "/portfolio", label: "Portfolio" },
   { path: "/career", label: "Career" },
+  { path: "/social", label: "Social" },
   { path: "/contact", label: "Contact" },
 ];
 
@@ -33,7 +34,7 @@ export default function Navbar() {
   return (
     <nav
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        scrolled ? "bg-white/95 backdrop-blur-md shadow-lg" : "bg-transparent"
+        scrolled ? "bg-black/95 backdrop-blur-md shadow-lg" : "bg-transparent"
       }`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -41,7 +42,7 @@ export default function Navbar() {
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2 group">
             <img
-              src={scrolled ? LogoWhite : LogoBlack}
+              src={LogoBlack}
               alt="Adway Creations"
               className="h-auto w-[150px] transition-all duration-300"
             />
@@ -53,22 +54,28 @@ export default function Navbar() {
               <Link
                 key={link.path}
                 to={link.path}
-                className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 ${
-                  location.pathname === link.path
-                    ? scrolled
-                      ? "bg-accent text-white shadow-md"
-                      : "bg-white/20 text-white backdrop-blur-sm"
-                    : scrolled
-                      ? "text-gray-600 hover:text-accent hover:bg-accent/5"
-                      : "text-white/80 hover:text-white hover:bg-white/10"
-                }`}
+                className={`relative px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 pb-1.5
+            after:absolute after:bottom-1 after:left-1/2 after:-translate-x-1/2 after:h-[2px] after:w-0 after:transition-all after:duration-300
+    
+    /* Global Hover: Make the line grow from the center to full width */
+    hover:after:w-[60%]
+    
+    ${
+      location.pathname === link.path
+        ? scrolled
+          ? "text-white  after:bg-white"
+          : "text-white backdrop-blur-sm after:bg-white"
+        : scrolled
+          ? "text-white/60 hover:text-white  after:bg-white active:scale-95"
+          : "text-white/80 hover:text-white  after:bg-white active:scale-95"
+    }`}
               >
                 {link.label}
               </Link>
             ))}
             <Link
               to="/contact"
-              className="ml-4 px-6 py-2.5 bg-accent text-white rounded-full text-sm font-semibold hover:bg-accent-dark transition-all duration-300 shadow-lg hover:shadow-xl hover:-translate-y-0.5 btn-shine"
+              className="ml-4 px-6 py-2.5 bg-white text-black rounded-md text-sm font-semibold hover:bg-white/90 transition-all duration-300 shadow-lg hover:shadow-xl hover:-translate-y-0.5"
             >
               Get Started
             </Link>
@@ -92,15 +99,15 @@ export default function Navbar() {
           isOpen ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
         }`}
       >
-        <div className="bg-white/95 backdrop-blur-md shadow-lg border-t border-gray-100 px-4 py-4 space-y-1">
+        <div className="bg-black/95 backdrop-blur-md shadow-lg border-t border-white/10 px-4 py-4 space-y-1">
           {navLinks.map((link) => (
             <Link
               key={link.path}
               to={link.path}
               className={`block px-4 py-3 rounded-xl text-sm font-medium transition-all ${
                 location.pathname === link.path
-                  ? "bg-accent/10 text-accent"
-                  : "text-gray-600 hover:bg-gray-50"
+                  ? "bg-white/10 text-white"
+                  : "text-white/60 hover:bg-white/5"
               }`}
             >
               {link.label}
@@ -108,7 +115,7 @@ export default function Navbar() {
           ))}
           <Link
             to="/contact"
-            className="block text-center mt-3 px-6 py-3 bg-accent text-white rounded-xl text-sm font-semibold hover:bg-accent-dark transition-all"
+            className="block text-center mt-3 px-6 py-3 bg-white text-black rounded-xl text-sm font-semibold hover:bg-white/90 transition-all"
           >
             Get Started
           </Link>

@@ -51,13 +51,13 @@ export default function Contact() {
   return (
     <>
       {/* Hero */}
-      <section className="relative pt-32 pb-24 bg-primary overflow-hidden">
+      <section className="relative pt-32 pb-24 bg-black overflow-hidden">
         <div className="absolute inset-0">
-          <div className="absolute top-0 left-1/2 w-96 h-96 bg-accent/10 rounded-full blur-3xl" />
-          <div className="absolute bottom-0 right-1/3 w-72 h-72 bg-purple-500/10 rounded-full blur-3xl" />
+          <div className="absolute top-0 left-1/2 w-96 h-96 bg-white/5 rounded-full blur-3xl" />
+          <div className="absolute bottom-0 right-1/3 w-72 h-72 bg-purple-500/5 rounded-full blur-3xl" />
         </div>
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <span className="inline-block px-4 py-2 bg-accent/10 border border-accent/20 text-accent rounded-full text-sm font-medium mb-6">
+          <span className="inline-block px-4 py-2 bg-white/10 border border-white/20 text-white rounded-full text-sm font-medium mb-6">
             Contact Us
           </span>
           <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-[88px] font-bold text-white leading-[1.05] tracking-[-0.02em]">
@@ -73,20 +73,39 @@ export default function Contact() {
       </section>
 
       {/* Contact Info Cards */}
-      <section className="py-16 bg-white">
+      <section className="py-16 bg-neutral-950">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 -mt-24 relative z-10">
             {contactInfo.map((info) => (
               <div
                 key={info.title}
-                className="bg-white rounded-2xl p-6 shadow-xl border border-gray-100 hover:border-accent/20 transition-all duration-300 group"
+                className="relative overflow-hidden bg-white rounded-2xl p-6 border border-white/10 hover:border-white/25 transition-all duration-300 group"
               >
-                <div className="w-12 h-12 bg-accent/10 rounded-xl flex items-center justify-center mb-4 group-hover:bg-accent transition-colors duration-300">
-                  <info.icon className="w-6 h-6 text-accent group-hover:text-white transition-colors" />
+                {/* Grid Pattern */}
+                <div className="absolute bottom-0 right-0 w-40 h-40 opacity-10 pointer-events-none">
+                  <div
+                    className="w-full h-full"
+                    style={{
+                      backgroundImage: `
+        linear-gradient(to right, #000 1px, transparent 1px),
+        linear-gradient(to bottom, #000 1px, transparent 1px)
+      `,
+                      backgroundSize: "12px 12px",
+                      WebkitMaskImage:
+                        "radial-gradient(circle at bottom right, black 25%, transparent 85%)",
+                      maskImage:
+                        "radial-gradient(circle at bottom right, black 25%, transparent 85%)",
+                    }}
+                  />
                 </div>
-                <h3 className="font-bold text-gray-900 mb-1">{info.title}</h3>
-                <p className="text-gray-900 font-medium">{info.detail}</p>
-                <p className="text-gray-400 text-sm">{info.sub}</p>
+
+                <div className="w-12 h-12 bg-black/10 rounded-xl flex items-center justify-center mb-4 group-hover:bg-black transition-colors duration-300">
+                  <info.icon className="w-6 h-6 text-black/70 group-hover:text-white transition-colors" />
+                </div>
+
+                <h3 className="font-bold text-black mb-1">{info.title}</h3>
+                <p className="text-black font-medium">{info.detail}</p>
+                <p className="text-black/40 text-sm">{info.sub}</p>
               </div>
             ))}
           </div>
@@ -94,26 +113,26 @@ export default function Contact() {
       </section>
 
       {/* Contact Form + Map */}
-      <section className="py-24 bg-white">
+      <section className="py-24 bg-neutral-950">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-5 gap-16">
             {/* Form */}
             <div className="lg:col-span-3">
-              <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 tracking-tight">
+              <h2 className="text-3xl sm:text-4xl font-bold text-white tracking-tight">
                 Tell us about your project
               </h2>
-              <p className="mt-3 text-gray-500 text-lg">
+              <p className="mt-3 text-white/60 text-lg">
                 Fill out the form below and we'll get back to you within 24
                 hours.
               </p>
 
               {submitted ? (
-                <div className="mt-10 p-8 bg-green-50 border border-green-200 rounded-2xl text-center">
-                  <CheckCircle2 className="w-16 h-16 text-green-500 mx-auto mb-4" />
-                  <h3 className="text-2xl font-bold text-gray-900 mb-2">
+                <div className="mt-10 p-8 bg-white/5 border border-white/10 rounded-2xl text-center">
+                  <CheckCircle2 className="w-16 h-16 text-white/40 mx-auto mb-4" />
+                  <h3 className="text-2xl font-bold text-white mb-2">
                     Thank you!
                   </h3>
-                  <p className="text-gray-600">
+                  <p className="text-white/60">
                     We've received your message and will get back to you within
                     24 hours.
                   </p>
@@ -129,7 +148,7 @@ export default function Contact() {
                         message: "",
                       });
                     }}
-                    className="mt-6 px-6 py-3 bg-accent text-white rounded-full font-semibold hover:bg-accent-dark transition-all"
+                    className="mt-6 px-6 py-3 bg-white text-black rounded-full font-semibold hover:bg-white/90 transition-all"
                   >
                     Send Another Message
                   </button>
@@ -138,7 +157,7 @@ export default function Contact() {
                 <form onSubmit={handleSubmit} className="mt-10 space-y-6">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label className="block text-sm font-medium text-white/70 mb-2">
                         Full Name *
                       </label>
                       <input
@@ -148,11 +167,11 @@ export default function Contact() {
                         value={formData.name}
                         onChange={handleChange}
                         placeholder="John Doe"
-                        className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-accent focus:ring-2 focus:ring-accent/20 outline-none transition-all bg-gray-50 focus:bg-white"
+                        className="w-full px-4 py-3 rounded-xl border border-white/10 focus:border-white/30 focus:ring-2 focus:ring-white/10 outline-none transition-all bg-white/5 text-white placeholder:text-white/30 focus:bg-white/10"
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label className="block text-sm font-medium text-white/70 mb-2">
                         Email Address *
                       </label>
                       <input
@@ -162,14 +181,14 @@ export default function Contact() {
                         value={formData.email}
                         onChange={handleChange}
                         placeholder="john@company.com"
-                        className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-accent focus:ring-2 focus:ring-accent/20 outline-none transition-all bg-gray-50 focus:bg-white"
+                        className="w-full px-4 py-3 rounded-xl border border-white/10 focus:border-white/30 focus:ring-2 focus:ring-white/10 outline-none transition-all bg-white/5 text-white placeholder:text-white/30 focus:bg-white/10"
                       />
                     </div>
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label className="block text-sm font-medium text-white/70 mb-2">
                         Company Name
                       </label>
                       <input
@@ -178,26 +197,53 @@ export default function Contact() {
                         value={formData.company}
                         onChange={handleChange}
                         placeholder="Your Company"
-                        className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-accent focus:ring-2 focus:ring-accent/20 outline-none transition-all bg-gray-50 focus:bg-white"
+                        className="w-full px-4 py-3 rounded-xl border border-white/10 focus:border-white/30 focus:ring-2 focus:ring-white/10 outline-none transition-all bg-white/5 text-white placeholder:text-white/30 focus:bg-white/10"
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label className="block text-sm font-medium text-white/70 mb-2">
                         Service Interested In
                       </label>
                       <select
                         name="service"
                         value={formData.service}
                         onChange={handleChange}
-                        className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-accent focus:ring-2 focus:ring-accent/20 outline-none transition-all bg-gray-50 focus:bg-white"
+                        className="w-full px-4 py-3 rounded-xl border border-white/10 focus:border-white/30 focus:ring-2 focus:ring-white/10 outline-none transition-all bg-white/5 text-white focus:bg-white/10"
                       >
-                        <option value="">Select a service</option>
-                        <option value="brand-strategy">Brand Strategy</option>
-                        <option value="visual-identity">Visual Identity</option>
-                        <option value="digital-design">Digital Design</option>
-                        <option value="motion-graphics">Motion Graphics</option>
-                        <option value="brand-growth">Brand Growth</option>
-                        <option value="brand-guidelines">
+                        <option value="" className="bg-neutral-900">
+                          Select a service
+                        </option>
+                        <option
+                          value="brand-strategy"
+                          className="bg-neutral-900"
+                        >
+                          Brand Strategy
+                        </option>
+                        <option
+                          value="visual-identity"
+                          className="bg-neutral-900"
+                        >
+                          Visual Identity
+                        </option>
+                        <option
+                          value="digital-design"
+                          className="bg-neutral-900"
+                        >
+                          Digital Design
+                        </option>
+                        <option
+                          value="motion-graphics"
+                          className="bg-neutral-900"
+                        >
+                          Motion Graphics
+                        </option>
+                        <option value="brand-growth" className="bg-neutral-900">
+                          Brand Growth
+                        </option>
+                        <option
+                          value="brand-guidelines"
+                          className="bg-neutral-900"
+                        >
                           Brand Guidelines
                         </option>
                       </select>
@@ -223,7 +269,7 @@ export default function Contact() {
                   </div> */}
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-white/70 mb-2">
                       Project Details *
                     </label>
                     <textarea
@@ -233,13 +279,13 @@ export default function Contact() {
                       value={formData.message}
                       onChange={handleChange}
                       placeholder="Tell us about your project, goals, and timeline..."
-                      className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-accent focus:ring-2 focus:ring-accent/20 outline-none transition-all bg-gray-50 focus:bg-white resize-none"
+                      className="w-full px-4 py-3 rounded-xl border border-white/10 focus:border-white/30 focus:ring-2 focus:ring-white/10 outline-none transition-all bg-white/5 text-white placeholder:text-white/30 focus:bg-white/10 resize-none"
                     />
                   </div>
 
                   <button
                     type="submit"
-                    className="group w-full sm:w-auto px-8 py-4 bg-accent text-white rounded-xl font-semibold text-lg hover:bg-accent-dark transition-all duration-300 shadow-lg hover:shadow-xl btn-shine flex items-center justify-center gap-2"
+                    className="group w-full sm:w-auto px-8 py-4 bg-white text-black rounded-xl font-semibold text-lg hover:bg-white/90 transition-all duration-300 shadow-lg hover:shadow-xl flex items-center justify-center gap-2"
                   >
                     Send Message
                     <Send className="w-5 h-5 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
@@ -274,8 +320,8 @@ export default function Contact() {
               </div>
 
               {/* FAQ */}
-              <div className="bg-surface rounded-2xl p-8">
-                <h3 className="text-xl font-bold text-gray-900 mb-6">
+              <div className="bg-white/5 rounded-2xl p-8">
+                <h3 className="text-xl font-bold text-white mb-6">
                   Frequently Asked
                 </h3>
                 <div className="space-y-4">
@@ -294,10 +340,10 @@ export default function Contact() {
                     },
                   ].map((faq) => (
                     <div key={faq.q}>
-                      <h4 className="font-semibold text-gray-900 text-sm">
+                      <h4 className="font-semibold text-white text-sm">
                         {faq.q}
                       </h4>
-                      <p className="text-gray-500 text-sm mt-1">{faq.a}</p>
+                      <p className="text-white/50 text-sm mt-1">{faq.a}</p>
                     </div>
                   ))}
                 </div>

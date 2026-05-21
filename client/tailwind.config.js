@@ -27,6 +27,11 @@ export default {
           transform: 'translateY(-6px)',
         },
       },
+      pulseRing: {
+        "0%":  { boxShadow: "0 0 0 0 rgba(124,58,237,0.55), 0 8px 32px rgba(124,58,237,0.45)" },
+        "60%": { boxShadow: "0 0 0 14px rgba(124,58,237,0), 0 8px 32px rgba(124,58,237,0.45)" },
+        "100%":{ boxShadow: "0 0 0 0 rgba(124,58,237,0), 0 8px 32px rgba(124,58,237,0.45)" },
+      },
     },
   },
 }

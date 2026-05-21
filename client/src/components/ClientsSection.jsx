@@ -85,16 +85,16 @@ export default function ClientsSection() {
   const marqueeClients = [...clients, ...clients];
 
   return (
-    <section className="py-24 bg-surface overflow-hidden">
+    <section className="py-24 bg-black overflow-hidden">
       {/* Heading */}
       <div className="max-w-3xl mx-auto text-center mb-14 px-4">
-        <span className="text-accent font-semibold text-sm uppercase tracking-wider">
+        <span className="text-white/50 font-semibold text-sm uppercase tracking-wider">
           Trusted By
         </span>
-        <h2 className="mt-4 text-4xl sm:text-5xl font-bold text-gray-900 tracking-tight">
+        <h2 className="mt-4 text-4xl sm:text-5xl font-bold text-white tracking-tight">
           Brands that believe in bold
         </h2>
-        <p className="mt-4 text-gray-500 text-lg max-w-xl mx-auto leading-relaxed">
+        <p className="mt-4 text-white/60 text-lg max-w-xl mx-auto leading-relaxed">
           From startups to global enterprises, we've helped visionary teams
           build identities that endure.
         </p>
@@ -103,8 +103,8 @@ export default function ClientsSection() {
       {/* Marquee row */}
       <div className="relative">
         {/* Fade edges */}
-        <div className="pointer-events-none absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-surface to-transparent z-10" />
-        <div className="pointer-events-none absolute inset-y-0 right-0 w-24 bg-gradient-to-l from-surface to-transparent z-10" />
+        <div className="pointer-events-none absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-black to-transparent z-10" />
+        <div className="pointer-events-none absolute inset-y-0 right-0 w-24 bg-gradient-to-l from-black to-transparent z-10" />
 
         <div className="flex animate-marquee-right">
           {marqueeClients.map((client, i) => (
@@ -112,7 +112,7 @@ export default function ClientsSection() {
               key={i}
               className="group flex-shrink-0 mx-4 sm:mx-6"
             >
-              <div className="flex items-center justify-center px-8 py-5 rounded-2xl bg-white border border-gray-100 shadow-sm hover:shadow-md hover:border-accent/20 transition-all duration-300 text-gray-400 hover:text-accent [&_svg]:transition-colors duration-300">
+              <div className="flex items-center justify-center px-8 py-5 rounded-2xl bg-white/5 border border-white/10 shadow-sm hover:shadow-md hover:border-white/25 transition-all duration-300 text-white/40 hover:text-white [&_svg]:transition-colors duration-300">
                 {client.logo}
               </div>
             </div>

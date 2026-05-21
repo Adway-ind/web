@@ -192,7 +192,7 @@ function ImageSlider({ images, title }) {
   return (
     <div className="relative">
       {/* Main image */}
-      <div className="relative aspect-[16/10] rounded-2xl overflow-hidden bg-gray-100">
+      <div className="relative aspect-[16/10] rounded-2xl overflow-hidden bg-white/5">
         {images.map((img, i) => (
           <div
             key={i}
@@ -235,7 +235,7 @@ function ImageSlider({ images, title }) {
             onClick={() => goTo(i)}
             className={`shrink-0 w-20 h-14 sm:w-24 sm:h-16 rounded-lg overflow-hidden transition-all duration-300 border-2 ${
               i === current
-                ? 'border-accent opacity-100 scale-105'
+                ? 'border-white opacity-100 scale-105'
                 : 'border-transparent opacity-50 hover:opacity-80'
             }`}
           >
@@ -255,11 +255,11 @@ export default function PortfolioDetail() {
 
   if (!project) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-white">
+      <div className="min-h-screen flex items-center justify-center bg-black">
         <div className="text-center">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">Project not found</h1>
-          <p className="text-gray-500 mb-8">The project you're looking for doesn't exist.</p>
-          <Link to="/portfolio" className="inline-flex items-center gap-2 text-accent font-semibold hover:gap-3 transition-all">
+          <h1 className="text-4xl font-bold text-white mb-4">Project not found</h1>
+          <p className="text-white/50 mb-8">The project you're looking for doesn't exist.</p>
+          <Link to="/portfolio" className="inline-flex items-center gap-2 text-white font-semibold hover:gap-3 transition-all">
             <ArrowLeft className="w-4 h-4" /> Back to Portfolio
           </Link>
         </div>
@@ -275,7 +275,7 @@ export default function PortfolioDetail() {
   return (
     <>
       {/* Top bar */}
-      <div className="bg-primary pt-24">
+      <div className="bg-black pt-24">
         <div className="max-w-6xl mx-auto px-6 lg:px-8 pb-8">
           <button
             onClick={() => navigate('/portfolio')}
@@ -288,38 +288,38 @@ export default function PortfolioDetail() {
       </div>
 
       {/* Hero area with slider */}
-      <section className="bg-primary pb-20">
+      <section className="bg-black pb-20">
         <div className="max-w-6xl mx-auto px-6 lg:px-8">
           <ImageSlider images={project.images} title={project.title} />
         </div>
       </section>
 
       {/* Content */}
-      <section className="py-20 bg-white">
+      <section className="py-20 bg-neutral-950">
         <div className="max-w-6xl mx-auto px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-16">
             {/* Main content */}
             <div className="lg:col-span-2">
-              <span className="text-accent text-sm font-semibold uppercase tracking-wider">
+              <span className="text-white/50 text-sm font-semibold uppercase tracking-wider">
                 {project.category}
               </span>
-              <h1 className="mt-4 text-4xl sm:text-5xl font-bold text-gray-900 tracking-tight leading-tight">
+              <h1 className="mt-4 text-4xl sm:text-5xl font-bold text-white tracking-tight leading-tight">
                 {project.title}
               </h1>
-              <p className="mt-6 text-gray-500 text-lg leading-relaxed">
+              <p className="mt-6 text-white/60 text-lg leading-relaxed">
                 {project.desc}
               </p>
 
               {/* Challenge */}
               <div className="mt-12">
-                <h2 className="text-2xl font-bold text-gray-900 mb-4">The Challenge</h2>
-                <p className="text-gray-500 leading-relaxed">{project.challenge}</p>
+                <h2 className="text-2xl font-bold text-white mb-4">The Challenge</h2>
+                <p className="text-white/60 leading-relaxed">{project.challenge}</p>
               </div>
 
               {/* Result */}
               <div className="mt-10">
-                <h2 className="text-2xl font-bold text-gray-900 mb-4">The Result</h2>
-                <p className="text-gray-500 leading-relaxed">{project.result}</p>
+                <h2 className="text-2xl font-bold text-white mb-4">The Result</h2>
+                <p className="text-white/60 leading-relaxed">{project.result}</p>
               </div>
             </div>
 
@@ -327,45 +327,45 @@ export default function PortfolioDetail() {
             <div className="lg:col-span-1">
               <div className="sticky top-28 space-y-8">
                 {/* Info card */}
-                <div className="p-6 rounded-2xl bg-surface border border-gray-100">
-                  <h3 className="text-sm font-semibold text-gray-900 uppercase tracking-wider mb-5">
+                <div className="p-6 rounded-2xl bg-white/5 border border-white/10">
+                  <h3 className="text-sm font-semibold text-white uppercase tracking-wider mb-5">
                     Project Info
                   </h3>
                   <div className="space-y-4">
                     <div className="flex items-start gap-3">
-                      <Tag className="w-4 h-4 text-accent mt-0.5 shrink-0" />
+                      <Tag className="w-4 h-4 text-white/40 mt-0.5 shrink-0" />
                       <div>
-                        <div className="text-xs text-gray-400 font-medium">Category</div>
-                        <div className="text-sm text-gray-900 font-medium">{project.category}</div>
+                        <div className="text-xs text-white/40 font-medium">Category</div>
+                        <div className="text-sm text-white font-medium">{project.category}</div>
                       </div>
                     </div>
                     <div className="flex items-start gap-3">
-                      <Calendar className="w-4 h-4 text-accent mt-0.5 shrink-0" />
+                      <Calendar className="w-4 h-4 text-white/40 mt-0.5 shrink-0" />
                       <div>
-                        <div className="text-xs text-gray-400 font-medium">Year</div>
-                        <div className="text-sm text-gray-900 font-medium">{project.year}</div>
+                        <div className="text-xs text-white/40 font-medium">Year</div>
+                        <div className="text-sm text-white font-medium">{project.year}</div>
                       </div>
                     </div>
                     <div className="flex items-start gap-3">
-                      <User className="w-4 h-4 text-accent mt-0.5 shrink-0" />
+                      <User className="w-4 h-4 text-white/40 mt-0.5 shrink-0" />
                       <div>
-                        <div className="text-xs text-gray-400 font-medium">Client</div>
-                        <div className="text-sm text-gray-900 font-medium">{project.client}</div>
+                        <div className="text-xs text-white/40 font-medium">Client</div>
+                        <div className="text-sm text-white font-medium">{project.client}</div>
                       </div>
                     </div>
                   </div>
                 </div>
 
                 {/* Tags */}
-                <div className="p-6 rounded-2xl bg-surface border border-gray-100">
-                  <h3 className="text-sm font-semibold text-gray-900 uppercase tracking-wider mb-4">
+                <div className="p-6 rounded-2xl bg-white/5 border border-white/10">
+                  <h3 className="text-sm font-semibold text-white uppercase tracking-wider mb-4">
                     Deliverables
                   </h3>
                   <div className="flex flex-wrap gap-2">
                     {project.tags.map((tag) => (
                       <span
                         key={tag}
-                        className="px-3 py-1.5 bg-white text-gray-600 rounded-full text-xs font-medium border border-gray-200"
+                        className="px-3 py-1.5 bg-white/5 text-white/60 rounded-full text-xs font-medium border border-white/10"
                       >
                         {tag}
                       </span>
@@ -376,7 +376,7 @@ export default function PortfolioDetail() {
                 {/* CTA */}
                 <Link
                   to="/contact"
-                  className="group flex items-center justify-center gap-2 w-full px-6 py-4 bg-accent text-white rounded-xl font-semibold hover:bg-accent-dark transition-all duration-300 shadow-lg shadow-accent/20 btn-shine"
+                  className="group flex items-center justify-center gap-2 w-full px-6 py-4 bg-white text-black rounded-xl font-semibold hover:bg-white/90 transition-all duration-300 shadow-lg"
                 >
                   Start a Similar Project
                   <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
@@ -388,38 +388,38 @@ export default function PortfolioDetail() {
       </section>
 
       {/* Project navigation */}
-      <section className="py-16 bg-surface border-t border-gray-100">
+      <section className="py-16 bg-black border-t border-white/10">
         <div className="max-w-6xl mx-auto px-6 lg:px-8">
           <div className="flex items-center justify-between">
             <Link
               to={`/portfolio/${prevSlug}`}
-              className="group flex items-center gap-3 text-gray-500 hover:text-gray-900 transition-colors"
+              className="group flex items-center gap-3 text-white/50 hover:text-white transition-colors"
             >
-              <div className="w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center group-hover:border-accent group-hover:text-accent transition-all">
+              <div className="w-10 h-10 rounded-full border border-white/20 flex items-center justify-center group-hover:border-white group-hover:text-white transition-all">
                 <ChevronLeft className="w-5 h-5" />
               </div>
               <div className="hidden sm:block">
-                <div className="text-xs text-gray-400 font-medium">Previous</div>
+                <div className="text-xs text-white/40 font-medium">Previous</div>
                 <div className="text-sm font-semibold">{projectsData[prevSlug].title}</div>
               </div>
             </Link>
 
             <Link
               to="/portfolio"
-              className="text-sm text-gray-400 hover:text-accent font-medium transition-colors"
+              className="text-sm text-white/40 hover:text-white font-medium transition-colors"
             >
               View All
             </Link>
 
             <Link
               to={`/portfolio/${nextSlug}`}
-              className="group flex items-center gap-3 text-gray-500 hover:text-gray-900 transition-colors"
+              className="group flex items-center gap-3 text-white/50 hover:text-white transition-colors"
             >
               <div className="hidden sm:block text-right">
-                <div className="text-xs text-gray-400 font-medium">Next</div>
+                <div className="text-xs text-white/40 font-medium">Next</div>
                 <div className="text-sm font-semibold">{projectsData[nextSlug].title}</div>
               </div>
-              <div className="w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center group-hover:border-accent group-hover:text-accent transition-all">
+              <div className="w-10 h-10 rounded-full border border-white/20 flex items-center justify-center group-hover:border-white group-hover:text-white transition-all">
                 <ChevronRight className="w-5 h-5" />
               </div>
             </Link>

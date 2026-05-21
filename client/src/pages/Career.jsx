@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { ChevronDown, ArrowRight, ArrowUpRight } from "lucide-react";
+import Video from "../assets/video/carrer-one.mp4";
 
 /* ─── Animated counter ─── */
 function useCountUp(end, duration = 2000) {
@@ -128,25 +129,25 @@ function AccordionRow({ category, isOpen, onToggle }) {
       <button
         onClick={onToggle}
         className={`w-full flex items-center justify-between px-0 sm:px-2 transition-colors duration-300 group ${
-          isOpen ? "bg-transparent" : "hover:bg-gray-100"
+          isOpen ? "bg-transparent" : "hover:bg-white/5"
         }`}
         style={{ height: "88px" }}
       >
         <div className="flex items-center gap-4 sm:gap-6">
-          <span className="text-xs font-medium text-gray-400 tabular-nums w-6">
+          <span className="text-xs font-medium text-white/30 tabular-nums w-6">
             {String(categories.indexOf(category) + 1).padStart(2, "0")}
           </span>
-          <span className="text-lg sm:text-xl font-semibold text-gray-900 tracking-tight">
+          <span className="text-lg sm:text-xl font-semibold text-white tracking-tight">
             {category.title}
           </span>
-          <span className="text-sm text-gray-400 font-medium">
+          <span className="text-sm text-white/30 font-medium">
             {category.count}
           </span>
         </div>
         <div
           className={`transition-transform duration-300 ${isOpen ? "rotate-180" : "group-hover:translate-y-0.5"}`}
         >
-          <ChevronDown className="w-5 h-5 text-gray-400" strokeWidth={1.5} />
+          <ChevronDown className="w-5 h-5 text-white/30" strokeWidth={1.5} />
         </div>
       </button>
 
@@ -159,20 +160,20 @@ function AccordionRow({ category, isOpen, onToggle }) {
           {category.roles.map((role) => (
             <Link
               key={role.title}
-              to="/contact"
-              className="group/role flex flex-col sm:flex-row sm:items-center justify-between py-5 border-b border-gray-200 last:border-0 hover:pl-2 transition-all duration-200"
+              to={`/apply?role=${encodeURIComponent(role.title)}`}
+              className="group/role flex flex-col sm:flex-row sm:items-center justify-between py-5 border-b border-white/10 last:border-0 hover:pl-2 transition-all duration-200"
             >
               <div>
-                <h4 className="text-base font-medium text-gray-900 group-hover/role:text-accent transition-colors">
+                <h4 className="text-base font-medium text-white group-hover/role:text-white/80 transition-colors">
                   {role.title}
                 </h4>
-                <div className="flex items-center gap-3 mt-1 text-sm text-gray-400">
+                <div className="flex items-center gap-3 mt-1 text-sm text-white/30">
                   <span>{role.location}</span>
-                  <span className="w-1 h-1 bg-gray-300 rounded-full" />
+                  <span className="w-1 h-1 bg-white/20 rounded-full" />
                   <span>{role.type}</span>
                 </div>
               </div>
-              <ArrowUpRight className="w-4 h-4 text-gray-300 group-hover/role:text-accent transition-colors mt-2 sm:mt-0 shrink-0" />
+              <ArrowUpRight className="w-4 h-4 text-white/20 group-hover/role:text-white/80 transition-colors mt-2 sm:mt-0 shrink-0" />
             </Link>
           ))}
         </div>
@@ -203,12 +204,25 @@ export default function Career() {
   return (
     <>
       {/* ═══ HERO ═══ */}
-      <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden bg-primary ">
+      <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden bg-black ">
         <div className="absolute inset-0">
           <div className="absolute inset-0">
-            <div className="absolute top-0 right-0 w-96 h-96 bg-accent/10 rounded-full blur-3xl" />
-            <div className="absolute bottom-0 left-0 w-72 h-72 bg-purple-500/10 rounded-full blur-3xl" />
+            <div className="absolute top-0 right-0 w-96 h-96 bg-white/5 rounded-full blur-3xl" />
+            <div className="absolute bottom-0 left-0 w-72 h-72 bg-purple-500/5 rounded-full blur-3xl" />
           </div>
+          <video
+            autoPlay
+            muted
+            loop
+            playsInline
+            preload="auto"
+            className="absolute inset-0 w-full h-full object-cover"
+          >
+            <source src={Video} type="video/mp4" />
+          </video>
+
+          {/* Overlay */}
+          <div className="absolute inset-0 bg-black/70" />
         </div>
 
         <div
@@ -255,12 +269,12 @@ export default function Career() {
       </section>
 
       {/* ═══ PERKS ═══ */}
-      <section className="py-28 bg-white">
-        <div className="max-w-5xl mx-auto px-6 lg:px-8">
-          <p className="text-xs uppercase tracking-[0.25em] text-gray-400 font-medium mb-4 text-center">
+      <section className="py-28 bg-neutral-950">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8">
+          <p className="text-xs uppercase tracking-[0.25em] text-white/40 font-medium mb-4 text-center">
             Why Adway
           </p>
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-medium text-gray-900 tracking-[-0.02em] text-center mb-20">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-medium text-white tracking-[-0.02em] text-center mb-20">
             Perks that power
             <br className="sm:hidden" /> your best work
           </h2>
@@ -269,15 +283,15 @@ export default function Career() {
             {perks.map((perk, i) => (
               <div key={perk.title} className="group">
                 <div className="flex items-center gap-3 mb-3">
-                  <span className="text-xs font-medium text-gray-300 tabular-nums">
+                  <span className="text-xs font-medium text-white/20 tabular-nums">
                     {String(i + 1).padStart(2, "0")}
                   </span>
-                  <div className="h-px flex-1 bg-gray-100" />
+                  <div className="h-px flex-1 bg-white/10" />
                 </div>
-                <h3 className="text-base font-semibold text-gray-900 mb-1.5">
+                <h3 className="text-base font-semibold text-white mb-1.5">
                   {perk.title}
                 </h3>
-                <p className="text-sm text-gray-400 leading-relaxed font-medium">
+                <p className="text-sm text-white/40 leading-relaxed font-medium">
                   {perk.desc}
                 </p>
               </div>
@@ -287,24 +301,24 @@ export default function Career() {
       </section>
 
       {/* ═══ CULTURE ═══ */}
-      <section className="py-28 bg-[#F5F5F5]">
-        <div className="max-w-5xl mx-auto px-6 lg:px-8">
+      <section className="py-28 bg-black">
+        <div className="max-w-6xl mx-auto px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 items-center">
             <div>
-              <p className="text-xs uppercase tracking-[0.25em] text-gray-400 font-medium mb-4">
+              <p className="text-xs uppercase tracking-[0.25em] text-white/40 font-medium mb-4">
                 Our Culture
               </p>
-              <h2 className="text-3xl sm:text-4xl md:text-5xl font-semibold text-gray-900 tracking-[-0.02em] leading-[1.1]">
+              <h2 className="text-3xl sm:text-4xl md:text-5xl font-semibold text-white tracking-[-0.02em] leading-[1.1]">
                 Where creativity
                 <br />
                 meets purpose
               </h2>
-              <p className="mt-8 text-gray-400 leading-relaxed font-medium">
+              <p className="mt-8 text-white/40 leading-relaxed font-medium">
                 At Adway, you won't just make things look good — you'll make
                 them mean something. Every brand has a story worth telling, and
                 every team member has a voice worth hearing.
               </p>
-              <p className="mt-4 text-gray-400 leading-relaxed font-medium">
+              <p className="mt-4 text-white/40 leading-relaxed font-medium">
                 No egos, no silos — just a shared passion for craft and impact.
                 We collaborate across disciplines and celebrate bold ideas.
               </p>
@@ -349,22 +363,22 @@ export default function Career() {
       </section>
 
       {/* ═══ CURRENT OPENINGS — Premium Minimal ═══ */}
-      <section id="openings" className="py-28 bg-[#F5F5F5]">
+      <section id="openings" className="py-28 bg-neutral-950">
         <div className="max-w-[1200px] mx-auto px-6 lg:px-8">
           {/* Heading */}
           <div className="text-center mb-20">
-            <h2 className="text-5xl sm:text-6xl md:text-7xl lg:text-[80px] font-semibold text-gray-900 tracking-[-0.03em] leading-[1.05]">
+            <h2 className="text-5xl sm:text-6xl md:text-7xl lg:text-[80px] font-semibold text-white tracking-[-0.03em] leading-[1.05]">
               Current Openings
             </h2>
-            <p className="mt-6 text-base sm:text-lg text-gray-400 font-light max-w-lg mx-auto">
+            <p className="mt-6 text-base sm:text-lg text-white/40 font-light max-w-lg mx-auto">
               Become part of a high-performing & collaborative team
             </p>
           </div>
 
           {/* Accordion */}
-          <div className="border-t border-gray-300">
+          <div className="border-t border-white/10">
             {categories.map((cat, i) => (
-              <div key={cat.title} className="border-b border-gray-300">
+              <div key={cat.title} className="border-b border-white/10">
                 <AccordionRow
                   category={cat}
                   isOpen={openIndex === i}
@@ -377,8 +391,8 @@ export default function Career() {
           {/* CTA Button */}
           <div className="flex justify-center mt-16">
             <Link
-              to="/contact"
-              className="group inline-flex items-center gap-2 text-sm font-medium text-gray-900 border border-gray-900 px-8 py-4 rounded-full hover:bg-gray-900 hover:text-white transition-all duration-300"
+              to="/apply"
+              className="group inline-flex items-center gap-2 text-sm font-medium text-white border border-white/20 px-8 py-4 rounded-full hover:bg-white hover:text-black transition-all duration-300"
             >
               See all openings
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-300" />
@@ -388,21 +402,21 @@ export default function Career() {
       </section>
 
       {/* ═══ BOTTOM CTA ═══ */}
-      <section className="py-28 bg-[#0a0a0f] relative overflow-hidden">
+      <section className="py-28 bg-black relative overflow-hidden">
         <div className="absolute inset-0">
-          <div className="absolute top-0 right-1/3 w-96 h-96 bg-accent/8 rounded-full blur-[120px]" />
+          <div className="absolute top-0 right-1/3 w-96 h-96 bg-white/5 rounded-full blur-[120px]" />
         </div>
         <div className="relative max-w-2xl mx-auto px-6 lg:px-8 text-center">
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-light text-white tracking-[-0.02em]">
             Don't see your role?
           </h2>
-          <p className="mt-6 text-gray-500 font-light max-w-md mx-auto">
+          <p className="mt-6 text-white/40 font-light max-w-md mx-auto">
             We're always open to exceptional talent. Send us your portfolio and
             tell us how you'd make an impact.
           </p>
           <Link
-            to="/contact"
-            className="group inline-flex items-center gap-2 mt-10 text-sm font-medium text-white border border-white/20 px-8 py-4 rounded-full hover:bg-white hover:text-gray-900 transition-all duration-300"
+            to="/apply"
+            className="group inline-flex items-center gap-2 mt-10 text-sm font-medium text-white border border-white/20 px-8 py-4 rounded-full hover:bg-white hover:text-black transition-all duration-300"
           >
             Send Open Application
             <ArrowUpRight className="w-4 h-4 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform duration-300" />

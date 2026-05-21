@@ -17,32 +17,25 @@ import {
 import Client from "../components/ClientsSection";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay } from "swiper/modules";
+import VideoSlide from "../assets/video/slide/video-slide-3.mp4";
 
 import "swiper/css";
 
-/* ───── Real images from Unsplash ───── */
+/* ───── Hero text slides (video is the shared background) ───── */
 const heroSlides = [
   {
-    image:
-      "https://images.unsplash.com/photo-1770885653473-ca48b4d69173?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHx0b3BpYy1mZWVkfDV8Q0R3dXdYSkFiRXd8fGVufDB8fHx8fA%3D%3D",
     title: "We craft brands",
     highlight: "that inspire",
   },
   {
-    image:
-      "https://plus.unsplash.com/premium_photo-1778573142747-8332b2c8fc4b?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHx0b3BpYy1mZWVkfDZ8Q0R3dXdYSkFiRXd8fGVufDB8fHx8fA%3D%3D",
     title: "Design that",
     highlight: "captures",
   },
   {
-    image:
-      "https://images.unsplash.com/photo-1761998066466-86bd7a1c00ba?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHx0b3BpYy1mZWVkfDQ5fENEd3V3WEpBYkV3fHxlbnwwfHx8fHw%3D",
     title: "Strategy that",
     highlight: "elevates",
   },
   {
-    image:
-      "https://images.unsplash.com/photo-1734779205331-4566d6965fa2?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHx0b3BpYy1mZWVkfDgzfENEd3V3WEpBYkV3fHxlbnwwfHx8fHw%3D",
     title: "Identity that",
     highlight: "resonates",
   },
@@ -180,25 +173,28 @@ function HeroSlider() {
   const slide = heroSlides[current];
 
   return (
-    <section className="relative min-h-screen flex items-center justify-left overflow-hidden">
-      {/* Background images – crossfade */}
-      {heroSlides.map((s, i) => (
-        <div
-          key={i}
-          className="absolute inset-0 transition-opacity duration-[1200ms] ease-in-out"
-          style={{ opacity: i === current ? 1 : 0 }}
-        >
-          <img src={s.image} alt="" className="w-full h-full object-cover" />
-          {/* Dark overlay */}
-          <div className="absolute inset-0 bg-primary/70" />
-          {/* Gradient overlay bottom */}
-          <div className="absolute inset-0 bg-gradient-to-t from-primary/90 via-transparent to-primary/40" />
-        </div>
-      ))}
+    <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-black">
+      {/* 1. SINGLE SHARED VIDEO BACKDROP (Plays continuously across text shifts) */}
+      <div className="absolute inset-0 w-full h-full overflow-hidden pointer-events-none select-none z-0">
+        <video
+          src={VideoSlide}
+          autoPlay
+          muted
+          loop
+          playsInline
+          className="w-full h-full object-cover scale-105"
+        />
+
+        {/* Dark Base Tint Overlay */}
+        <div className="absolute inset-0 bg-black/20" />
+
+        {/* Advanced Cinematographic Vignette Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-black/60 opacity-90" />
+      </div>
 
       {/* Grid overlay */}
       <div
-        className="absolute inset-0 opacity-[0.03] z-[1]"
+        className="absolute inset-0 opacity-[0.03] z-[1] pointer-events-none"
         style={{
           backgroundImage:
             "linear-gradient(rgba(255,255,255,.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.1) 1px, transparent 1px)",
@@ -206,98 +202,104 @@ function HeroSlider() {
         }}
       />
 
-      {/* Content */}
-      <div className="relative z-10 max-w-7xl mx-48 px-4 sm:px-6 lg:px-8 py-32 text-left">
-        <div key={`badge-${current}`} className="animate-fade-in-up">
-          <span className="inline-block px-4 py-2 bg-accent/10 border border-accent/20 text-amber-50 rounded-full text-sm font-medium mb-8 backdrop-blur-sm">
-            Award-Winning Branding Agency
-          </span>
-        </div>
-
-        <h1
-          key={`title-${current}`}
-          className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold text-white leading-[1.05] tracking-tight animate-fade-in-up animation-delay-200"
-        >
-          {slide.title}
-          <br />
-          that <span className="gradient-text">{slide.highlight}</span>
-        </h1>
-
-        <p
-          key={`desc-${current}`}
-          className="mt-8 text-lg sm:text-xl text-white/60 max-w-2xl leading-relaxed animate-fade-in-up animation-delay-400"
-        >
-          From strategy to visual identity, we create brand experiences that
-          captivate audiences and drive business growth.
-        </p>
-
-        <div className="mt-10 flex flex-col sm:flex-row items-start sm:items-center gap-4 animate-fade-in-up animation-delay-600">
-          <Link
-            to="/contact"
-            className="group px-8 py-4 bg-accent text-white rounded-full font-semibold text-lg hover:bg-accent-dark transition-all duration-300 shadow-lg shadow-accent/25 hover:shadow-xl hover:shadow-accent/30 hover:-translate-y-0.5 btn-shine flex items-center gap-2"
+      {/* Content Layer Container */}
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-32 text-center flex flex-col items-center justify-center min-h-screen w-full">
+        {/* TEXT CONTENT CAROUSEL LOOP */}
+        {heroSlides.map((slide, i) => (
+          <div
+            key={i}
+            className="absolute inset-0 flex flex-col items-center justify-center transition-all duration-[1200ms] ease-in-out px-4 max-w-7xl mx-auto"
+            style={{
+              opacity: i === current ? 1 : 0,
+              pointerEvents: i === current ? "auto" : "none",
+              transform:
+                i === current
+                  ? "scale(1) translateY(0px)"
+                  : "scale(0.98) translateY(15px)",
+            }}
           >
-            Start Your Project
-            <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-          </Link>
-          <Link
-            to="/portfolio"
-            className="group px-8 py-4 bg-white/10 text-white border border-white/20 rounded-full font-semibold text-lg hover:bg-white/20 transition-all duration-300 backdrop-blur-sm flex items-center gap-2"
-          >
-            View Our Work
-            <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-          </Link>
-        </div>
+            {/* Badge */}
+            <div key={`badge-${current}`} className="animate-fade-in-up">
+              <span className="inline-block px-4 py-2 bg-white/10 border border-white/20 text-white rounded-full text-sm font-medium mb-8 backdrop-blur-sm">
+                Award-Winning Branding Agency
+              </span>
+            </div>
 
-        {/* Slider nav arrows */}
-        <div className="mt-14 flex items-center gap-4">
-          <button
-            onClick={prev}
-            className="w-12 h-12 rounded-full border border-white/20 flex items-center justify-center text-white/60 hover:bg-white/10 hover:text-white hover:border-white/40 transition-all duration-300"
-            aria-label="Previous slide"
-          >
-            <ChevronLeft className="w-5 h-5" />
-          </button>
+            {/* Heading */}
+            <h1
+              key={`title-${current}`}
+              className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold text-white leading-[1.05] tracking-tight animate-fade-in-up animation-delay-200 mx-auto"
+            >
+              {slide.title}
+              <br />
+              that <span className="gradient-text">{slide.highlight}</span>
+            </h1>
 
-          {/* Dots */}
-          {/* <div className="flex items-center gap-2">
-            {heroSlides.map((_, i) => (
+            {/* Description */}
+            <p
+              key={`desc-${current}`}
+              className="mt-8 text-lg sm:text-xl text-white/80 max-w-2xl leading-relaxed animate-fade-in-up animation-delay-400 mx-auto"
+            >
+              From strategy to visual identity, we create brand experiences that
+              captivate audiences and drive business growth.
+            </p>
+
+            {/* Action Buttons */}
+            <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4 animate-fade-in-up animation-delay-600 w-full">
+              <Link
+                to="/contact"
+                className="group w-full sm:w-auto px-8 py-4 bg-white text-black rounded-md font-semibold text-lg hover:bg-white/90 transition-all duration-300 shadow-lg shadow-white/10 hover:shadow-xl hover:shadow-white/20 hover:-translate-y-0.5 flex items-center justify-center gap-2"
+              >
+                Start Your Project
+                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+              </Link>
+              <Link
+                to="/portfolio"
+                className="group w-full sm:w-auto px-8 py-4 bg-white/10 text-white border border-white/20 rounded-md font-semibold text-lg hover:bg-white/20 transition-all duration-300 backdrop-blur-sm flex items-center justify-center gap-2"
+              >
+                View Our Work
+                <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+              </Link>
+            </div>
+
+            {/* Slider nav arrows */}
+            <div className="mt-14 flex items-center justify-center gap-4 w-full">
               <button
-                key={i}
-                onClick={() => goTo(i)}
-                aria-label={`Go to slide ${i + 1}`}
+                onClick={prev}
+                className="w-12 h-12 rounded-full border border-white/20 flex items-center justify-center text-white/60 hover:bg-white/10 hover:text-white hover:border-white/40 transition-all duration-300 pointer-events-auto"
+                aria-label="Previous slide"
+              >
+                <ChevronLeft className="w-5 h-5" />
+              </button>
+
+              {/* Dots (Uncomment if needed) */}
+              {/* <div className="flex items-center justify-center gap-2 pointer-events-auto">
+            {heroSlides.map((_, idx) => (
+              <button
+                key={idx}
+                onClick={() => goTo(idx)}
+                aria-label={`Go to slide ${idx + 1}`}
                 className={`h-2 rounded-full transition-all duration-500 ${
-                  i === current
-                    ? "w-8 bg-accent"
-                    : "w-2 bg-white/30 hover:bg-white/50"
+                  idx === current ? "w-8 bg-accent" : "w-2 bg-white/30 hover:bg-white/50"
                 }`}
               />
             ))}
           </div> */}
 
-          <button
-            onClick={next}
-            className="w-12 h-12 rounded-full border border-white/20 flex items-center justify-center text-white/60 hover:bg-white/10 hover:text-white hover:border-white/40 transition-all duration-300"
-            aria-label="Next slide"
-          >
-            <ChevronRight className="w-5 h-5" />
-          </button>
-        </div>
-
-        {/* Stats */}
-        {/* <div className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-8">
-          {stats.map((stat) => (
-            <div key={stat.label} className="text-left">
-              <div className="text-3xl sm:text-4xl font-bold text-white">
-                {stat.number}
-              </div>
-              <div className="text-sm text-white/40 mt-1">{stat.label}</div>
+              <button
+                onClick={next}
+                className="w-12 h-12 rounded-full border border-white/20 flex items-center justify-center text-white/60 hover:bg-white/10 hover:text-white hover:border-white/40 transition-all duration-300 pointer-events-auto"
+                aria-label="Next slide"
+              >
+                <ChevronRight className="w-5 h-5" />
+              </button>
             </div>
-          ))}
-        </div> */}
+          </div>
+        ))}
       </div>
 
       {/* Scroll indicator */}
-      <div className="absolute bottom-8 z-10 right-[50%]">
+      <div className="absolute bottom-8 z-10 left-1/2 -translate-x-1/2 pointer-events-none">
         <div className="w-6 h-10 border-2 border-white/20 rounded-full flex items-start justify-center p-1">
           <div className="w-1.5 h-3 bg-white/40 rounded-full animate-bounce" />
         </div>
@@ -314,42 +316,69 @@ export default function Home() {
       <HeroSlider />
 
       {/* Services Overview */}
-      <section className="py-24 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="relative py-24 bg-black overflow-hidden">
+        {/* Ambient Background Glows */}
+        <div className="absolute top-1/4 left-[-10%] w-[500px] h-[500px] rounded-full bg-purple-600/20 blur-[120px] pointer-events-none mix-blend-screen animate-pulse duration-[6000ms]" />
+        <div className="absolute bottom-1/4 right-[-10%] w-[600px] h-[600px] rounded-full bg-blue-600/15 blur-[140px] pointer-events-none mix-blend-screen animate-pulse duration-[8000ms]" />
+        <div className="absolute top-1/2 left-1/3 w-[400px] h-[400px] rounded-full bg-fuchsia-500/10 blur-[100px] pointer-events-none mix-blend-screen" />
+
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Header Content */}
           <div className="text-center max-w-3xl mx-auto mb-16">
-            <span className="text-accent font-semibold text-sm uppercase tracking-wider">
+            <span className="text-white/50 font-semibold text-sm uppercase tracking-wider">
               What We Do
             </span>
-            <h2 className="mt-4 text-4xl sm:text-5xl font-bold text-gray-900 tracking-tight">
+            <h2 className="mt-4 text-4xl sm:text-5xl font-bold text-white tracking-tight">
               Services built for impact
             </h2>
-            <p className="mt-4 text-lg text-gray-500">
+            <p className="mt-4 text-lg text-white/60">
               We offer a complete suite of branding services designed to
               transform your business into a memorable brand.
             </p>
           </div>
 
+          {/* Services Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {services.map((service) => (
               <div
                 key={service.title}
-                className="group p-8 rounded-2xl border border-gray-100 hover:border-accent/20 hover:shadow-xl hover:shadow-accent/5 transition-all duration-500 bg-white hover:-translate-y-1"
+                className="group relative p-8 rounded-2xl overflow-hidden border border-white/20 bg-gradient-to-br from-white/[0.07] to-white/[0.01] backdrop-blur-xl shadow-2xl shadow-black/40 hover:border-white/30 hover:from-white/[0.12] hover:to-white/[0.03] hover:-translate-y-1 transition-all duration-500"
               >
-                <div className="w-14 h-14 bg-accent/10 rounded-xl flex items-center justify-center mb-6 group-hover:bg-accent group-hover:scale-110 transition-all duration-300">
-                  <service.icon className="w-7 h-7 text-accent group-hover:text-white transition-colors" />
+                {/* 1. Realistic Glass Grain/Texture Layer */}
+                <div
+                  className="absolute inset-0 opacity-[0.03] mix-blend-overlay pointer-events-none select-none"
+                  style={{
+                    backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
+                  }}
+                />
+
+                {/* 2. Soft Inner Gloss Highlights */}
+                <div className="absolute inset-0 bg-gradient-to-b from-white/[0.05] to-transparent pointer-events-none" />
+
+                {/* 3. Card Content */}
+                <div className="relative z-10">
+                  {/* Icon Wrapper with Layered Glass Effect */}
+                  <div className="w-14 h-14 bg-gradient-to-br from-white/10 to-white/[0.02] border border-white/20 backdrop-blur-md rounded-xl flex items-center justify-center mb-6 group-hover:bg-white group-hover:scale-110 transition-all duration-300">
+                    <service.icon className="w-7 h-7 text-white group-hover:text-black transition-colors" />
+                  </div>
+
+                  {/* Text Styling */}
+                  <h3 className="text-xl font-bold text-white mb-3 tracking-wide">
+                    {service.title}
+                  </h3>
+                  <p className="text-white/70 text-sm leading-relaxed font-light">
+                    {service.desc}
+                  </p>
                 </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-3">
-                  {service.title}
-                </h3>
-                <p className="text-gray-500 leading-relaxed">{service.desc}</p>
               </div>
             ))}
           </div>
 
+          {/* Footer Link */}
           <div className="text-center mt-12">
             <Link
               to="/services"
-              className="group inline-flex items-center gap-2 text-accent font-semibold hover:gap-3 transition-all"
+              className="group inline-flex items-center gap-2 text-white font-semibold hover:gap-3 transition-all"
             >
               Explore All Services
               <ArrowRight className="w-4 h-4" />
@@ -359,23 +388,23 @@ export default function Home() {
       </section>
 
       {/* Portfolio Preview */}
-      <section className="py-24 bg-surface">
+      <section className="py-24 bg-neutral-950">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-16">
             <div>
-              <span className="text-accent font-semibold text-sm uppercase tracking-wider">
+              <span className="text-white/50 font-semibold text-sm uppercase tracking-wider">
                 Our Work
               </span>
-              <h2 className="mt-4 text-4xl sm:text-5xl font-bold text-gray-900 tracking-tight">
+              <h2 className="mt-4 text-4xl sm:text-5xl font-bold text-white tracking-tight">
                 Featured projects
               </h2>
-              <p className="mt-4 text-lg text-gray-500 max-w-xl">
+              <p className="mt-4 text-lg text-white/60 max-w-xl">
                 A selection of brands we've helped build, transform, and grow.
               </p>
             </div>
             <Link
               to="/portfolio"
-              className="group inline-flex items-center gap-2 text-accent font-semibold hover:gap-3 transition-all shrink-0"
+              className="group inline-flex items-center gap-2 text-white font-semibold hover:gap-3 transition-all shrink-0"
             >
               View All Projects
               <ArrowRight className="w-4 h-4" />
@@ -413,13 +442,13 @@ export default function Home() {
       </section>
 
       {/* Testimonials */}
-      <section className="py-24 bg-white">
+      <section className="py-24 bg-black">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-3xl mx-auto mb-16">
-            <span className="text-accent font-semibold text-sm uppercase tracking-wider">
+            <span className="text-white/50 font-semibold text-sm uppercase tracking-wider">
               Testimonials
             </span>
-            <h2 className="mt-4 text-4xl sm:text-5xl font-bold text-gray-900 tracking-tight">
+            <h2 className="mt-4 text-4xl sm:text-5xl font-bold text-white tracking-tight">
               What our clients say
             </h2>
           </div>
@@ -444,10 +473,10 @@ export default function Home() {
           >
             {testimonials.map((t) => (
               <SwiperSlide key={t.name}>
-                <div className="relative p-8 rounded-2xl bg-surface border border-gray-100 hover:border-accent/20 hover:shadow-lg transition-all duration-300 h-full">
-                  <Quote className="w-10 h-10 text-accent/20 mb-4" />
+                <div className="relative p-8 rounded-2xl bg-white/5 border border-white/10 hover:border-white/25 hover:shadow-lg transition-all duration-300 h-full">
+                  <Quote className="w-10 h-10 text-white/10 mb-4" />
 
-                  <p className="text-gray-600 leading-relaxed mb-6">{t.text}</p>
+                  <p className="text-white/70 leading-relaxed mb-6">{t.text}</p>
 
                   <div className="flex items-center gap-1 mb-4">
                     {[...Array(t.rating)].map((_, j) => (
@@ -459,8 +488,8 @@ export default function Home() {
                   </div>
 
                   <div>
-                    <div className="font-semibold text-gray-900">{t.name}</div>
-                    <div className="text-sm text-gray-500">{t.role}</div>
+                    <div className="font-semibold text-white">{t.name}</div>
+                    <div className="text-sm text-white/50">{t.role}</div>
                   </div>
                 </div>
               </SwiperSlide>
@@ -472,10 +501,10 @@ export default function Home() {
       <Client />
 
       {/* Process Section */}
-      <section className="py-24 bg-primary text-white">
+      <section className="py-24 bg-neutral-950 text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-3xl mx-auto mb-16">
-            <span className="text-accent font-semibold text-sm uppercase tracking-wider">
+            <span className="text-white/50 font-semibold text-sm uppercase tracking-wider">
               Our Process
             </span>
             <h2 className="mt-4 text-4xl sm:text-5xl font-bold tracking-tight">
@@ -483,7 +512,7 @@ export default function Home() {
             </h2>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {[
               {
                 step: "01",
@@ -506,8 +535,8 @@ export default function Home() {
                 desc: "Roll out your brand with confidence, supported by guidelines and assets.",
               },
             ].map((item) => (
-              <div key={item.step} className="text-center md:text-left">
-                <div className="text-5xl font-bold text-accent/20 mb-4">
+              <div key={item.step} className="text-center">
+                <div className="text-5xl font-bold text-white/10 mb-4">
                   {item.step}
                 </div>
                 <h3 className="text-xl font-bold mb-2">{item.title}</h3>
