@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { ChevronDown, ArrowRight, ArrowUpRight } from "lucide-react";
 import Video from "../assets/video/carrer-one.mp4";
+import { API } from "../context/AuthContext";
 
 /* ─── Animated counter ─── */
 function useCountUp(end, duration = 2000) {
@@ -48,7 +49,7 @@ function useCountUp(end, duration = 2000) {
 }
 
 /* ─── Job data ─── */
-const categories = [
+const defaultCategories = [
   {
     title: "Business Development",
     count: 3,
@@ -88,14 +89,14 @@ const categories = [
   },
 ];
 
-const values = [
+const defaultValues = [
   { number: "15", label: "Team Members" },
   { number: "5", label: "Countries" },
   { number: "97%", label: "Retention Rate" },
   { number: "4.8", label: "Rating" },
 ];
 
-const perks = [
+const defaultPerks = [
   {
     title: "Health & Wellness",
     desc: "Full medical, dental, vision + mental health support",
@@ -123,7 +124,7 @@ const perks = [
 ];
 
 /* ─── Accordion Row ─── */
-function AccordionRow({ category, isOpen, onToggle }) {
+function AccordionRow({ category, index, isOpen, onToggle }) {
   return (
     <div>
       <button
@@ -135,7 +136,7 @@ function AccordionRow({ category, isOpen, onToggle }) {
       >
         <div className="flex items-center gap-4 sm:gap-6">
           <span className="text-xs font-medium text-white/30 tabular-nums w-6">
-            {String(categories.indexOf(category) + 1).padStart(2, "0")}
+            {String(index + 1).padStart(2, "0")}
           </span>
           <span className="text-lg sm:text-xl font-semibold text-white tracking-tight">
             {category.title}
@@ -200,6 +201,22 @@ function Stat({ number, label }) {
 /* ─── Page ─── */
 export default function Career() {
   const [openIndex, setOpenIndex] = useState(null);
+  const [categories, setCategories] = useState(defaultCategories);
+  const [values, setValues] = useState(defaultValues);
+  const [perks, setPerks] = useState(defaultPerks);
+
+  useEffect(() => {
+    fetch(`${API}/api/careers`)
+      .then((res) => (res.ok ? res.json() : Promise.reject()))
+      .then((data) => {
+        if (data.categories) setCategories(data.categories);
+        if (data.stats) setValues(data.stats);
+        if (data.perks) setPerks(data.perks);
+      })
+      .catch(() => {
+        // Keep fallback static data if API is unavailable
+      });
+  }, []);
 
   return (
     <>
@@ -301,24 +318,24 @@ export default function Career() {
       </section>
 
       {/* ═══ CULTURE ═══ */}
-      <section className="py-28 bg-black">
+      <section className="py-28 bg-white">
         <div className="max-w-6xl mx-auto px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 items-center">
             <div>
-              <p className="text-xs uppercase tracking-[0.25em] text-white/40 font-medium mb-4">
+              <p className="text-xs uppercase tracking-[0.25em] text-black/40 font-medium mb-4">
                 Our Culture
               </p>
-              <h2 className="text-3xl sm:text-4xl md:text-5xl font-semibold text-white tracking-[-0.02em] leading-[1.1]">
+              <h2 className="text-3xl sm:text-4xl md:text-5xl font-semibold text-black tracking-[-0.02em] leading-[1.1]">
                 Where creativity
                 <br />
                 meets purpose
               </h2>
-              <p className="mt-8 text-white/40 leading-relaxed font-medium">
+              <p className="mt-8 text-black/40 leading-relaxed font-medium">
                 At Adway, you won't just make things look good — you'll make
                 them mean something. Every brand has a story worth telling, and
                 every team member has a voice worth hearing.
               </p>
-              <p className="mt-4 text-white/40 leading-relaxed font-medium">
+              <p className="mt-4 text-black/40 leading-relaxed font-medium">
                 No egos, no silos — just a shared passion for craft and impact.
                 We collaborate across disciplines and celebrate bold ideas.
               </p>

@@ -9,6 +9,7 @@ import {
   CheckCircle2,
   Send,
 } from "lucide-react";
+import { API } from "../context/AuthContext";
 
 /* ─── Available positions ─── */
 const positions = [
@@ -72,6 +73,9 @@ export default function Apply() {
     "w-full px-4 py-3 rounded-lg border border-white/[0.07] bg-white/[0.03] text-[#e8e4dc] text-sm outline-none transition-all duration-200 focus:border-[#b49b6e]/40 focus:bg-white/[0.05] appearance-none cursor-pointer pr-10";
 
   const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState("");
+  const [responseDebug, setResponseDebug] = useState(null);
 
   const handleChange = (e) => {
     const { name, value, files } = e.target;
@@ -81,9 +85,46 @@ export default function Apply() {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setSubmitted(true);
+    setSubmitting(true);
+    setError("");
+
+    try {
+      const name = `${formData.firstName.trim()} ${formData.lastName.trim()}`.trim();
+      if (!name) throw new Error("First name and last name are required.");
+
+      const payload = new FormData();
+      payload.append("name", name);
+      payload.append("email", formData.email);
+      payload.append("position", formData.position);
+      payload.append("phone", formData.phone || "");
+      payload.append("portfolio", formData.portfolio || "");
+      payload.append("linkedin", formData.linkedin || "");
+      payload.append("coverNote", formData.message || "");
+      payload.append("experience", formData.experience || "");
+      payload.append("startDate", formData.startDate || "");
+      if (formData.resume) payload.append("resume", formData.resume);
+
+      const response = await fetch(`${API}/api/applications`, {
+        method: "POST",
+        body: payload,
+      });
+
+      const body = await response.json().catch(() => ({}));
+      console.log("Application API response:", body);
+      setResponseDebug(body);
+
+      if (!response.ok) {
+        throw new Error(body.error || "Failed to submit application");
+      }
+
+      setSubmitted(true);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   if (submitted) {
@@ -388,24 +429,33 @@ export default function Apply() {
                 recruitment purposes. We never share your data with third
                 parties.
               </p>
-              
-              <button
-                type="submit"
-                className="group inline-flex items-center gap-2.5 px-7 py-3.5 bg-accent hover:bg-accent/90 text-white text-sm font-medium rounded-lg transition-all duration-200 active:scale-[0.98] shrink-0"
-              >
-                Submit application
-                <svg
-                  className="w-4 h-4 stroke-white transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
+              <div className="flex flex-col gap-2">
+                {error && <p className="text-sm text-red-400">{error}</p>}
+                {responseDebug && (
+                  <div className="rounded-xl border border-white/10 bg-white/5 p-3 text-xs text-white/70">
+                    <div className="font-medium text-white mb-1">Debug response</div>
+                    <pre className="whitespace-pre-wrap break-words">{JSON.stringify(responseDebug, null, 2)}</pre>
+                  </div>
+                )}
+                <button
+                  type="submit"
+                  disabled={submitting}
+                  className="group inline-flex items-center gap-2.5 px-7 py-3.5 bg-accent hover:bg-accent/90 text-white text-sm font-medium rounded-lg transition-all duration-200 active:scale-[0.98] shrink-0 disabled:cursor-not-allowed disabled:opacity-60"
                 >
-                  <line x1="5" y1="12" x2="19" y2="12" />
-                  <polyline points="12 5 19 12 12 19" />
-                </svg>
-              </button>
+                  {submitting ? "Submitting…" : "Submit application"}
+                  <svg
+                    className="w-4 h-4 stroke-white transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <line x1="5" y1="12" x2="19" y2="12" />
+                    <polyline points="12 5 19 12 12 19" />
+                  </svg>
+                </button>
+              </div>
             </div>
           </form>
         </div>

@@ -1,108 +1,43 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight, Filter } from "lucide-react";
-import Video from "../assets/video/portfolio-one.mp4"
+import Video from "../assets/video/portfolio-one.mp4";
+import { API } from "../context/AuthContext";
 
-
-const categories = [
-  "All",
-  "Brand Strategy",
-  "Visual Identity",
-  "Digital Design",
-  "Motion Graphics",
-];
-
-const projects = [
-  {
-    slug: "lumina-cosmetics",
-    title: "Lumina Cosmetics",
-    category: "Visual Identity",
-    desc: "A complete visual identity overhaul for a premium cosmetics brand, including logo, packaging, and retail design.",
-    image:
-      "https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=800&q=80",
-    tags: ["Logo Design", "Packaging", "Brand Guidelines"],
-  },
-  {
-    slug: "techvault",
-    title: "TechVault",
-    category: "Brand Strategy",
-    desc: "Strategic brand positioning and identity development for a fintech startup entering a competitive market.",
-    image:
-      "https://images.unsplash.com/photo-1551288049-bebda4e15f92?w=800&q=80",
-    tags: ["Strategy", "Positioning", "Naming"],
-  },
-  {
-    slug: "ecogreen-living",
-    title: "EcoGreen Living",
-    category: "Digital Design",
-    desc: "A full digital experience design including website, app, and e-commerce platform for sustainable living.",
-    image:
-      "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=800&q=80",
-    tags: ["Web Design", "App Design", "E-commerce"],
-  },
-  {
-    slug: "artisan-coffee",
-    title: "Artisan Coffee Co.",
-    category: "Visual Identity",
-    desc: "Artisanal brand identity for a specialty coffee roaster, from logo to cafe interior design concepts.",
-    image:
-      "https://images.unsplash.com/photo-1495474472287-4d71bc2035a5?w=800&q=80",
-    tags: ["Logo Design", "Packaging", "Interior"],
-  },
-  {
-    slug: "nova-fitness",
-    title: "Nova Fitness",
-    category: "Digital Design",
-    desc: "Modern digital platform and brand experience for a next-generation fitness brand.",
-    image:
-      "https://images.unsplash.com/photo-1534438327606-49c30f3adafb?w=800&q=80",
-    tags: ["Web Design", "App UI/UX", "Brand System"],
-  },
-  {
-    slug: "skyline-realestate",
-    title: "Skyline Real Estate",
-    category: "Brand Strategy",
-    desc: "Premium brand strategy and identity for a luxury real estate development company.",
-    image:
-      "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800&q=80",
-    tags: ["Strategy", "Visual Identity", "Collateral"],
-  },
-  {
-    slug: "pulse-music",
-    title: "Pulse Music",
-    category: "Motion Graphics",
-    desc: "Dynamic motion identity and animated brand assets for a music streaming platform.",
-    image:
-      "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=800&q=80",
-    tags: ["Logo Animation", "Motion Design", "Social"],
-  },
-  {
-    slug: "harvest-kitchen",
-    title: "Harvest Kitchen",
-    category: "Visual Identity",
-    desc: "Farm-to-table restaurant brand identity with handcrafted visual elements and earthy tones.",
-    image:
-      "https://images.unsplash.com/photo-1414235077428-33898c825008?w=800&q=80",
-    tags: ["Logo Design", "Menu Design", "Signage"],
-  },
-  {
-    slug: "vortex-gaming",
-    title: "Vortex Gaming",
-    category: "Motion Graphics",
-    desc: "Electrifying motion brand and visual effects for an esports and gaming community platform.",
-    image:
-      "https://images.unsplash.com/photo-1542751371-adc38448a05e?w=800&q=80",
-    tags: ["Motion Identity", "Visual Effects", "Streaming Assets"],
-  },
-];
+const resolveImageUrl = (url) => {
+  if (!url) return "";
+  if (/^(?:https?:|blob:|data:)/.test(url)) return url;
+  return `${API}${url}`;
+};
 
 export default function Portfolio() {
   const [activeCategory, setActiveCategory] = useState("All");
+  const [projects, setProjects] = useState([]);
+  const [categories, setCategories] = useState(["All"]);
+  const [loading, setLoading] = useState(true);
 
-  const filtered =
-    activeCategory === "All"
-      ? projects
-      : projects.filter((p) => p.category === activeCategory);
+  // Fetch categories on mount
+  useEffect(() => {
+    fetch(`${API}/api/categories`)
+      .then((res) => (res.ok ? res.json() : Promise.reject()))
+      .then((data) => setCategories(data))
+      .catch((err) => console.error("Error fetching categories:", err));
+  }, []);
+
+  // Fetch projects when category changes
+  useEffect(() => {
+    setLoading(true);
+    const url =
+      activeCategory === "All"
+        ? `${API}/api/projects`
+        : `${API}/api/projects?category=${encodeURIComponent(activeCategory)}`;
+
+    fetch(url)
+      .then((res) => (res.ok ? res.json() : Promise.reject()))
+      .then((data) => setProjects(data))
+      .catch((err) => console.error("Error fetching projects:", err))
+      .finally(() => setLoading(false));
+  }, [activeCategory]);
 
   return (
     <>
@@ -165,8 +100,13 @@ export default function Portfolio() {
           </div>
 
           {/* Projects Grid */}
+          {loading ? (
+            <div className="flex items-center justify-center py-24">
+              <div className="w-8 h-8 border-2 border-white/10 border-t-white/50 rounded-full animate-spin" />
+            </div>
+          ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {filtered.map((project) => (
+            {projects.map((project) => (
               <Link
                 to={`/portfolio/${project.slug}`}
                 key={project.slug}
@@ -175,7 +115,7 @@ export default function Portfolio() {
                 {/* Project Image */}
                 <div className="aspect-[4/3] relative overflow-hidden">
                   <img
-                    src={project.image}
+                    src={resolveImageUrl(project.image)}
                     alt={project.title}
                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                   />
@@ -213,8 +153,9 @@ export default function Portfolio() {
               </Link>
             ))}
           </div>
+          )}
 
-          {filtered.length === 0 && (
+          {!loading && projects.length === 0 && (
             <div className="text-center py-16">
               <p className="text-white/30 text-lg">
                 No projects found in this category.
