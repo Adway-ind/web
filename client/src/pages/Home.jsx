@@ -11,33 +11,51 @@ import {
   Star,
   Quote,
   ChevronRight,
-  ChevronLeft,
+  Image as ImageIcon,
 } from "lucide-react";
 
 import Client from "../components/ClientsSection";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay } from "swiper/modules";
 import VideoSlide from "../assets/video/slide/video-slide-3.mp4";
+import { API } from "../config/api";
+import { useAuth } from "../context/AuthContext";
+import Antigravity from "../components/Antigravity";
 
 import "swiper/css";
+
+/* ───── Resolve image URL helper ───── */
+const resolveImageUrl = (url) => {
+  if (!url) return "";
+  if (/^(?:https?:|blob:|data:)/.test(url)) return url;
+  return `${API}${url}`;
+};
 
 /* ───── Hero text slides (video is the shared background) ───── */
 const heroSlides = [
   {
-    title: "We craft brands",
-    highlight: "that inspire",
+    title: "Digital",
+    highlight: "Marketing",
+    paragraph:
+      "We are a leading Digital marketing agency with award-winning creative strategists and technologists.",
   },
   {
-    title: "Design that",
-    highlight: "captures",
+    title: "Strategic",
+    highlight: "Consulting",
+    paragraph:
+      "We specialize in establishing your brand and marketing strategy to attract consumers.",
   },
   {
-    title: "Strategy that",
-    highlight: "elevates",
+    title: "Creative",
+    highlight: "Branding",
+    paragraph:
+      "We are experts in logo design, packaging design, and brand communications design.",
   },
   {
-    title: "Identity that",
-    highlight: "resonates",
+    title: "Technology",
+    highlight: "Solutions",
+    paragraph:
+      "We have deep expertise and experts in responsive web design and CMS web development",
   },
 ];
 
@@ -74,37 +92,6 @@ const services = [
   },
 ];
 
-const portfolioItems = [
-  {
-    slug: "lumina-cosmetics",
-    title: "Lumina Cosmetics",
-    category: "Visual Identity",
-    image:
-      "https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=800&q=80",
-  },
-  {
-    slug: "techvault",
-    title: "TechVault",
-    category: "Brand Strategy",
-    image:
-      "https://plus.unsplash.com/premium_photo-1683121716061-3faddf4dc504?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8dGVjaHxlbnwwfHwwfHx8MA%3D%3D",
-  },
-  {
-    slug: "ecogreen-living",
-    title: "EcoGreen Living",
-    category: "Digital Design",
-    image:
-      "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=800&q=80",
-  },
-  {
-    slug: "artisan-coffee",
-    title: "Artisan Coffee Co.",
-    category: "Visual Identity",
-    image:
-      "https://images.unsplash.com/photo-1579762715118-a6f1d4b934f1?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTF8fGFydGlzdGljfGVufDB8fDB8fHww",
-  },
-];
-
 const testimonials = [
   {
     name: "Sarah Mitchell",
@@ -138,13 +125,6 @@ const testimonials = [
   },
 ];
 
-const stats = [
-  { number: "200+", label: "Projects Delivered" },
-  { number: "50+", label: "Happy Clients" },
-  { number: "12+", label: "Years Experience" },
-  { number: "15", label: "Design Awards" },
-];
-
 /* ───── Hero Slider Component ───── */
 function HeroSlider() {
   const [current, setCurrent] = useState(0);
@@ -162,7 +142,6 @@ function HeroSlider() {
   );
 
   const next = useCallback(() => goTo(current + 1), [current, goTo]);
-  const prev = useCallback(() => goTo(current - 1), [current, goTo]);
 
   /* Auto-play */
   useEffect(() => {
@@ -170,45 +149,62 @@ function HeroSlider() {
     return () => clearInterval(timer);
   }, [next]);
 
-  const slide = heroSlides[current];
-
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-black">
-      {/* 1. SINGLE SHARED VIDEO BACKDROP (Plays continuously across text shifts) */}
-      <div className="absolute inset-0 w-full h-full overflow-hidden pointer-events-none select-none z-0">
+      {/* Antigravity 3D Effect Background */}
+      <div className="absolute inset-0 w-full h-full z-[1] pointer-events-none">
+        <Antigravity
+          color="#A855F7"
+          colorTwo="#6366F1"
+          ringCount={6}
+          speed={1}
+          attenuation={10}
+          lineThickness={2}
+          baseRadius={0.35}
+          radiusStep={0.1}
+          scaleRate={0.1}
+          opacity={1}
+          blur={0}
+          noiseAmount={0.1}
+          rotation={0}
+          ringGap={1.5}
+          fadeIn={0.7}
+          fadeOut={0.5}
+          followMouse={false}
+          mouseInfluence={0.2}
+          hoverScale={1.2}
+          parallax={0.05}
+          clickBurst={false}
+        />
+      </div>
+      {/* Single shared video backdrop */}
+      {/* <div className="absolute inset-0 w-full h-full overflow-hidden pointer-events-none select-none z-[2]">
         <video
           src={VideoSlide}
           autoPlay
           muted
           loop
           playsInline
-          className="w-full h-full object-cover scale-105"
+          className="w-full h-full object-cover scale-105 opacity-40"
         />
-
-        {/* Dark Base Tint Overlay */}
-        <div className="absolute inset-0 bg-black/20" />
-
-        {/* Advanced Cinematographic Vignette Overlay */}
+        <div className="absolute inset-0 bg-black/30" />
         <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-black/60 opacity-90" />
-      </div>
-
+      </div> */}
       {/* Grid overlay */}
       <div
-        className="absolute inset-0 opacity-[0.03] z-[1] pointer-events-none"
+        className="absolute inset-0 opacity-[0.03] z-[3] pointer-events-none"
         style={{
           backgroundImage:
             "linear-gradient(rgba(255,255,255,.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.1) 1px, transparent 1px)",
           backgroundSize: "60px 60px",
         }}
       />
-
-      {/* Content Layer Container */}
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-32 text-center flex flex-col items-center justify-center min-h-screen w-full">
-        {/* TEXT CONTENT CAROUSEL LOOP */}
+      {/* Content Layer */}
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-32 text-center flex flex-col items-center justify-center min-h-screen w-full pointer-events-none">
         {heroSlides.map((slide, i) => (
           <div
             key={i}
-            className="absolute inset-0 flex flex-col items-center justify-center transition-all duration-[1200ms] ease-in-out px-4 max-w-7xl mx-auto"
+            className="absolute inset-0 flex flex-col items-center justify-center transition-all duration-[1200ms] ease-in-out px-2 sm:px-4 w-full max-w-7xl mx-auto"
             style={{
               opacity: i === current ? 1 : 0,
               pointerEvents: i === current ? "auto" : "none",
@@ -218,91 +214,205 @@ function HeroSlider() {
                   : "scale(0.98) translateY(15px)",
             }}
           >
-            {/* Badge */}
-            <div key={`badge-${current}`} className="animate-fade-in-up">
-              <span className="inline-block px-4 py-2 bg-white/10 border border-white/20 text-white rounded-full text-sm font-medium mb-8 backdrop-blur-sm">
-                Award-Winning Branding Agency
-              </span>
-            </div>
-
-            {/* Heading */}
-            <h1
-              key={`title-${current}`}
-              className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold text-white leading-[1.05] tracking-tight animate-fade-in-up animation-delay-200 mx-auto"
-            >
+            <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold text-white leading-[1.1] sm:leading-[1.05] tracking-tight animate-fade-in-up animation-delay-200 mx-auto text-center pointer-events-auto">
               {slide.title}
-              <br />
-              that <span className="gradient-text">{slide.highlight}</span>
+              <span className="gradient-text ml-2 sm:ml-5">
+                {slide.highlight}
+              </span>
             </h1>
 
-            {/* Description */}
-            <p
-              key={`desc-${current}`}
-              className="mt-8 text-lg sm:text-xl text-white/80 max-w-2xl leading-relaxed animate-fade-in-up animation-delay-400 mx-auto"
-            >
-              From strategy to visual identity, we create brand experiences that
-              captivate audiences and drive business growth.
+            <p className="mt-4 sm:mt-6 md:mt-8 text-sm sm:text-base md:text-lg lg:text-xl text-white/80 max-w-xl sm:max-w-2xl leading-relaxed animate-fade-in-up animation-delay-400 mx-auto text-center px-2 pointer-events-auto">
+              {slide.paragraph}
             </p>
 
-            {/* Action Buttons */}
-            <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4 animate-fade-in-up animation-delay-600 w-full">
+            <div className="mt-6 sm:mt-8 md:mt-10 flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 animate-fade-in-up animation-delay-600 w-full px-2 pointer-events-auto">
               <Link
                 to="/contact"
-                className="group w-full sm:w-auto px-8 py-4 bg-white text-black rounded-md font-semibold text-lg hover:bg-white/90 transition-all duration-300 shadow-lg shadow-white/10 hover:shadow-xl hover:shadow-white/20 hover:-translate-y-0.5 flex items-center justify-center gap-2"
+                className="group w-full sm:w-auto px-6 sm:px-8 py-3.5 sm:py-4 bg-white text-black rounded-md font-semibold text-[10px] sm:text-lg hover:bg-white/90 transition-all duration-300 shadow-lg shadow-white/10 hover:shadow-xl hover:shadow-white/20 hover:-translate-y-0.5 flex items-center justify-center gap-2"
               >
                 Start Your Project
-                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-1 transition-transform" />
               </Link>
               <Link
                 to="/portfolio"
-                className="group w-full sm:w-auto px-8 py-4 bg-white/10 text-white border border-white/20 rounded-md font-semibold text-lg hover:bg-white/20 transition-all duration-300 backdrop-blur-sm flex items-center justify-center gap-2"
+                className="group relative overflow-hidden w-full sm:w-auto rounded-md p-[1px]"
               >
-                View Our Work
-                <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                {/* White Animated Border */}
+                <span className="absolute inset-[-1000%] animate-[spin_3s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,transparent_0%,white_40%,transparent_60%)]" />
+
+                {/* Button */}
+                <span className="relative z-10 flex items-center justify-center gap-2 px-6 sm:px-8 py-3.5 sm:py-4 bg-black/80 backdrop-blur-xl text-white border border-white/10 rounded-md font-semibold text-[10px] sm:text-lg hover:bg-white/10 transition-all duration-300">
+                  View Our Work
+                  <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-1 transition-transform duration-300" />
+                </span>
               </Link>
-            </div>
-
-            {/* Slider nav arrows */}
-            <div className="mt-14 flex items-center justify-center gap-4 w-full">
-              <button
-                onClick={prev}
-                className="w-12 h-12 rounded-full border border-white/20 flex items-center justify-center text-white/60 hover:bg-white/10 hover:text-white hover:border-white/40 transition-all duration-300 pointer-events-auto"
-                aria-label="Previous slide"
-              >
-                <ChevronLeft className="w-5 h-5" />
-              </button>
-
-              {/* Dots (Uncomment if needed) */}
-              {/* <div className="flex items-center justify-center gap-2 pointer-events-auto">
-            {heroSlides.map((_, idx) => (
-              <button
-                key={idx}
-                onClick={() => goTo(idx)}
-                aria-label={`Go to slide ${idx + 1}`}
-                className={`h-2 rounded-full transition-all duration-500 ${
-                  idx === current ? "w-8 bg-accent" : "w-2 bg-white/30 hover:bg-white/50"
-                }`}
-              />
-            ))}
-          </div> */}
-
-              <button
-                onClick={next}
-                className="w-12 h-12 rounded-full border border-white/20 flex items-center justify-center text-white/60 hover:bg-white/10 hover:text-white hover:border-white/40 transition-all duration-300 pointer-events-auto"
-                aria-label="Next slide"
-              >
-                <ChevronRight className="w-5 h-5" />
-              </button>
             </div>
           </div>
         ))}
       </div>
-
       {/* Scroll indicator */}
-      <div className="absolute bottom-8 z-10 left-1/2 -translate-x-1/2 pointer-events-none">
-        <div className="w-6 h-10 border-2 border-white/20 rounded-full flex items-start justify-center p-1">
-          <div className="w-1.5 h-3 bg-white/40 rounded-full animate-bounce" />
+      {/* <div className="absolute bottom-8 z-10 left-1/2 -translate-x-1/2 pointer-events-none">
+        <p className="text-white/40 text-sm tracking-widest animate-bounce">
+          SCROLL
+        </p>
+      </div> */}
+    </section>
+  );
+}
+
+/* ───── Featured Portfolio Section ───── */
+function FeaturedPortfolio() {
+  const { authFetch } = useAuth();
+  const [projects, setProjects] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [showAll, setShowAll] = useState(false);
+
+  useEffect(() => {
+    // Hit the public endpoint that we just fixed on the backend
+    authFetch("/api/projects/featured")
+      .then((data) => {
+        // The backend query handles the filtering directly via SQL,
+        // so if data exists, it's safe to load straight into state!
+        const featured = Array.isArray(data) ? data : [];
+        setProjects(featured);
+      })
+      .catch((err) => {
+        console.error("Error fetching featured projects:", err);
+        setProjects([]);
+      })
+      .finally(() => setLoading(false));
+  }, []);
+
+  // Show 4 by default; "Show All Featured" reveals the rest
+  const visibleProjects = showAll ? projects : projects.slice(0, 4);
+
+  return (
+    <section className="py-24 bg-white">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Header */}
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-16">
+          <div>
+            <span className="text-white/50 font-semibold text-sm uppercase tracking-wider">
+              Our Work
+            </span>
+            <h2 className="mt-4 text-4xl sm:text-5xl font-bold text-black tracking-tight">
+              Featured projects
+            </h2>
+            <p className=" text-center sm:text-left mt-4 text-lg text-black/60 max-w-xl">
+              A selection of brands we've helped build, transform, and grow.
+            </p>
+          </div>
+          <Link
+            to="/portfolio"
+            className="group inline-flex items-center justify-center gap-2 text-black font-semibold hover:gap-3 transition-all shrink-0"
+          >
+            View All Projects
+            <ArrowRight className="w-4 h-4" />
+          </Link>
         </div>
+
+        {/* Loading state */}
+        {loading && (
+          <div className="flex items-center justify-center h-64">
+            <div className="w-6 h-6 border-2 border-white/20 border-t-violet-500 rounded-full animate-spin" />
+          </div>
+        )}
+
+        {/* Empty state — no featured projects yet */}
+        {!loading && projects.length === 0 && (
+          <div className="flex flex-col items-center justify-center h-64 gap-4 text-center">
+            <div className="w-14 h-14 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center">
+              <ImageIcon className="w-6 h-6 text-white/20" />
+            </div>
+            <div>
+              <p className="text-white/40 font-medium">
+                No featured projects yet
+              </p>
+              <p className="text-white/25 text-sm mt-1">
+                Mark projects as featured in the admin panel to display them
+                here.
+              </p>
+            </div>
+            <Link
+              to="/portfolio"
+              className="mt-2 inline-flex items-center gap-2 text-sm text-violet-400 hover:text-violet-300 font-medium transition-colors"
+            >
+              Browse all projects <ArrowRight className="w-3.5 h-3.5" />
+            </Link>
+          </div>
+        )}
+
+        {/* Projects Grid */}
+        {!loading && visibleProjects.length > 0 && (
+          <>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              {visibleProjects.map((item) => (
+                <Link
+                  to={`/portfolio/${item.slug || item.id}`}
+                  key={item.id}
+                  className="group relative overflow-hidden rounded-2xl aspect-[4/3] cursor-pointer"
+                >
+                  {item.image ? (
+                    <img
+                      src={resolveImageUrl(item.image)}
+                      alt={item.title}
+                      className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                    />
+                  ) : (
+                    <div className="absolute inset-0 w-full h-full bg-white/5 flex items-center justify-center">
+                      <ImageIcon className="w-10 h-10 text-white/10" />
+                    </div>
+                  )}
+
+                  <div className="absolute inset-0 bg-black/30 group-hover:bg-black/50 transition-colors duration-300" />
+
+                  {/* Featured badge */}
+                  <div className="absolute top-4 left-4">
+                    <span className="px-2.5 py-1 rounded-full bg-violet-500/30 border border-violet-400/40 backdrop-blur-sm text-[11px] font-semibold text-violet-300 tracking-wide">
+                      Featured
+                    </span>
+                  </div>
+
+                  <div className="absolute inset-0 flex flex-col justify-end p-8">
+                    <span className="text-white/60 text-sm font-medium">
+                      {item.category}
+                    </span>
+                    <h3 className="text-2xl sm:text-3xl font-bold text-white mt-1">
+                      {item.title}
+                    </h3>
+                    {item.client && (
+                      <p className="text-white/50 text-sm mt-1">
+                        {item.client}
+                      </p>
+                    )}
+                    <div className="mt-4 flex items-center gap-2 text-white/80 text-sm font-medium opacity-0 group-hover:opacity-100 translate-y-4 group-hover:translate-y-0 transition-all duration-300">
+                      View Project <ArrowRight className="w-4 h-4" />
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+
+            {/* Show more / show less toggle (only if there are more than 4 featured) */}
+            {projects.length > 4 && (
+              <div className="mt-10 text-center">
+                <button
+                  onClick={() => setShowAll((v) => !v)}
+                  className="inline-flex items-center gap-2 px-6 py-3 rounded-xl border border-white/10 bg-white/[0.03] hover:bg-white/[0.07] text-white/70 hover:text-white text-sm font-semibold transition-all"
+                >
+                  {showAll ? (
+                    <>Show Less</>
+                  ) : (
+                    <>
+                      Show All {projects.length} Featured Projects{" "}
+                      <ArrowRight className="w-4 h-4" />
+                    </>
+                  )}
+                </button>
+              </div>
+            )}
+          </>
+        )}
       </div>
     </section>
   );
@@ -317,13 +427,11 @@ export default function Home() {
 
       {/* Services Overview */}
       <section className="relative py-24 bg-black overflow-hidden">
-        {/* Ambient Background Glows */}
         <div className="absolute top-1/4 left-[-10%] w-[500px] h-[500px] rounded-full bg-purple-600/20 blur-[120px] pointer-events-none mix-blend-screen animate-pulse duration-[6000ms]" />
         <div className="absolute bottom-1/4 right-[-10%] w-[600px] h-[600px] rounded-full bg-blue-600/15 blur-[140px] pointer-events-none mix-blend-screen animate-pulse duration-[8000ms]" />
         <div className="absolute top-1/2 left-1/3 w-[400px] h-[400px] rounded-full bg-fuchsia-500/10 blur-[100px] pointer-events-none mix-blend-screen" />
 
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Header Content */}
           <div className="text-center max-w-3xl mx-auto mb-16">
             <span className="text-white/50 font-semibold text-sm uppercase tracking-wider">
               What We Do
@@ -337,32 +445,46 @@ export default function Home() {
             </p>
           </div>
 
-          {/* Services Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {services.map((service) => (
               <div
                 key={service.title}
                 className="group relative p-8 rounded-2xl overflow-hidden border border-white/20 bg-gradient-to-br from-white/[0.07] to-white/[0.01] backdrop-blur-xl shadow-2xl shadow-black/40 hover:border-white/30 hover:from-white/[0.12] hover:to-white/[0.03] hover:-translate-y-1 transition-all duration-500"
+                onMouseMove={(e) => {
+                  const rect = e.currentTarget.getBoundingClientRect();
+                  const x = (
+                    ((e.clientX - rect.left) / rect.width) *
+                    100
+                  ).toFixed(1);
+                  const y = (
+                    ((e.clientY - rect.top) / rect.height) *
+                    100
+                  ).toFixed(1);
+                  e.currentTarget.style.setProperty("--gx", `${x}%`);
+                  e.currentTarget.style.setProperty("--gy", `${y}%`);
+                }}
               >
-                {/* 1. Realistic Glass Grain/Texture Layer */}
+                {/* Noise texture */}
                 <div
                   className="absolute inset-0 opacity-[0.03] mix-blend-overlay pointer-events-none select-none"
                   style={{
                     backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
                   }}
                 />
-
-                {/* 2. Soft Inner Gloss Highlights */}
+                {/* Top sheen */}
                 <div className="absolute inset-0 bg-gradient-to-b from-white/[0.05] to-transparent pointer-events-none" />
-
-                {/* 3. Card Content */}
+                {/* Glare layer */}
+                <div
+                  className="absolute inset-0 pointer-events-none rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                  style={{
+                    background:
+                      "radial-gradient(circle at var(--gx, 50%) var(--gy, 50%), rgba(255,255,255,0.13) 0%, rgba(255,255,255,0.04) 40%, transparent 70%)",
+                  }}
+                />
                 <div className="relative z-10">
-                  {/* Icon Wrapper with Layered Glass Effect */}
                   <div className="w-14 h-14 bg-gradient-to-br from-white/10 to-white/[0.02] border border-white/20 backdrop-blur-md rounded-xl flex items-center justify-center mb-6 group-hover:bg-white group-hover:scale-110 transition-all duration-300">
                     <service.icon className="w-7 h-7 text-white group-hover:text-black transition-colors" />
                   </div>
-
-                  {/* Text Styling */}
                   <h3 className="text-xl font-bold text-white mb-3 tracking-wide">
                     {service.title}
                   </h3>
@@ -374,7 +496,6 @@ export default function Home() {
             ))}
           </div>
 
-          {/* Footer Link */}
           <div className="text-center mt-12">
             <Link
               to="/services"
@@ -387,59 +508,8 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Portfolio Preview */}
-      <section className="py-24 bg-neutral-950">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-16">
-            <div>
-              <span className="text-white/50 font-semibold text-sm uppercase tracking-wider">
-                Our Work
-              </span>
-              <h2 className="mt-4 text-4xl sm:text-5xl font-bold text-white tracking-tight">
-                Featured projects
-              </h2>
-              <p className="mt-4 text-lg text-white/60 max-w-xl">
-                A selection of brands we've helped build, transform, and grow.
-              </p>
-            </div>
-            <Link
-              to="/portfolio"
-              className="group inline-flex items-center gap-2 text-white font-semibold hover:gap-3 transition-all shrink-0"
-            >
-              View All Projects
-              <ArrowRight className="w-4 h-4" />
-            </Link>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {portfolioItems.map((item) => (
-              <Link
-                to={`/portfolio/${item.slug}`}
-                key={item.title}
-                className="group relative overflow-hidden rounded-2xl aspect-[4/3] cursor-pointer"
-              >
-                <img
-                  src={item.image}
-                  alt={item.title}
-                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                />
-                <div className="absolute inset-0 bg-black/30 group-hover:bg-black/50 transition-colors duration-300" />
-                <div className="absolute inset-0 flex flex-col justify-end p-8">
-                  <span className="text-white/60 text-sm font-medium">
-                    {item.category}
-                  </span>
-                  <h3 className="text-2xl sm:text-3xl font-bold text-white mt-1">
-                    {item.title}
-                  </h3>
-                  <div className="mt-4 flex items-center gap-2 text-white/80 text-sm font-medium opacity-0 group-hover:opacity-100 translate-y-4 group-hover:translate-y-0 transition-all duration-300">
-                    View Project <ArrowRight className="w-4 h-4" />
-                  </div>
-                </div>
-              </Link>
-            ))}
-          </div>
-        </div>
-      </section>
+      {/* ── Featured Portfolio (API-driven) ── */}
+      <FeaturedPortfolio />
 
       {/* Testimonials */}
       <section className="py-24 bg-black">
@@ -458,26 +528,17 @@ export default function Home() {
             spaceBetween={30}
             slidesPerView={1}
             loop={true}
-            autoplay={{
-              delay: 3000,
-              disableOnInteraction: false,
-            }}
+            autoplay={{ delay: 3000, disableOnInteraction: false }}
             breakpoints={{
-              768: {
-                slidesPerView: 2,
-              },
-              1024: {
-                slidesPerView: 3,
-              },
+              768: { slidesPerView: 2 },
+              1024: { slidesPerView: 3 },
             }}
           >
             {testimonials.map((t) => (
               <SwiperSlide key={t.name}>
                 <div className="relative p-8 rounded-2xl bg-white/5 border border-white/10 hover:border-white/25 hover:shadow-lg transition-all duration-300 h-full">
                   <Quote className="w-10 h-10 text-white/10 mb-4" />
-
                   <p className="text-white/70 leading-relaxed mb-6">{t.text}</p>
-
                   <div className="flex items-center gap-1 mb-4">
                     {[...Array(t.rating)].map((_, j) => (
                       <Star
@@ -486,7 +547,6 @@ export default function Home() {
                       />
                     ))}
                   </div>
-
                   <div>
                     <div className="font-semibold text-white">{t.name}</div>
                     <div className="text-sm text-white/50">{t.role}</div>

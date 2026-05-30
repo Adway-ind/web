@@ -9,7 +9,7 @@ import {
   User,
   Tag,
 } from 'lucide-react'
-import { API } from '../context/AuthContext'
+import { API } from '../config/api'
 
 const resolveImageUrl = (url) => {
   if (!url) return ''

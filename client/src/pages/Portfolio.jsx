@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight, Filter } from "lucide-react";
 import Video from "../assets/video/portfolio-one.mp4";
-import { API } from "../context/AuthContext";
+import { API } from "../config/api";
 
 const resolveImageUrl = (url) => {
   if (!url) return "";

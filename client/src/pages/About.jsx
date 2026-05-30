@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { useState, useEffect } from "react";
 import {
   ArrowRight,
   Users,
@@ -6,7 +7,7 @@ import {
   Heart,
   Lightbulb,
   Rocket,
-  Palette ,
+  Palette,
   TrendingUp,
   Target,
   Gem,
@@ -14,6 +15,10 @@ import {
 import amalImage from "../assets/image/person/amal.jpeg";
 import Adway from "../assets/image/person/adway.jpeg";
 import Video from "../assets/video/about-one.mp4";
+import { Canvas } from "@react-three/fiber";
+import { useGLTF, OrbitControls, Environment } from "@react-three/drei";
+import * as THREE from "three";
+import CircularGallery from "../components/CircularGallery";
 
 const team = [
   { name: "Anadhu", role: "Brand Strategist", image: Adway },
@@ -48,7 +53,6 @@ const values = [
   },
 ];
 
-
 const milestones = [
   {
     year: "2014",
@@ -61,7 +65,28 @@ const milestones = [
   { year: "2024", event: "Reached 200+ projects delivered worldwide" },
 ];
 
+function LogoModel({ color }) {
+  const { scene } = useGLTF("/shape.glb");
+
+  useEffect(() => {
+    scene.traverse((child) => {
+      if (child.isMesh) {
+        child.material = child.material.clone();
+        child.material.color.set(color);
+        // Optional: preserve metalness/roughness from original
+        // child.material.metalness = 0.3
+        // child.material.roughness = 0.4
+      }
+    });
+  }, [scene, color]);
+
+  return (
+    <primitive object={scene} scale={1.5} rotation={[0, Math.PI / 4, 0]} />
+  );
+}
+
 export default function About() {
+  const [color, setColor] = useState("#2563eb");
   return (
     <>
       {/* Hero */}
@@ -103,60 +128,72 @@ export default function About() {
       </section>
 
       {/* Story Section */}
-      <section className="py-24 bg-neutral-950">
+      <section className="py-24 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+            {/* LEFT CONTENT */}
             <div>
-              <span className="text-white/50 font-semibold text-sm uppercase tracking-wider">
+              <span className="text-black/50 font-semibold text-sm uppercase tracking-wider">
                 Our Story
               </span>
-              <h2 className="mt-4 text-4xl sm:text-5xl font-medium text-white tracking-tight">
+
+              <h2 className="mt-4 text-4xl sm:text-5xl font-medium text-black tracking-tight leading-tight">
                 Building brands since 2014
               </h2>
-              <p className="mt-6 text-white/60 text-lg leading-relaxed">
+
+              <p className="mt-6 text-black/60 text-lg leading-relaxed">
                 Adway was born from a simple belief: every business deserves a
                 brand that truly represents who they are. What started as a
                 small design studio has grown into a full-service branding
                 agency trusted by startups and enterprises alike.
               </p>
-              <p className="mt-4 text-white/60 text-lg leading-relaxed">
+
+              <p className="mt-4 text-black/60 text-lg leading-relaxed">
                 Over the past decade, we've helped over 200 brands find their
                 voice, define their visual identity, and connect with their
                 audiences in meaningful ways. Our approach combines strategic
                 thinking with bold creative execution.
               </p>
-              <div className="mt-8 flex gap-8">
-                <div>
-                  <div className="text-4xl font-bold text-white">12+</div>
-                  <div className="text-sm text-white/40 mt-1">
-                    Years of Experience
-                  </div>
-                </div>
-                <div>
-                  <div className="text-4xl font-bold text-white">200+</div>
-                  <div className="text-sm text-white/40 mt-1">
-                    Brands Transformed
-                  </div>
-                </div>
-                <div>
-                  <div className="text-4xl font-bold text-white">15</div>
-                  <div className="text-sm text-white/40 mt-1">
-                    Design Awards
-                  </div>
-                </div>
-              </div>
+
+              {/* Color Picker */}
+              {/* <div className="mt-8 flex items-center gap-3">
+                <label className="text-sm text-gray-600">
+                  Model color
+                </label>
+
+                <input
+                  type="color"
+                  value={color}
+                  onChange={(e) => setColor(e.target.value)}
+                  className="w-10 h-10 rounded cursor-pointer border"
+                />
+
+                <span className="text-sm font-mono text-gray-400">
+                  {color}
+                </span>
+              </div> */}
             </div>
-            <div className="relative">
-              <div className="aspect-square rounded-3xl bg-gradient-to-br from-white/10 via-purple-500/5 to-blue-500/10 flex items-center justify-center">
-                <div className="text-center">
-                  <Users className="w-20 h-20 text-white/40 mx-auto mb-4" />
-                  <p className="text-2xl font-bold text-white">15 Creatives</p>
-                  <p className="text-white/50">One Vision</p>
-                </div>
-              </div>
-              {/* Decorative */}
-              <div className="absolute -top-4 -right-4 w-24 h-24 bg-white/5 rounded-2xl -z-10" />
-              <div className="absolute -bottom-4 -left-4 w-32 h-32 bg-purple-500/5 rounded-2xl -z-10" />
+
+            {/* RIGHT 3D MODEL */}
+            <div className="aspect-square rounded-3xl overflow-hidden hidden sm:flex ">
+              <Canvas camera={{ position: [0, 0, 5], fov: 100 }}>
+                {/* Lights */}
+                <ambientLight intensity={1.2} />
+                <directionalLight position={[5, 5, 5]} intensity={2} />
+
+                {/* 3D Model */}
+                <LogoModel color={color} />
+
+                {/* Controls */}
+                <OrbitControls
+                  enableZoom={false}
+                  autoRotate
+                  autoRotateSpeed={2}
+                />
+
+                {/* Environment */}
+                <Environment preset="city" />
+              </Canvas>
             </div>
           </div>
         </div>
@@ -181,7 +218,9 @@ export default function About() {
                 className="group p-8 rounded-2xl bg-white/5 border border-white/10 hover:border-white/25 hover:shadow-xl transition-all duration-300"
               >
                 <div className="w-14 h-14 bg-white/10 rounded-xl flex items-center justify-center mb-6 group-hover:bg-white transition-colors duration-300">
-                  <v.icon className={`w-7 h-7 ${v.color} group-hover:text-black transition-colors`} />
+                  <v.icon
+                    className={`w-7 h-7 ${v.color} group-hover:text-black transition-colors`}
+                  />
                 </div>
                 <h3 className="text-xl font-bold text-white mb-3">{v.title}</h3>
                 <p className="text-white/50 leading-relaxed">{v.desc}</p>
@@ -192,16 +231,16 @@ export default function About() {
       </section>
 
       {/* Team */}
-      <section className="py-24 bg-neutral-950">
+      <section className="py-24 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-3xl mx-auto mb-16">
-            <span className="text-white/50 font-semibold text-sm uppercase tracking-wider">
+            <span className="text-black/50 font-semibold text-sm uppercase tracking-wider">
               Our Team
             </span>
-            <h2 className="mt-4 text-4xl sm:text-5xl font-medium text-white tracking-tight">
+            <h2 className="mt-4 text-4xl sm:text-5xl font-medium text-black tracking-tight">
               The creative minds
             </h2>
-            <p className="mt-4 text-lg text-white/60">
+            <p className="mt-4 text-lg text-black/60">
               A diverse team of experts passionate about building remarkable
               brands.
             </p>
@@ -217,56 +256,8 @@ export default function About() {
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   />
                 </div>
-                <h3 className="text-lg font-bold text-white">{member.name}</h3>
-                <p className="text-white/50 text-sm">{member.role}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Timeline */}
-      <section className="py-24 bg-black">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center max-w-3xl mx-auto mb-16">
-            <span className="text-white/50 font-semibold text-sm uppercase tracking-wider">
-              Our Journey
-            </span>
-            <h2 className="mt-4 text-4xl sm:text-5xl font-medium text-white tracking-tight">
-              Milestones along the way
-            </h2>
-          </div>
-
-          <div className="relative max-w-3xl mx-auto">
-            {/* Timeline line */}
-            <div className="absolute left-4 md:left-1/2 top-0 bottom-0 w-0.5 bg-white/10 -translate-x-1/2" />
-
-            {milestones.map((m, i) => (
-              <div
-                key={m.year}
-                className={`relative flex items-start gap-8 mb-12 last:mb-0 ${
-                  i % 2 === 0 ? "md:flex-row" : "md:flex-row-reverse"
-                }`}
-              >
-                <div
-                  className={`flex-1 ${i % 2 === 0 ? "md:text-right" : "md:text-left"} hidden md:block`}
-                >
-                  <div className="bg-white/5 p-6 rounded-xl border border-white/10">
-                    <div className="text-white font-bold text-lg">{m.year}</div>
-                    <p className="text-white/60 mt-1">{m.event}</p>
-                  </div>
-                </div>
-                <div className="relative z-10 w-8 h-8 bg-white rounded-full border-4 border-black shadow-md shrink-0 hidden md:block" />
-                <div className="flex-1 hidden md:block" />
-
-                {/* Mobile view */}
-                <div className="flex gap-4 md:hidden">
-                  <div className="relative z-10 w-8 h-8 bg-white rounded-full border-4 border-black shadow-md shrink-0 mt-1" />
-                  <div className="bg-white/5 p-4 rounded-xl border border-white/10 flex-1">
-                    <div className="text-white font-bold">{m.year}</div>
-                    <p className="text-white/60 text-sm mt-1">{m.event}</p>
-                  </div>
-                </div>
+                <h3 className="text-lg font-bold text-black">{member.name}</h3>
+                <p className="text-black/50 text-sm">{member.role}</p>
               </div>
             ))}
           </div>
@@ -275,6 +266,17 @@ export default function About() {
 
       {/* CTA */}
       <section className="py-24 bg-neutral-950">
+        <div style={{ height: "600px", position: "relative" }}>
+          <div className="w-full h-full grayscale">
+            <CircularGallery
+              bend={1}
+              textColor="#ffffff"
+              borderRadius={0.05}
+              scrollSpeed={2}
+              scrollEase={0.05}
+            />
+          </div>
+        </div>
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-4xl sm:text-5xl font-medium text-white tracking-tight">
             Want to be our next success story?

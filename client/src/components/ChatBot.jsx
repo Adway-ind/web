@@ -1,141 +1,238 @@
-import { useState, useRef, useEffect } from "react";
+﻿import { useState, useRef, useEffect } from "react";
 import { MessageCircle, X, Send, Bot, User } from "lucide-react";
+import { API } from "../config/api";
 
-/* ─── Quick prompts ─── */
-const quickPrompts = [
-  "What services do you offer?",
-  "How much does branding cost?",
-  "How long does a project take?",
-  "I want to start a project",
+const serviceOptions = [
+  "Website Development",
+  "Branding & Logo Design",
+  "Social Media Marketing",
+  "SEO Services",
+  "Video Production",
 ];
 
-/* ─── Bot responses ─── */
-const botResponses = {
-  services:
-    "We offer Brand Strategy, Visual Identity, Digital Design, Motion Graphics, Brand Growth, and Brand Guidelines. Each service is tailored to your specific needs. Want to explore any of these in detail?",
-  cost: "Our pricing is project-based and depends on scope, timeline, and deliverables. Typical branding projects range from $5K–$50K+. We'd love to learn more about your needs — shall I connect you with our team?",
-  timeline:
-    "Most branding projects take 6–12 weeks depending on complexity. A visual identity project is typically 6–8 weeks, while a full brand strategy can take 10–12 weeks. Want to discuss your specific timeline?",
-  start:
-    "Great! The best way to get started is to fill out our contact form or schedule a call. I can redirect you to our contact page right now — just say the word!",
-  default:
-    "Thanks for your message! For detailed inquiries, our team is best equipped to help. Would you like me to connect you with someone, or is there anything else I can assist with?",
+const projectTypeOptions = {
+  "Website Development": [
+    "Business Website",
+    "E-commerce Store",
+    "Portfolio Website",
+    "Landing Page",
+  ],
+  "Branding & Logo Design": [
+    "Logo Design",
+    "Brand Identity",
+    "Rebrand / Refresh",
+    "Packaging Design",
+  ],
+  "Social Media Marketing": [
+    "Content Creation",
+    "Advertising Campaign",
+    "Channel Management",
+    "Influencer Marketing",
+  ],
+  "SEO Services": [
+    "Local SEO",
+    "Technical SEO",
+    "Content SEO",
+    "SEO Audit",
+  ],
+  "Video Production": [
+    "Explainer Video",
+    "Social Media Video",
+    "Brand Film",
+    "Product Video",
+  ],
 };
 
-function getBotResponse(input) {
-  const lower = input.toLowerCase();
-  if (
-    lower.includes("service") ||
-    lower.includes("offer") ||
-    lower.includes("what do you")
-  )
-    return botResponses.services;
-  if (
-    lower.includes("cost") ||
-    lower.includes("price") ||
-    lower.includes("pricing") ||
-    lower.includes("how much")
-  )
-    return botResponses.cost;
-  if (
-    lower.includes("long") ||
-    lower.includes("timeline") ||
-    lower.includes("take") ||
-    lower.includes("duration")
-  )
-    return botResponses.timeline;
-  if (
-    lower.includes("start") ||
-    lower.includes("begin") ||
-    lower.includes("project") ||
-    lower.includes("hire")
-  )
-    return botResponses.start;
-  return botResponses.default;
-}
+const budgetOptions = [
+  "₹25K–₹50K",
+  "₹50K–₹1L",
+  "₹1L–₹3L",
+  "₹3L+",
+];
+
+const timelineOptions = [
+  "Immediately",
+  "Within 1 Month",
+  "Within 3 Months",
+  "Just Exploring",
+];
+
+const consultationOptions = [
+  "Book Consultation",
+  "Request Proposal",
+  "Talk to Expert",
+];
+
+const initialMessage = {
+  role: "bot",
+  text: "👋 Welcome to Adway Creations. What service are you interested in?",
+  options: serviceOptions,
+};
 
 export default function ChatBot() {
   const [isOpen, setIsOpen] = useState(false);
-  const [messages, setMessages] = useState([
-    {
-      role: "bot",
-      text: "Hey there! 👋 I'm Adway's assistant. How can I help you today?",
-    },
-  ]);
-  const [input, setInput] = useState("");
+  const [messages, setMessages] = useState([initialMessage]);
+  const [stage, setStage] = useState("service");
+  const [selectedService, setSelectedService] = useState("");
+  const [selectedProjectType, setSelectedProjectType] = useState("");
+  const [selectedBudget, setSelectedBudget] = useState("");
+  const [selectedTimeline, setSelectedTimeline] = useState("");
+  const [contact, setContact] = useState({
+    name: "",
+    business: "",
+    email: "",
+    phone: "",
+    requirements: "",
+  });
+  const [contactSubmitted, setContactSubmitted] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
 
-  /* Auto-scroll to bottom */
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, isTyping]);
 
-  /* Focus input when chat opens */
   useEffect(() => {
     if (isOpen) {
       setTimeout(() => inputRef.current?.focus(), 300);
     }
   }, [isOpen]);
 
-  const handleSend = (text) => {
-    const msg = text || input.trim();
-    if (!msg) return;
-
-    setMessages((prev) => [...prev, { role: "user", text: msg }]);
-    setInput("");
-    setIsTyping(true);
-
-    /* Simulate typing delay */
-    setTimeout(
-      () => {
-        setIsTyping(false);
-        setMessages((prev) => [
-          ...prev,
-          { role: "bot", text: getBotResponse(msg) },
-        ]);
-      },
-      800 + Math.random() * 600,
-    );
+  const appendUserMessage = (text) => {
+    setMessages((prev) => [...prev, { role: "user", text }]);
   };
 
-  const handleKeyDown = (e) => {
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault();
-      handleSend();
+  const appendBotMessage = (text, options = []) => {
+    setMessages((prev) => [...prev, { role: "bot", text, options }]);
+  };
+
+  const handleOptionSelect = (option) => {
+    appendUserMessage(option);
+    setIsTyping(true);
+
+    setTimeout(() => {
+      setIsTyping(false);
+
+      if (stage === "service") {
+        setSelectedService(option);
+        const followUp = projectTypeOptions[option] || ["Small Project", "Medium Project", "Large Project"];
+        appendBotMessage(
+          `Great choice! What type of ${option.toLowerCase()} do you need?`,
+          followUp,
+        );
+        setStage("projectType");
+        return;
+      }
+
+      if (stage === "projectType") {
+        setSelectedProjectType(option);
+        appendBotMessage("What's your approximate budget?", budgetOptions);
+        setStage("budget");
+        return;
+      }
+
+      if (stage === "budget") {
+        setSelectedBudget(option);
+        appendBotMessage("How soon would you like to start?", timelineOptions);
+        setStage("timeline");
+        return;
+      }
+
+      if (stage === "timeline") {
+        setSelectedTimeline(option);
+        appendBotMessage(
+          "Please enter your name, business name, email, phone number and a brief project summary so our team can contact you.",
+        );
+        setStage("contact");
+        return;
+      }
+
+      if (stage === "consultation") {
+        appendBotMessage(
+          "Thank you for choosing Adway Creations. Our team will reach out shortly with the next steps.",
+        );
+        setStage("done");
+        return;
+      }
+    }, 500);
+  };
+
+  const handleContactChange = (field, value) => {
+    setContact((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const handleContactSubmit = async (event) => {
+    event.preventDefault();
+    if (!contact.name || !contact.phone || !contact.email) {
+      return;
+    }
+
+    const summary = `Name: ${contact.name}, Business: ${contact.business || "N/A"}, Email: ${contact.email}, Phone: ${contact.phone}, Requirements: ${contact.requirements || "N/A"}`;
+    appendUserMessage(summary);
+    setContactSubmitted(true);
+    setIsTyping(true);
+
+    try {
+      const payload = {
+        service: selectedService,
+        projectType: selectedProjectType,
+        budget: selectedBudget,
+        timeline: selectedTimeline,
+        contact,
+      };
+
+      const response = await fetch(`${API}/api/chat-enquiries`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        const error = await response.json().catch(() => ({}));
+        throw new Error(error.error || "Failed to submit inquiry");
+      }
+
+      const data = await response.json();
+      appendBotMessage(
+        "Thanks! Your inquiry has been sent. Would you like a free consultation with our team?",
+        consultationOptions,
+      );
+      setStage("consultation");
+    } catch (error) {
+      console.error("Chat enquiry submit failed:", error);
+      appendBotMessage(
+        "Something went wrong while saving your inquiry. Please try again or contact us directly.",
+      );
+      setContactSubmitted(false);
+      setStage("contact");
+    } finally {
+      setIsTyping(false);
     }
   };
 
+  const showContactForm = stage === "contact" && !contactSubmitted;
+
   return (
     <>
-      {/* ─── Chat Panel ─── */}
       <div
-        className={`fixed z-[9999] transition-all duration-300 ease-out
-          /* Bottom position — above the FAB on all screens */
-          bottom-24 right-4 sm:right-6
-          /* Full width on small screens, capped on larger */
-          w-[calc(100vw-2rem)] sm:w-[400px]
-          max-h-[70vh] sm:max-h-[520px]
-          ${
-            isOpen
-              ? "opacity-100 translate-y-0 pointer-events-auto"
-              : "opacity-0 translate-y-4 pointer-events-none"
-          }
-        `}
+        className={`fixed z-[9999] transition-all duration-300 ease-out bottom-24 right-4 sm:right-6 w-[calc(100vw-2rem)] sm:w-[400px] max-h-[70vh] sm:max-h-[520px] ${
+          isOpen
+            ? "opacity-100 translate-y-0 pointer-events-auto"
+            : "opacity-0 translate-y-4 pointer-events-none"
+        }`}
       >
         <div className="flex flex-col bg-neutral-950 border border-white/10 rounded-2xl shadow-2xl shadow-black/50 overflow-hidden h-[70vh] sm:h-[520px]">
-          {/* Header */}
           <div className="flex items-center justify-between px-5 py-4 border-b border-white/10 bg-black">
             <div className="flex items-center gap-3">
               <div className="w-9 h-9 bg-white/10 rounded-full flex items-center justify-center">
                 <Bot className="w-5 h-5 text-white" />
               </div>
               <div>
-                <p className="text-sm font-semibold text-white leading-tight">
-                  Adway Assistant
-                </p>
-                <p className="text-[11px] text-white/40">Always online</p>
+                <p className="text-sm font-semibold text-white leading-tight">Adway Assistant</p>
+                <p className="text-[11px] text-white/40">Guided lead generation</p>
               </div>
             </div>
             <button
@@ -147,14 +244,12 @@ export default function ChatBot() {
             </button>
           </div>
 
-          {/* Messages */}
           <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4 scrollbar-thin">
-            {messages.map((msg, i) => (
+            {messages.map((msg, index) => (
               <div
-                key={i}
+                key={index}
                 className={`flex gap-2.5 ${msg.role === "user" ? "flex-row-reverse" : "flex-row"}`}
               >
-                {/* Avatar */}
                 <div
                   className={`shrink-0 w-7 h-7 rounded-full flex items-center justify-center mt-0.5 ${
                     msg.role === "bot" ? "bg-white/10" : "bg-white/20"
@@ -167,7 +262,6 @@ export default function ChatBot() {
                   )}
                 </div>
 
-                {/* Bubble */}
                 <div
                   className={`max-w-[80%] px-4 py-2.5 rounded-2xl text-sm leading-relaxed ${
                     msg.role === "bot"
@@ -180,7 +274,6 @@ export default function ChatBot() {
               </div>
             ))}
 
-            {/* Typing indicator */}
             {isTyping && (
               <div className="flex gap-2.5">
                 <div className="shrink-0 w-7 h-7 rounded-full bg-white/10 flex items-center justify-center mt-0.5">
@@ -199,89 +292,105 @@ export default function ChatBot() {
             <div ref={messagesEndRef} />
           </div>
 
-          {/* Quick prompts */}
-          {messages.length <= 1 && (
-            <div className="px-4 pb-2 flex flex-wrap gap-2">
-              {quickPrompts.map((prompt) => (
-                <button
-                  key={prompt}
-                  onClick={() => handleSend(prompt)}
-                  className="px-3 py-1.5 bg-white/5 border border-white/10 rounded-full text-xs text-white/60 hover:text-white hover:border-white/25 transition-all duration-200"
-                >
-                  {prompt}
-                </button>
-              ))}
-            </div>
-          )}
-
-          {/* Input */}
           <div className="px-4 py-3 border-t border-white/10 bg-black">
-            <div className="flex items-end gap-2">
-              <textarea
-                ref={inputRef}
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyDown={handleKeyDown}
-                placeholder="Type a message..."
-                rows={1}
-                className="flex-1 px-4 py-2.5 rounded-xl border border-white/10 focus:border-white/25 focus:ring-1 focus:ring-white/10 outline-none transition-all bg-white/5 text-white text-sm placeholder:text-white/30 resize-none max-h-24"
-                style={{ minHeight: "42px" }}
-              />
-              <button
-                onClick={() => handleSend()}
-                disabled={!input.trim()}
-                className="shrink-0 w-10 h-10 rounded-xl bg-white text-black flex items-center justify-center hover:bg-white/90 transition-all duration-200 disabled:opacity-30 disabled:cursor-not-allowed"
-                aria-label="Send message"
-              >
-                <Send className="w-4 h-4" />
-              </button>
-            </div>
+            {showContactForm ? (
+              <form onSubmit={handleContactSubmit} className="space-y-3">
+                <div className="grid gap-3">
+                  <input
+                    type="text"
+                    value={contact.name}
+                    onChange={(e) => handleContactChange("name", e.target.value)}
+                    placeholder="Name"
+                    className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/40 focus:outline-none"
+                    required
+                  />
+                  <input
+                    type="text"
+                    value={contact.business}
+                    onChange={(e) => handleContactChange("business", e.target.value)}
+                    placeholder="Business Name"
+                    className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/40 focus:outline-none"
+                  />
+                  <input
+                    type="email"
+                    value={contact.email}
+                    onChange={(e) => handleContactChange("email", e.target.value)}
+                    placeholder="Email"
+                    className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/40 focus:outline-none"
+                    required
+                  />
+                  <input
+                    type="tel"
+                    value={contact.phone}
+                    onChange={(e) => handleContactChange("phone", e.target.value)}
+                    placeholder="Phone Number"
+                    className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/40 focus:outline-none"
+                    required
+                  />
+                  <textarea
+                    value={contact.requirements}
+                    onChange={(e) => handleContactChange("requirements", e.target.value)}
+                    placeholder="Project requirements"
+                    rows={3}
+                    className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/40 focus:outline-none resize-none"
+                  />
+                </div>
+                <button
+                  type="submit"
+                  className="w-full rounded-xl bg-violet-600 px-4 py-3 text-sm font-semibold text-white hover:bg-violet-500 transition"
+                >
+                  Submit Contact Details
+                </button>
+              </form>
+            ) : (
+              <div className="flex flex-wrap gap-2">
+                {messages
+                  .filter((msg) => msg.role === "bot" && msg.options)
+                  .slice(-1)[0]
+                  ?.options?.map((option) => (
+                    <button
+                      key={option}
+                      onClick={() => handleOptionSelect(option)}
+                      className="px-3 py-2 border border-white/20 text-white rounded-full text-xs hover:text-black hover:bg-white transition"
+                    >
+                      {option}
+                    </button>
+                  ))}
+              </div>
+            )}
           </div>
         </div>
       </div>
 
-      {/* ─── Floating Action Button ─── */}
       <div className="fixed z-[9998] bottom-5 right-4 sm:right-6">
-        {/* Notification badge */}
         {!isOpen && (
           <span className="absolute -top-1 -right-1 z-10 flex h-5 w-5 items-center justify-center rounded-full bg-rose-500 text-[10px] font-bold text-white ">
             3
           </span>
         )}
-
         <button
           onClick={() => setIsOpen(!isOpen)}
           aria-label={isOpen ? "Close chat" : "Open chat"}
-          className={`
-    relative flex h-[55px] w-[55px] items-center justify-center rounded-full
-    transition-all duration-300 ease-out overflow-visible
-    ${
-      isOpen
-        ? "scale-90 border border-white bg-black hover:bg-violet-600"
-        : "border border-violet-500/10 bg-violet-600 hover:bg-violet-600/30"
-    }
-  `}
+          className={`relative flex h-[55px] w-[55px] items-center justify-center rounded-full transition-all duration-300 ease-out overflow-visible ${
+            isOpen
+              ? "scale-90 border border-white bg-black hover:bg-violet-600"
+              : "border border-violet-500/10 bg-violet-600 hover:bg-violet-600/30"
+          }`}
         >
           {!isOpen && (
             <>
-              {/* Pulse Effects */}
               <span className="absolute -inset-2 rounded-full animate-spin [animation-duration:5s]">
                 <span className="absolute inset-0 rounded-full border border-violet-500/20" />
                 <span className="absolute top-0 left-1/2 -translate-x-1/2 w-2 h-2 rounded-full bg-violet-400 shadow-[0_0_12px_rgba(167,139,250,0.9)]" />
               </span>
-
-              {/* Rotating Ring */}
               <span className="absolute -inset-2 rounded-full animate-spin [animation-duration:2s]">
-<span className="absolute inset-0 rounded-full border-2 border-transparent border-t-white/80 border-r-white/80" />              </span>
-
-             
-
+                <span className="absolute inset-0 rounded-full border-2 border-transparent border-t-white/80 border-r-white/80" />
+              </span>
               <span className="absolute -inset-3 rounded-full animate-spin [animation-duration:8s] [animation-direction:reverse]">
                 <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-indigo-400 shadow-[0_0_8px_rgba(129,140,248,0.8)]" />
               </span>
             </>
           )}
-
           <span className="relative z-10">
             {isOpen ? (
               <X className="h-[22px] w-[22px] text-white" strokeWidth={2.5} />

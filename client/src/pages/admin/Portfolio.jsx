@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "../../context/AuthContext";
+import { API } from "../../config/api";
 import {
   Briefcase,
   Search,
@@ -16,8 +17,6 @@ import {
 } from "lucide-react";
 import * as XLSX from "xlsx";
 
-const API = import.meta.env.VITE_API_URL || "http://localhost:5000";
-
 const resolveImageUrl = (url) => {
   if (!url) return "";
   if (/^(?:https?:|blob:|data:)/.test(url)) return url;
@@ -32,7 +31,6 @@ export default function AdminPortfolio() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingProject, setEditingProject] = useState(null);
 
-  // File tracker stores are now accurately reset on context initialization
   const [coverFile, setCoverFile] = useState(null);
   const [galleryFiles, setGalleryFiles] = useState([]);
 
@@ -49,6 +47,7 @@ export default function AdminPortfolio() {
     challenge: "",
     result: "",
     images: "",
+    featured: "",
   });
 
   const fetchProjects = () => {
@@ -78,19 +77,22 @@ export default function AdminPortfolio() {
       Category: project.category || "",
       Client: project.client || "",
       Year: project.year || "",
+      Featured: project.featured ? "Yes" : "No",
       Description: project.desc || "",
       Challenge: project.challenge || "",
       Result: project.result || "",
-      Tags: Array.isArray(project.tags) ? project.tags.join(", ") : project.tags || "",
+      Tags: Array.isArray(project.tags)
+        ? project.tags.join(", ")
+        : project.tags || "",
       "Cover Image URL": resolveImageUrl(project.image),
       "Gallery URLs": Array.isArray(project.images)
-        ? project.images.map(url => resolveImageUrl(url)).join(", ")
+        ? project.images.map((url) => resolveImageUrl(url)).join(", ")
         : project.images || "",
     }));
 
     const worksheet = XLSX.utils.json_to_sheet(sheetData);
     const workbook = XLSX.utils.book_new();
-    XXLSX.utils.book_append_sheet(workbook, worksheet, "Portfolio Projects");
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Portfolio Projects");
 
     const maxColumnWidths = Object.keys(sheetData[0]).map((key) => {
       const maxLength = Math.max(
@@ -101,12 +103,14 @@ export default function AdminPortfolio() {
     });
     worksheet["!cols"] = maxColumnWidths;
 
-    XXLSX.writeFile(workbook, `portfolio_export_${new Date().toISOString().split('T')[0]}.xlsx`);
+    XLSX.writeFile(
+      workbook,
+      `portfolio_export_${new Date().toISOString().split("T")[0]}.xlsx`
+    );
   };
 
   const openAddModal = () => {
     setEditingProject(null);
-    // Explicitly flushing old stuck files out of memory
     setCoverFile(null);
     setGalleryFiles([]);
     setFormData({
@@ -121,13 +125,13 @@ export default function AdminPortfolio() {
       challenge: "",
       result: "",
       images: "",
+      featured: "",
     });
     setIsModalOpen(true);
   };
 
   const openEditModal = (project) => {
     setEditingProject(project);
-    // Flush out previous session caches cleanly before mapping edit entries
     setCoverFile(null);
     setGalleryFiles([]);
     setFormData({
@@ -135,13 +139,18 @@ export default function AdminPortfolio() {
       slug: project.slug || "",
       category: project.category || "Brand Strategy",
       image: project.image || "",
-      tags: Array.isArray(project.tags) ? project.tags.join(", ") : project.tags || "",
+      tags: Array.isArray(project.tags)
+        ? project.tags.join(", ")
+        : project.tags || "",
       year: project.year || "",
       client: project.client || "",
       desc: project.desc || "",
       challenge: project.challenge || "",
       result: project.result || "",
-      images: Array.isArray(project.images) ? project.images.join(", ") : project.images || "",
+      images: Array.isArray(project.images)
+        ? project.images.join(", ")
+        : project.images || "",
+      featured: project.featured ? true : false,
     });
     setIsModalOpen(true);
   };
@@ -156,6 +165,51 @@ export default function AdminPortfolio() {
     }
   };
 
+  /* ── Inline featured toggle with optimistic UI ── */
+  const handleToggleFeatured = async (project) => {
+    // Convert to 0/1 integer since database stores TINYINT
+    const newFeatured = project.featured ? 0 : 1;
+
+    // Optimistic UI update
+    setProjects((prev) =>
+      prev.map((p) =>
+        p.id === project.id ? { ...p, featured: newFeatured } : p
+      )
+    );
+
+    try {
+      const form = new FormData();
+      form.append("featured", newFeatured);
+
+      const result = await authFetch(
+        `/api/admin/portfolio/${project.id}`,
+        {
+          method: "PATCH",
+          body: form,
+        }
+      );
+
+      if (result && typeof result === "object") {
+        setProjects((prev) =>
+          prev.map((p) =>
+            p.id === project.id ? result : p
+          )
+        );
+      }
+    } catch (err) {
+      // rollback
+      setProjects((prev) =>
+        prev.map((p) =>
+          p.id === project.id
+            ? { ...p, featured: project.featured }
+            : p
+        )
+      );
+
+      alert("Failed to update featured status: " + err.message);
+    }
+  };
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -164,7 +218,6 @@ export default function AdminPortfolio() {
   const handleCoverImageChange = (e) => {
     const file = e.target.files[0];
     if (!file) return;
-
     setCoverFile(file);
     setFormData((prev) => ({
       ...prev,
@@ -176,17 +229,18 @@ export default function AdminPortfolio() {
     const files = Array.from(e.target.files);
     if (!files.length) return;
 
-    // Attach tracking wrappers to newly loaded items to cleanly isolate them from backend DB links
-    const filesWithId = files.map(file => ({
+    const filesWithId = files.map((file) => ({
       file,
-      localUrl: URL.createObjectURL(file)
+      localUrl: URL.createObjectURL(file),
     }));
 
     setGalleryFiles((prev) => [...prev, ...filesWithId]);
 
     setFormData((prev) => {
-      const existing = prev.images ? prev.images.split(",").filter(Boolean) : [];
-      const newPreviews = filesWithId.map(f => f.localUrl);
+      const existing = prev.images
+        ? prev.images.split(",").filter(Boolean)
+        : [];
+      const newPreviews = filesWithId.map((f) => f.localUrl);
       return {
         ...prev,
         images: [...existing, ...newPreviews].join(","),
@@ -199,8 +253,9 @@ export default function AdminPortfolio() {
       const imgs = prev.images.split(",").filter(Boolean);
       const targetUrl = imgs[index];
 
-      // Clean up local binary file reference tracker arrays safely using references
-      setGalleryFiles((prevFiles) => prevFiles.filter(item => item.localUrl !== targetUrl));
+      setGalleryFiles((prevFiles) =>
+        prevFiles.filter((item) => item.localUrl !== targetUrl)
+      );
 
       imgs.splice(index, 1);
       return {
@@ -229,29 +284,32 @@ export default function AdminPortfolio() {
       form.append("challenge", formData.challenge);
       form.append("result", formData.result);
       form.append("tags", formData.tags);
+      // Convert boolean to 0/1 for database
+      form.append("featured", formData.featured ? 1 : 0);
 
       if (coverFile) {
         form.append("coverImage", coverFile);
       }
 
-      // We maintain and separate what images are preserved database entries vs freshly attached file blocks
       const currentImages = formData.images.split(",").filter(Boolean);
-      const existingDbUrls = currentImages.filter(url => !url.startsWith("blob:"));
+      const existingDbUrls = currentImages.filter(
+        (url) => !url.startsWith("blob:")
+      );
 
       form.append("existingImages", JSON.stringify(existingDbUrls));
 
-      galleryFiles.forEach(wrapper => {
+      galleryFiles.forEach((wrapper) => {
         form.append("galleryImages", wrapper.file);
       });
 
       const result = await authFetch(url, {
         method,
-        body: form
+        body: form,
       });
 
       if (editingProject) {
         setProjects((prev) =>
-          prev.map((p) => p.id === editingProject.id ? result : p)
+          prev.map((p) => (p.id === editingProject.id ? result : p))
         );
       } else {
         setProjects((prev) => [result, ...prev]);
@@ -279,11 +337,13 @@ export default function AdminPortfolio() {
         <div>
           <h1 className="text-2xl font-bold text-white">Portfolio Items</h1>
           <p className="text-white/40 text-sm mt-1">
-            {projects.length} total projects in database
+            {projects.length} total projects &mdash;{" "}
+            <span className="text-violet-400">
+              {projects.filter((p) => p.featured).length} featured
+            </span>
           </p>
         </div>
 
-        {/* Action Controls Container */}
         <div className="flex items-center gap-3">
           <button
             onClick={exportToExcel}
@@ -316,106 +376,171 @@ export default function AdminPortfolio() {
         />
       </div>
 
-      {/* Loading Canvas state */}
+      {/* Loading state */}
       {loading ? (
         <div className="flex items-center justify-center h-64">
           <div className="w-6 h-6 border-2 border-white/20 border-t-violet-500 rounded-full animate-spin" />
         </div>
       ) : (
-        /* Projects Grid wrapper */
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filtered.length === 0 ? (
-            <div className="col-span-full text-center py-16 bg-white/[0.01] border border-white/[0.04] rounded-2xl">
-              <Briefcase className="w-10 h-10 text-white/10 mx-auto mb-3" />
-              <p className="text-white/20">No projects found</p>
-            </div>
-          ) : (
-            filtered.map((project) => (
-              <div
-                key={project.id}
-                className="bg-white/[0.02] border border-white/[0.06] rounded-2xl overflow-hidden hover:border-white/10 transition-all flex flex-col group"
-              >
-                {/* Visual Cover Asset */}
-                <div className="aspect-[16/10] bg-neutral-900 relative overflow-hidden">
-                  {project.image ? (
-                    <img
-                      src={resolveImageUrl(project.image)}
-                      alt={project.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center text-white/10">
-                      <ImageIcon className="w-8 h-8" />
-                    </div>
-                  )}
-                  <div className="absolute top-3 left-3 bg-black/60 backdrop-blur-md px-2.5 py-1 rounded-full text-[10px] font-semibold text-white/80 border border-white/10 uppercase tracking-wide">
-                    {project.category}
-                  </div>
-                </div>
+        <div className="overflow-hidden rounded-2xl border border-white/10 bg-white/[0.02]">
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-white/10 bg-white/[0.03]">
+                  <th className="px-4 py-3 text-left text-white/50 font-semibold">
+                    Image
+                  </th>
+                  <th className="px-4 py-3 text-left text-white/50 font-semibold">
+                    Title
+                  </th>
+                  <th className="px-4 py-3 text-left text-white/50 font-semibold">
+                    Category
+                  </th>
+                  <th className="px-4 py-3 text-left text-white/50 font-semibold">
+                    Client
+                  </th>
+                  <th className="px-4 py-3 text-left text-white/50 font-semibold">
+                    Year
+                  </th>
+                  <th className="px-4 py-3 text-left text-white/50 font-semibold">
+                    Tags
+                  </th>
+                  {/* ── NEW: Featured column ── */}
+                  <th className="px-4 py-3 text-center text-white/50 font-semibold">
+                    Featured
+                  </th>
+                  <th className="px-4 py-3 text-right text-white/50 font-semibold">
+                    Actions
+                  </th>
+                </tr>
+              </thead>
 
-                {/* Information blocks layout */}
-                <div className="p-5 flex-1 flex flex-col justify-between">
-                  <div className="space-y-2">
-                    <h3 className="text-lg font-bold text-white line-clamp-1">
-                      {project.title}
-                    </h3>
-                    <p className="text-white/40 text-xs leading-relaxed line-clamp-2">
-                      {project.desc}
-                    </p>
+              <tbody>
+                {filtered.length === 0 ? (
+                  <tr>
+                    <td colSpan={8} className="py-10 text-center text-white/30">
+                      No projects found
+                    </td>
+                  </tr>
+                ) : (
+                  filtered.map((project) => (
+                    <tr
+                      key={project.id}
+                      className="border-b border-white/[0.05] hover:bg-white/[0.03] transition"
+                    >
+                      {/* Image */}
+                      <td className="px-4 py-3">
+                        {project.image ? (
+                          <img
+                            src={resolveImageUrl(project.image)}
+                            alt={project.title}
+                            className="w-16 h-12 rounded-lg object-cover border border-white/10"
+                          />
+                        ) : (
+                          <div className="w-16 h-12 rounded-lg bg-white/5 flex items-center justify-center">
+                            <ImageIcon className="w-4 h-4 text-white/20" />
+                          </div>
+                        )}
+                      </td>
 
-                    <div className="pt-2 flex flex-wrap gap-4 text-xs text-white/30">
-                      <span className="flex items-center gap-1">
-                        <User className="w-3 h-3" />
+                      {/* Title */}
+                      <td className="px-4 py-3">
+                        <div className="font-medium text-white">
+                          {project.title}
+                        </div>
+                        <div className="text-xs text-white/40 line-clamp-1">
+                          {project.desc}
+                        </div>
+                      </td>
+
+                      {/* Category */}
+                      <td className="px-4 py-3 text-white/70">
+                        {project.category}
+                      </td>
+
+                      {/* Client */}
+                      <td className="px-4 py-3 text-white/70">
                         {project.client}
-                      </span>
-                      <span className="flex items-center gap-1">
-                        <Calendar className="w-3 h-3" />
+                      </td>
+
+                      {/* Year */}
+                      <td className="px-4 py-3 text-white/70">
                         {project.year}
-                      </span>
-                    </div>
+                      </td>
 
-                    <div className="flex flex-wrap gap-1.5 pt-2">
-                      {(Array.isArray(project.tags)
-                        ? project.tags
-                        : typeof project.tags === "string"
-                          ? project.tags.split(",").map((t) => t.trim()).filter(Boolean)
-                          : [])
-                        .map((tag) => (
+                      {/* Tags */}
+                      <td className="px-4 py-3">
+                        <div className="flex flex-wrap gap-1">
+                          {(Array.isArray(project.tags)
+                            ? project.tags
+                            : typeof project.tags === "string"
+                              ? project.tags
+                                .split(",")
+                                .map((t) => t.trim())
+                                .filter(Boolean)
+                              : []
+                          )
+                            .slice(0, 3)
+                            .map((tag) => (
+                              <span
+                                key={tag}
+                                className="px-2 py-0.5 bg-white/5 border border-white/10 rounded-full text-[10px] text-white/60"
+                              >
+                                {tag}
+                              </span>
+                            ))}
+                        </div>
+                      </td>
+
+                      {/* ── Featured toggle ── */}
+                      <td className="px-4 py-3 text-center">
+                        <button
+                          onClick={() => handleToggleFeatured(project)}
+                          title={
+                            project.featured
+                              ? "Remove from homepage"
+                              : "Show on homepage"
+                          }
+                          className={`relative inline-flex w-11 h-6 rounded-full transition-all duration-300 focus:outline-none ${project.featured
+                              ? "bg-violet-600"
+                              : "bg-white/10 hover:bg-white/20"
+                            }`}
+                        >
                           <span
-                            key={tag}
-                            className="px-2 py-0.5 bg-white/5 border border-white/10 rounded-full text-[10px] text-white/50"
-                          >
-                            {tag}
-                          </span>
-                        ))}
-                    </div>
-                  </div>
+                            className={`absolute top-1 left-1 w-4 h-4 rounded-full bg-white shadow transition-all duration-300 ${project.featured ? "translate-x-5" : ""
+                              }`}
+                          />
+                        </button>
+                      </td>
 
-                  {/* Operational controls row */}
-                  <div className="mt-5 pt-4 border-t border-white/[0.04] flex items-center justify-end gap-2">
-                    <button
-                      onClick={() => openEditModal(project)}
-                      className="p-2 rounded-lg text-white/40 hover:text-white hover:bg-white/5 transition-all"
-                      title="Edit project"
-                    >
-                      <Edit className="w-4 h-4" />
-                    </button>
-                    <button
-                      onClick={() => handleDelete(project.id)}
-                      className="p-2 rounded-lg text-white/40 hover:text-rose-400 hover:bg-rose-500/10 transition-all"
-                      title="Delete project"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ))
-          )}
+                      {/* Actions */}
+                      <td className="px-4 py-3">
+                        <div className="flex justify-end gap-2">
+                          <button
+                            onClick={() => openEditModal(project)}
+                            className="p-2 rounded-lg text-white/40 hover:text-white hover:bg-white/5"
+                          >
+                            <Edit className="w-4 h-4" />
+                          </button>
+
+                          <button
+                            onClick={() => handleDelete(project.id)}
+                            className="p-2 rounded-lg text-white/40 hover:text-red-400 hover:bg-red-500/10"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
 
-      {/* Primary Editor Form Modal */}
+      {/* Editor Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in">
           <div className="bg-neutral-900 border border-white/10 rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl animate-scale-up flex flex-col">
@@ -522,7 +647,9 @@ export default function AdminPortfolio() {
                         onChange={handleCoverImageChange}
                         className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
                       />
-                      <span className="text-xs text-white/40 group-hover:text-white/60 transition-all">Choose file...</span>
+                      <span className="text-xs text-white/40 group-hover:text-white/60 transition-all">
+                        Choose file...
+                      </span>
                     </div>
                   ) : (
                     <div className="relative flex items-center justify-between p-2 bg-white/[0.03] border border-white/10 rounded-lg">
@@ -532,13 +659,15 @@ export default function AdminPortfolio() {
                           alt="Cover preview"
                           className="w-8 h-8 rounded object-cover border border-white/10"
                         />
-                        <span className="text-xs text-white/60 truncate max-w-[180px]">Main Cover Image Loaded</span>
+                        <span className="text-xs text-white/60 truncate max-w-[180px]">
+                          Main Cover Image Loaded
+                        </span>
                       </div>
                       <button
                         type="button"
                         onClick={() => {
                           setCoverFile(null);
-                          setFormData(prev => ({ ...prev, image: "" }));
+                          setFormData((prev) => ({ ...prev, image: "" }));
                         }}
                         className="p-1 rounded bg-red-500/10 hover:bg-red-500/20 text-red-400 transition-all"
                       >
@@ -606,7 +735,7 @@ export default function AdminPortfolio() {
                 />
               </div>
 
-              {/* Gallery upload logic context dropzone */}
+              {/* Gallery upload */}
               <div className="space-y-2">
                 <label className="text-[11px] font-semibold text-white/40 uppercase tracking-wider block">
                   Project Gallery Images
@@ -623,32 +752,67 @@ export default function AdminPortfolio() {
                   <span className="text-xs text-white/60 group-hover:text-violet-400 transition-all font-medium">
                     Click to upload gallery photos
                   </span>
-                  <span className="text-[10px] text-white/30 mt-0.5">Supports uploading multiple files at once</span>
+                  <span className="text-[10px] text-white/30 mt-0.5">
+                    Supports uploading multiple files at once
+                  </span>
                 </div>
 
-                {formData.images && formData.images.split(",").filter(Boolean).length > 0 && (
-                  <div className="grid grid-cols-4 sm:grid-cols-6 gap-2 p-3 bg-white/[0.02] border border-white/5 rounded-xl">
-                    {formData.images.split(",").map((imgUrl, idx) => {
-                      if (!imgUrl) return null;
-                      return (
-                        <div key={idx} className="relative aspect-square rounded-md overflow-hidden border border-white/10 group bg-neutral-950">
-                          <img
-                            src={resolveImageUrl(imgUrl.trim())}
-                            alt={`Preview asset ${idx}`}
-                            className="w-full h-full object-cover"
-                          />
-                          <button
-                            type="button"
-                            onClick={() => removeGalleryImage(idx)}
-                            className="absolute top-1 right-1 p-0.5 rounded bg-black/60 backdrop-blur-sm text-white/60 hover:text-red-400 hover:bg-black/90 transition-all"
+                {formData.images &&
+                  formData.images.split(",").filter(Boolean).length > 0 && (
+                    <div className="grid grid-cols-4 sm:grid-cols-6 gap-2 p-3 bg-white/[0.02] border border-white/5 rounded-xl">
+                      {formData.images.split(",").map((imgUrl, idx) => {
+                        if (!imgUrl) return null;
+                        return (
+                          <div
+                            key={idx}
+                            className="relative aspect-square rounded-md overflow-hidden border border-white/10 group bg-neutral-950"
                           >
-                            <X className="w-3 h-3" />
-                          </button>
-                        </div>
-                      );
-                    })}
-                  </div>
-                )}
+                            <img
+                              src={resolveImageUrl(imgUrl.trim())}
+                              alt={`Preview asset ${idx}`}
+                              className="w-full h-full object-cover"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => removeGalleryImage(idx)}
+                              className="absolute top-1 right-1 p-0.5 rounded bg-black/60 backdrop-blur-sm text-white/60 hover:text-red-400 hover:bg-black/90 transition-all"
+                            >
+                              <X className="w-3 h-3" />
+                            </button>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+              </div>
+
+              {/* Featured toggle */}
+              <div className="flex items-center justify-between p-4 bg-white/[0.03] border border-white/10 rounded-xl">
+                <div>
+                  <h3 className="text-sm font-semibold text-white">
+                    Featured Project
+                  </h3>
+                  <p className="text-xs text-white/40 mt-1">
+                    Show this project in homepage featured section
+                  </p>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      featured: !prev.featured,
+                    }))
+                  }
+                  className={`relative w-14 h-8 rounded-full transition-all duration-300 ${formData.featured ? "bg-violet-600" : "bg-white/10"
+                    }`}
+                >
+                  <span
+                    className={`absolute top-1 left-1 w-6 h-6 rounded-full bg-white transition-all duration-300 ${formData.featured ? "translate-x-6" : ""
+                      }`}
+                  />
+                </button>
               </div>
 
               <div className="pt-4 border-t border-white/10 flex items-center justify-end gap-3">

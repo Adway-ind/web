@@ -47,34 +47,7 @@ export default function Social() {
           </a>
 
           {/* Stats */}
-          <div className="mt-12 flex items-center justify-center gap-8 sm:gap-12">
-            <div className="text-center">
-              <div className="text-2xl sm:text-3xl font-bold text-white">
-                126
-              </div>
-              <div className="text-xs text-white/40 uppercase tracking-wider mt-1">
-                Followers
-              </div>
-            </div>
-            <div className="w-px h-8 bg-white/10" />
-            <div className="text-center">
-              <div className="text-2xl sm:text-3xl font-bold text-white">
-                95+
-              </div>
-              <div className="text-xs text-white/40 uppercase tracking-wider mt-1">
-                Posts
-              </div>
-            </div>
-            <div className="w-px h-8 bg-white/10" />
-            <div className="text-center">
-              <div className="text-2xl sm:text-3xl font-bold text-white">
-                190+
-              </div>
-              <div className="text-xs text-white/40 uppercase tracking-wider mt-1">
-                Following
-              </div>
-            </div>
-          </div>
+          
         </div>
       </section>
 

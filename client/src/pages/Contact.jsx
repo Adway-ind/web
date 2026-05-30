@@ -43,9 +43,41 @@ export default function Contact() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setSubmitted(true);
+
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/contact-enquiries`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(formData),
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message);
+      }
+
+      setSubmitted(true);
+
+      setFormData({
+        name: "",
+        email: "",
+        company: "",
+        service: "",
+        budget: "",
+        message: "",
+      });
+    } catch (error) {
+      console.error(error);
+      alert(error.message || "Failed to send enquiry");
+    }
   };
 
   return (

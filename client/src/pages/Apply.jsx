@@ -9,7 +9,7 @@ import {
   CheckCircle2,
   Send,
 } from "lucide-react";
-import { API } from "../context/AuthContext";
+import { API } from "../config/api";
 
 /* ─── Available positions ─── */
 const positions = [

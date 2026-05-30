@@ -2,13 +2,14 @@ import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { ChevronDown, ArrowRight, ArrowUpRight } from "lucide-react";
 import Video from "../assets/video/carrer-one.mp4";
-import { API } from "../context/AuthContext";
+import { API } from "../config/api";
 
 /* ─── Animated counter ─── */
 function useCountUp(end, duration = 2000) {
   const [count, setCount] = useState("0");
   const ref = useRef(null);
   const started = useRef(false);
+
 
   useEffect(() => {
     const obs = new IntersectionObserver(
@@ -58,13 +59,20 @@ const defaultCategories = [
         title: "Senior Brand Designer",
         location: "Remote / New York",
         type: "Full-time",
+        description: "Lead visual storytelling and brand systems across digital product launches.",
       },
       {
         title: "Digital Product Designer",
         location: "Remote / New York",
         type: "Full-time",
+        description: "Design seamless product experiences that align with brand strategy.",
       },
-      { title: "Motion Designer", location: "Remote", type: "Full-time" },
+      {
+        title: "Motion Designer",
+        location: "Remote",
+        type: "Full-time",
+        description: "Create motion assets for campaigns, presentations, and web interactions.",
+      },
     ],
   },
   {
@@ -75,16 +83,32 @@ const defaultCategories = [
         title: "Brand Strategist",
         location: "Remote / London",
         type: "Full-time",
+        description: "Shape positioning and campaign strategy for our most ambitious clients.",
       },
-      { title: "Operations Manager", location: "New York", type: "Full-time" },
+      {
+        title: "Operations Manager",
+        location: "New York",
+        type: "Full-time",
+        description: "Oversee team operations, resourcing, and process improvements.",
+      },
     ],
   },
   {
     title: "Data and Analytics",
     count: 2,
     roles: [
-      { title: "Content Writer", location: "Remote", type: "Part-time" },
-      { title: "Marketing Analyst", location: "Remote", type: "Full-time" },
+      {
+        title: "Content Writer",
+        location: "Remote",
+        type: "Part-time",
+        description: "Craft compelling copy for brands, campaigns, and client narratives.",
+      },
+      {
+        title: "Marketing Analyst",
+        location: "Remote",
+        type: "Full-time",
+        description: "Analyze marketing insights and recommend growth-focused strategies.",
+      },
     ],
   },
 ];
@@ -129,9 +153,8 @@ function AccordionRow({ category, index, isOpen, onToggle }) {
     <div>
       <button
         onClick={onToggle}
-        className={`w-full flex items-center justify-between px-0 sm:px-2 transition-colors duration-300 group ${
-          isOpen ? "bg-transparent" : "hover:bg-white/5"
-        }`}
+        className={`w-full flex items-center justify-between px-0 sm:px-2 transition-colors duration-300 group ${isOpen ? "bg-transparent" : "hover:bg-white/5"
+          }`}
         style={{ height: "88px" }}
       >
         <div className="flex items-center gap-4 sm:gap-6">
@@ -142,7 +165,7 @@ function AccordionRow({ category, index, isOpen, onToggle }) {
             {category.title}
           </span>
           <span className="text-sm text-white/30 font-medium">
-            {category.count}
+            {category.roles?.length || 0}
           </span>
         </div>
         <div
@@ -153,9 +176,8 @@ function AccordionRow({ category, index, isOpen, onToggle }) {
       </button>
 
       <div
-        className={`overflow-hidden transition-all duration-400 ease-in-out ${
-          isOpen ? "max-h-[600px] opacity-100" : "max-h-0 opacity-0"
-        }`}
+        className={`overflow-hidden transition-all duration-400 ease-in-out ${isOpen ? "max-h-[600px] opacity-100" : "max-h-0 opacity-0"
+          }`}
       >
         <div className="pb-8 pl-8 sm:pl-14">
           {category.roles.map((role) => (
@@ -173,6 +195,11 @@ function AccordionRow({ category, index, isOpen, onToggle }) {
                   <span className="w-1 h-1 bg-white/20 rounded-full" />
                   <span>{role.type}</span>
                 </div>
+                {role.description ? (
+                  <p className="mt-2 text-sm text-white/40 max-w-2xl">
+                    {role.description}
+                  </p>
+                ) : null}
               </div>
               <ArrowUpRight className="w-4 h-4 text-white/20 group-hover/role:text-white/80 transition-colors mt-2 sm:mt-0 shrink-0" />
             </Link>
@@ -204,6 +231,12 @@ export default function Career() {
   const [categories, setCategories] = useState(defaultCategories);
   const [values, setValues] = useState(defaultValues);
   const [perks, setPerks] = useState(defaultPerks);
+
+  const [showAll, setShowAll] = useState(false);
+
+  const displayedCategories = showAll
+    ? categories
+    : categories.slice(0, 5);
 
   useEffect(() => {
     fetch(`${API}/api/careers`)
@@ -394,9 +427,10 @@ export default function Career() {
 
           {/* Accordion */}
           <div className="border-t border-white/10">
-            {categories.map((cat, i) => (
+            {displayedCategories.map((cat, i) => (
               <div key={cat.title} className="border-b border-white/10">
                 <AccordionRow
+                  index={i}
                   category={cat}
                   isOpen={openIndex === i}
                   onToggle={() => setOpenIndex(openIndex === i ? null : i)}
@@ -406,15 +440,17 @@ export default function Career() {
           </div>
 
           {/* CTA Button */}
-          <div className="flex justify-center mt-16">
-            <Link
-              to="/apply"
-              className="group inline-flex items-center gap-2 text-sm font-medium text-white border border-white/20 px-8 py-4 rounded-full hover:bg-white hover:text-black transition-all duration-300"
-            >
-              See all openings
-              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-300" />
-            </Link>
-          </div>
+          {categories.length > 5 && !showAll && (
+            <div className="flex justify-center mt-16">
+              <button
+                onClick={() => setShowAll(true)}
+                className="group inline-flex items-center gap-2 text-sm font-medium text-white border border-white/20 px-8 py-4 rounded-full hover:bg-white hover:text-black transition-all duration-300"
+              >
+                See all openings
+                <ArrowDown className="w-4 h-4 group-hover:translate-y-1 transition-transform duration-300" />
+              </button>
+            </div>
+          )}
         </div>
       </section>
 

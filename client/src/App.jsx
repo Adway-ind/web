@@ -20,8 +20,11 @@ import AdminLayout from "./pages/admin/AdminLayout";
 import Dashboard from "./pages/admin/Dashboard";
 import Applications from "./pages/admin/Applications";
 import Messages from "./pages/admin/Messages";
+import ChatEnquiries from "./pages/admin/ChatEnquiries";
 import AdminSettings from "./pages/admin/Settings";
 import AdminPortfolio from "./pages/admin/Portfolio";
+import CareerJobs from "./pages/admin/CareerJobs";
+import ContactEnquiries from "./pages/admin/contact_enquiries";
 import "./App.css";
 
 function App() {
@@ -76,7 +79,10 @@ function App() {
           >
             <Route index element={<Dashboard />} />
             <Route path="applications" element={<Applications />} />
+            <Route path="career-jobs" element={<CareerJobs />} />
             <Route path="messages" element={<Messages />} />
+            <Route path="chat-enquiries" element={<ChatEnquiries />} />
+            <Route path="contact-enquiries" element={<ContactEnquiries />} />
             <Route path="settings" element={<AdminSettings />} />
             <Route path="portfolio" element={<AdminPortfolio />} />
           </Route>
