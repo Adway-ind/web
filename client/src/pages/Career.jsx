@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { ChevronDown, ArrowRight, ArrowUpRight } from "lucide-react";
 import Video from "../assets/video/carrer-one.mp4";
 import { API } from "../config/api";
+import SEO from "../components/SEO";
 
 /* ─── Animated counter ─── */
 function useCountUp(end, duration = 2000) {
@@ -253,6 +254,12 @@ export default function Career() {
 
   return (
     <>
+      <SEO 
+        title="Careers at Adway - Join Our Team | Branding Agency"
+        description="Join Adway's talented team of creatives, strategists, and developers. Explore career opportunities in branding, design, and digital marketing."
+        keywords="careers at adway, creative jobs, branding careers, design jobs, digital marketing careers"
+        url="/career"
+      />
       {/* ═══ HERO ═══ */}
       <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden bg-black ">
         <div className="absolute inset-0">

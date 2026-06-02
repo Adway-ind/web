@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 
 import Video from "../assets/video/service-one.mp4";
+import SEO from "../components/SEO";
 
 const services = [
   {
@@ -133,6 +134,12 @@ const process = [
 export default function Services() {
   return (
     <>
+      <SEO 
+        title="Our Services - Branding, Digital Marketing & Web Development | Adway"
+        description="Explore Adway's comprehensive services: brand strategy, visual identity, digital design, motion graphics, and brand growth solutions for modern businesses."
+        keywords="branding services, digital marketing, web development, visual identity, brand strategy, motion graphics"
+        url="/services"
+      />
       {/* Hero */}
       <section className="relative pt-32 pb-24 bg-black overflow-hidden">
         <div className="absolute inset-0">

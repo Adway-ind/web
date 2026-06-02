@@ -10,6 +10,7 @@ import {
   Tag,
 } from 'lucide-react'
 import { API } from '../config/api'
+import SEO from '../components/SEO'
 
 const resolveImageUrl = (url) => {
   if (!url) return ''
@@ -123,23 +124,36 @@ export default function PortfolioDetail() {
     setLoading(true)
     setNotFound(false)
     setProject(null)
+    console.log('Fetching project with slug:', slug)
     fetch(`${API}/api/projects/${slug}`)
       .then((res) => {
+        console.log('Response status:', res.status)
         if (!res.ok) throw new Error('Not found')
         return res.json()
       })
-      .then(({ project, prevSlug, nextSlug }) => {
-        setProject(project)
-        setPrevProject(prevSlug || null)
-        setNextProject(nextSlug || null)
+      .then((data) => {
+        console.log('Received project data:', data)
+        // Handle both response formats: { project, prevProject, nextProject } or direct project
+        const projectData = data.project || data
+        setProject(projectData)
+        setPrevProject(data.prevProject || null)
+        setNextProject(data.nextProject || null)
       })
-      .catch(() => setNotFound(true))
+      .catch((err) => {
+        console.error('Error fetching project:', err)
+        setNotFound(true)
+      })
       .finally(() => setLoading(false))
   }, [slug])
 
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-black">
+        <SEO 
+          title="Loading Project - Adway Portfolio"
+          description="Loading project details from Adway's portfolio."
+          url={`/portfolio/${slug}`}
+        />
         <div className="w-8 h-8 border-2 border-white/10 border-t-white/50 rounded-full animate-spin" />
       </div>
     )
@@ -148,6 +162,11 @@ export default function PortfolioDetail() {
   if (notFound || !project) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-black">
+        <SEO 
+          title="Project Not Found - Adway Portfolio"
+          description="The requested project could not be found in Adway's portfolio."
+          url={`/portfolio/${slug}`}
+        />
         <div className="text-center">
           <h1 className="text-4xl font-bold text-white mb-4">Project not found</h1>
           <p className="text-white/50 mb-8">The project you're looking for doesn't exist.</p>
@@ -165,21 +184,30 @@ export default function PortfolioDetail() {
   // Normalise images — API may return a JSON array string or an actual array
   const images = Array.isArray(project.images)
     ? project.images
+    : project.images && typeof project.images === 'string'
+    ? JSON.parse(project.images)
     : project.image
     ? [project.image]
     : []
 
-  const resolvedImages = images.map(resolveImageUrl)
+  const resolvedImages = images.filter(Boolean).map(resolveImageUrl)
 
   // Normalise tags
   const tags = Array.isArray(project.tags)
     ? project.tags
     : typeof project.tags === 'string'
-    ? JSON.parse(project.tags)
+    ? project.tags.split(',').map(t => t.trim()).filter(Boolean)
     : []
 
   return (
     <>
+      <SEO 
+        title={`${project.title} - Portfolio | Adway`}
+        description={project.description || `View ${project.title} project details in Adway's portfolio.`}
+        keywords={`${project.category}, branding project, digital marketing, ${project.title}`}
+        url={`/portfolio/${slug}`}
+        image={project.image ? resolveImageUrl(project.image) : undefined}
+      />
       {/* Top bar */}
       <div className="bg-black pt-24">
         <div className="max-w-6xl mx-auto px-6 lg:px-8 pb-8">

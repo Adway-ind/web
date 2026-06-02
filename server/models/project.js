@@ -79,6 +79,11 @@ module.exports = (sequelize, DataTypes) => {
           this.setDataValue("images", Array.isArray(value) ? JSON.stringify(value) : value);
         },
       },
+      featured: {
+        type: DataTypes.TINYINT,
+        allowNull: false,
+        defaultValue: 0,
+      },
     },
     {
       tableName: "projects",

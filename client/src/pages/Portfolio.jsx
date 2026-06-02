@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { ArrowRight, Filter } from "lucide-react";
 import Video from "../assets/video/portfolio-one.mp4";
 import { API } from "../config/api";
+import SEO from "../components/SEO";
 
 const resolveImageUrl = (url) => {
   if (!url) return "";
@@ -41,6 +42,12 @@ export default function Portfolio() {
 
   return (
     <>
+      <SEO 
+        title="Our Portfolio - Branding & Digital Projects | Adway"
+        description="Explore Adway's portfolio of successful branding, digital marketing, and web development projects. See how we've transformed brands across industries."
+        keywords="portfolio, branding projects, digital marketing, web development portfolio, creative work"
+        url="/portfolio"
+      />
       {/* Hero */}
       <section className="relative pt-32 pb-24 bg-black overflow-hidden">
         <div className="absolute inset-0">
@@ -102,14 +109,22 @@ export default function Portfolio() {
           {/* Projects Grid */}
           {loading ? (
             <div className="flex items-center justify-center py-24">
-              <div className="w-8 h-8 border-2 border-white/10 border-t-white/50 rounded-full animate-spin" />
+              <div className="w-8 h-8 border-2   rounded-full animate-spin" />
             </div>
           ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {projects.map((project) => (
+            {projects.map((project) => {
+              // Ensure tags is an array
+              const projectTags = Array.isArray(project.tags) 
+                ? project.tags 
+                : typeof project.tags === 'string'
+                ? project.tags.split(',').map(t => t.trim()).filter(Boolean)
+                : [];
+
+              return (
               <Link
                 to={`/portfolio/${project.slug}`}
-                key={project.slug}
+                key={project.slug || project.id}
                 className="group relative rounded-2xl overflow-hidden bg-white/5 border border-white/10 hover:border-white/25 hover:shadow-xl transition-all duration-500"
               >
                 {/* Project Image */}
@@ -136,22 +151,11 @@ export default function Portfolio() {
                   <h3 className="text-xl font-bold text-white mt-1 group-hover:text-white/90 transition-colors">
                     {project.title}
                   </h3>
-                  <p className="text-white/50 text-sm mt-2 leading-relaxed">
-                    {project.desc}
-                  </p>
-                  <div className="flex flex-wrap gap-2 mt-4">
-                    {project.tags.map((tag) => (
-                      <span
-                        key={tag}
-                        className="px-3 py-1 bg-white/5 text-white/60 rounded-full text-xs font-medium border border-white/10"
-                      >
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
+                  
                 </div>
               </Link>
-            ))}
+            );
+            })}
           </div>
           )}
 

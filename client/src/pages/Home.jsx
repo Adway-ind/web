@@ -21,6 +21,7 @@ import VideoSlide from "../assets/video/slide/video-slide-3.mp4";
 import { API } from "../config/api";
 import { useAuth } from "../context/AuthContext";
 import Antigravity from "../components/Antigravity";
+import SEO from "../components/SEO";
 
 import "swiper/css";
 
@@ -59,35 +60,99 @@ const heroSlides = [
   },
 ];
 
+const showcaseData = [
+  {
+    id: 1,
+    type: "image",
+    image:
+      "https://images.unsplash.com/photo-1523726491678-bf852e717f6a?q=80&w=1200&auto=format&fit=crop",
+    className: "col-span-1 row-span-2",
+  },
+  {
+    id: 2,
+    type: "content",
+    title: "International Packaging Designs and Quality",
+    desc: "We create impactful branding and packaging experiences that blend creativity, strategy, and functionality for modern businesses.",
+    className: "col-span-1 row-span-1",
+  },
+  {
+    id: 3,
+    type: "gallery",
+    images: [
+      "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=800&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?q=80&w=800&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1520607162513-77705c0f0d4a?q=80&w=800&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1496171367470-9ed9a91ea931?q=80&w=800&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1516321497487-e288fb19713f?q=80&w=800&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1455390582262-044cdead277a?q=80&w=800&auto=format&fit=crop",
+    ],
+    className: "col-span-1 row-span-1",
+  },
+  {
+    id: 4,
+    type: "content",
+    title: "150+ Brand Identities Created",
+    desc: "We build memorable visual identities that connect brands with audiences through timeless and strategic design systems.",
+    className: "col-span-1 row-span-1",
+  },
+  {
+    id: 5,
+    type: "image",
+    image:
+      "https://images.unsplash.com/photo-1558655146-9f40138edfeb?q=80&w=1200&auto=format&fit=crop",
+    className: "col-span-1 row-span-1",
+  },
+  {
+    id: 6,
+    type: "content",
+    title: "Brand Communications & Experience",
+    desc: "From digital campaigns to storytelling, we help brands create meaningful customer experiences across every touchpoint.",
+    className: "col-span-1 row-span-1",
+  },
+  {
+    id: 7,
+    type: "image",
+    image: "https://images.pexels.com/photos/7675029/pexels-photo-7675029.jpeg",
+    className: "col-span-1 row-span-1",
+  },
+  {
+    id: 6,
+    type: "content",
+    title: "Modern Web Experiences",
+    desc: "We design and develop fast, responsive, and visually engaging websites that enhance user experience and help brands grow online.",
+    className: "col-span-1 row-span-1",
+  },
+];
+
 const services = [
   {
     icon: Target,
-    title: "Brand Strategy",
+    title: "Creative Branding",
     desc: "We uncover insights that define your brand's position and create a roadmap for meaningful growth.",
   },
   {
     icon: Palette,
-    title: "Visual Identity",
+    title: "Digital Marketing",
     desc: "From logos to color systems, we design visual identities that capture your brand's essence.",
   },
   {
     icon: Layers,
-    title: "Digital Design",
+    title: "Web Development",
     desc: "Beautiful, intuitive digital experiences that connect with your audience on every screen.",
   },
   {
     icon: Zap,
-    title: "Motion Graphics",
+    title: "eCommerce Development",
     desc: "Dynamic animations and motion design that bring your brand story to life.",
   },
   {
     icon: TrendingUp,
-    title: "Brand Growth",
+    title: "Marketing Strategy",
     desc: "Strategic brand evolution that scales with your business and resonates in new markets.",
   },
   {
     icon: Sparkles,
-    title: "Brand Guidelines",
+    title: "Consulting",
     desc: "Comprehensive brand books that ensure consistency across every touchpoint.",
   },
 ];
@@ -284,7 +349,7 @@ function FeaturedPortfolio() {
   }, []);
 
   // Show 4 by default; "Show All Featured" reveals the rest
-  const visibleProjects = showAll ? projects : projects.slice(0, 4);
+  const visibleProjects = showAll ? projects : projects.slice(0, 6);
 
   return (
     <section className="py-24 bg-white">
@@ -345,7 +410,7 @@ function FeaturedPortfolio() {
         {/* Projects Grid */}
         {!loading && visibleProjects.length > 0 && (
           <>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               {visibleProjects.map((item) => (
                 <Link
                   to={`/portfolio/${item.slug || item.id}`}
@@ -394,7 +459,7 @@ function FeaturedPortfolio() {
             </div>
 
             {/* Show more / show less toggle (only if there are more than 4 featured) */}
-            {projects.length > 4 && (
+            {projects.length > 6 && (
               <div className="mt-10 text-center">
                 <button
                   onClick={() => setShowAll((v) => !v)}
@@ -420,8 +485,43 @@ function FeaturedPortfolio() {
 
 /* ───── Home Page ───── */
 export default function Home() {
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "Adway",
+    "url": "https://adway.agency",
+    "logo": "https://adway.agency/favicon.svg",
+    "description": "Premium Branding & Digital Marketing Agency",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "123 Creative Ave",
+      "addressLocality": "Design District",
+      "addressRegion": "NY",
+      "postalCode": "10001",
+      "addressCountry": "US"
+    },
+    "contactPoint": {
+      "@type": "ContactPoint",
+      "telephone": "+1-555-123-4567",
+      "contactType": "Customer Service"
+    },
+    "sameAs": [
+      "https://facebook.com/adway",
+      "https://instagram.com/adway",
+      "https://linkedin.com/company/adway",
+      "https://twitter.com/adway"
+    ]
+  };
+
   return (
     <>
+      <SEO 
+        title="Adway - Premium Branding & Digital Marketing Agency"
+        description="Transform your brand with Adway's expert branding, digital marketing, web development, and strategic consulting services. We create impactful brand experiences."
+        keywords="branding agency, digital marketing, web development, creative branding, marketing strategy, brand identity, logo design"
+        url="/"
+        structuredData={structuredData}
+      />
       {/* Hero Slider */}
       <HeroSlider />
 
@@ -559,6 +659,77 @@ export default function Home() {
       </section>
 
       <Client />
+
+      <section className="bg-white py-20">
+        <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Heading */}
+          <div className="text-center mb-14">
+            <span className="text-sm tracking-[0.3em] uppercase text-neutral-500 font-medium">
+              Our Expertise
+            </span>
+
+            <h2 className="mt-4 text-4xl md:text-5xl font-semibold tracking-tight text-neutral-900">
+              Creative Branding Experience
+            </h2>
+
+            <p className="mt-5 max-w-2xl mx-auto text-neutral-600 leading-relaxed">
+              We craft premium branding, packaging, and digital experiences
+              designed to elevate businesses in modern markets.
+            </p>
+          </div>
+
+          {/* Bento Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 auto-rows-[320px] gap-[1px] bg-neutral-300 overflow-hidden rounded-3xl">
+            {showcaseData.map((item) => (
+              <div
+                key={item.id}
+                className={`bg-white ${item.className} overflow-hidden group`}
+              >
+                {/* Single Image */}
+                {item.type === "image" && (
+                  <div className="h-full w-full overflow-hidden">
+                    <img
+                      src={item.image}
+                      alt=""
+                      className="h-full w-full object-cover transition duration-700 group-hover:scale-105"
+                    />
+                  </div>
+                )}
+
+                {/* Content Block */}
+                {item.type === "content" && (
+                  <div className="h-full flex flex-col items-center justify-center text-center px-8 md:px-12">
+                    <h3 className="text-2xl md:text-3xl font-semibold text-neutral-900 leading-tight">
+                      {item.title}
+                    </h3>
+
+                    <p className="mt-6 text-neutral-600 leading-8 max-w-md">
+                      {item.desc}
+                    </p>
+
+                    <div className="w-24 h-[2px] bg-violet-500 mt-10" />
+                  </div>
+                )}
+
+                {/* Gallery Grid */}
+                {item.type === "gallery" && (
+                  <div className="grid grid-cols-2 grid-rows-3 h-full gap-[1px] bg-neutral-300">
+                    {item.images.map((img, index) => (
+                      <div key={index} className="overflow-hidden bg-white">
+                        <img
+                          src={img}
+                          alt=""
+                          className="h-full w-full object-cover transition duration-500 hover:scale-105"
+                        />
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
 
       {/* Process Section */}
       <section className="py-24 bg-neutral-950 text-white">

@@ -10,6 +10,7 @@ import {
   Send,
 } from "lucide-react";
 import { API } from "../config/api";
+import SEO from "../components/SEO";
 
 /* ─── Available positions ─── */
 const positions = [
@@ -165,6 +166,12 @@ export default function Apply() {
 
   return (
     <>
+      <SEO 
+        title="Apply for a Position at Adway | Branding Agency Careers"
+        description="Apply for career opportunities at Adway. Join our team of creative professionals in branding, design, and digital marketing."
+        keywords="apply adway, job application, creative jobs, branding careers"
+        url="/apply"
+      />
       {/* Hero / Header */}
       <section className="relative pt-28 pb-16 bg-black overflow-hidden">
         <div className="absolute inset-0">

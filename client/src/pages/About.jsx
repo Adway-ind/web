@@ -14,11 +14,12 @@ import {
 } from "lucide-react";
 import amalImage from "../assets/image/person/amal.jpeg";
 import Adway from "../assets/image/person/adway.jpeg";
-import Video from "../assets/video/about-one.mp4";
+import Video from "../assets/video/softaurora.webm";
 import { Canvas } from "@react-three/fiber";
 import { useGLTF, OrbitControls, Environment } from "@react-three/drei";
 import * as THREE from "three";
 import CircularGallery from "../components/CircularGallery";
+import SEO from "../components/SEO";
 
 const team = [
   { name: "Anadhu", role: "Brand Strategist", image: Adway },
@@ -89,6 +90,12 @@ export default function About() {
   const [color, setColor] = useState("#2563eb");
   return (
     <>
+      <SEO 
+        title="About Adway - Our Story & Team | Branding Agency"
+        description="Learn about Adway's journey, our passionate team of brand strategists and designers, and our mission to transform brands through creative excellence."
+        keywords="about adway, branding team, brand strategists, creative agency, our story"
+        url="/about"
+      />
       {/* Hero */}
       <section className="relative h-[600px] overflow-hidden bg-black">
         {/* Background Video */}
@@ -100,11 +107,11 @@ export default function About() {
           preload="auto"
           className="absolute inset-0 w-full h-full object-cover"
         >
-          <source src={Video} type="video/mp4" />
+          <source src={Video} type="video/webm" />
         </video>
 
         {/* Overlay */}
-        <div className="absolute inset-0 bg-black/70" />
+        <div className="absolute inset-0 bg-black/20" />
 
         {/* Content */}
         <div className="relative z-10 h-full flex items-center justify-center">
@@ -142,17 +149,19 @@ export default function About() {
               </h2>
 
               <p className="mt-6 text-black/60 text-lg leading-relaxed">
-                Adway was born from a simple belief: every business deserves a
-                brand that truly represents who they are. What started as a
-                small design studio has grown into a full-service branding
-                agency trusted by startups and enterprises alike.
+                At Adway, we help brands grow through creative digital
+                marketing, branding, content creation, SEO, SEM, and eCommerce
+                solutions. Based in Kochi, Kerala, we combine strategy,
+                innovation, and design to build strong online experiences that
+                drive real business growth.
               </p>
 
               <p className="mt-4 text-black/60 text-lg leading-relaxed">
-                Over the past decade, we've helped over 200 brands find their
-                voice, define their visual identity, and connect with their
-                audiences in meaningful ways. Our approach combines strategic
-                thinking with bold creative execution.
+                From startups and SMEs to global brands, Adway delivers
+                personalized and cost-effective marketing solutions that
+                attract, engage, and convert audiences. With a focus on
+                creativity, performance, and results, we help businesses stand
+                out in today’s competitive digital landscape.
               </p>
 
               {/* Color Picker */}

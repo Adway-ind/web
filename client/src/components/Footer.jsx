@@ -21,7 +21,7 @@ export default function Footer() {
             </div>
             <Link
               to="/contact"
-              className="group flex items-center justify-center gap-2 px-8 py-4 bg-accent text-white rounded-full font-semibold hover:bg-accent-dark transition-all duration-300 shadow-lg hover:shadow-xl btn-shine w-full sm:w-auto"
+              className="group flex items-center justify-center gap-2 px-8 py-4 bg-accent text-white rounded-full font-semibold bg-accent-dark hover:bg-accent-dark transition-all duration-300 shadow-lg hover:shadow-xl btn-shine w-full sm:w-auto"
             >
               Start a Project
               <ArrowUpRight className="w-5 h-5 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
@@ -55,6 +55,8 @@ export default function Footer() {
                 { label: "About Us", path: "/about" },
                 { label: "Services", path: "/services" },
                 { label: "Portfolio", path: "/portfolio" },
+                { label: "Career", path: "/career" },
+                { label: "Social", path: "/social" },
                 { label: "Contact", path: "/contact" },
               ].map((link) => (
                 <li key={link.path}>

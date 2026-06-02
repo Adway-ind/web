@@ -1,14 +1,19 @@
 import { ExternalLink } from "lucide-react";
-
 import { FaInstagramSquare } from "react-icons/fa";
+import SEO from "../components/SEO";
 
 const INSTAGRAM_HANDLE = "adway.creations";
 const INSTAGRAM_URL = `https://www.instagram.com/${INSTAGRAM_HANDLE}/`;
 
 export default function Social() {
-
   return (
     <>
+      <SEO 
+        title="Follow Adway on Social Media | Branding Agency"
+        description="Follow Adway on social media for the latest branding inspiration, design trends, and creative insights. Connect with our community."
+        keywords="adway social media, branding inspiration, design trends, creative community"
+        url="/social"
+      />
       {/* Hero */}
       <section className="relative pt-32 pb-20 bg-black overflow-hidden">
         <div className="absolute inset-0">

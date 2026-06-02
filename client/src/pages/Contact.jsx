@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Mail, Phone, MapPin, Clock, Send, CheckCircle2 } from "lucide-react";
+import SEO from "../components/SEO";
 
 const contactInfo = [
   {
@@ -74,14 +75,21 @@ export default function Contact() {
         budget: "",
         message: "",
       });
+
+      setTimeout(() => setSubmitted(false), 5000);
     } catch (error) {
-      console.error(error);
-      alert(error.message || "Failed to send enquiry");
+      console.error("Error submitting form:", error);
     }
   };
 
   return (
     <>
+      <SEO 
+        title="Contact Adway - Get In Touch | Branding Agency"
+        description="Get in touch with Adway for your branding and digital marketing needs. Contact us for a consultation about your project."
+        keywords="contact adway, branding agency contact, digital marketing consultation"
+        url="/contact"
+      />
       {/* Hero */}
       <section className="relative pt-32 pb-24 bg-black overflow-hidden">
         <div className="absolute inset-0">

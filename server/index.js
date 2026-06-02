@@ -31,7 +31,7 @@ if (!fs.existsSync(RESUME_DIR)) {
 }
 
 const db = require("./config/db");
-const { sequelize, Application } = require("./models");
+const { sequelize, Application, CareerJob, ChatEnquiry } = require("./models");
 
 const app = express();
 console.log("📁 Server directory:", __dirname);
@@ -47,7 +47,20 @@ app.use(
 
 /* ═══ SECURITY MIDDLEWARE ═══ */
 app.use(helmet({ crossOriginResourcePolicy: false }));
-app.use(cors({ origin: process.env.CLIENT_URL || "http://localhost:5173" }));
+const allowedOrigins = [
+  "http://localhost:5173",
+  process.env.CLIENT_URL,
+].filter(Boolean);
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      if (!origin) return callback(null, true);
+      if (allowedOrigins.includes(origin)) return callback(null, true);
+      callback(new Error(`CORS policy does not allow access from origin ${origin}`));
+    },
+    credentials: true,
+  })
+);
 app.use(express.json({ limit: "2mb" }));
 app.use(express.urlencoded({
   extended: true,
@@ -77,6 +90,212 @@ function readJSON(file, fallback = []) {
 }
 function writeJSON(file, data) {
   fs.writeFileSync(path.join(DATA_DIR, file), JSON.stringify(data, null, 2));
+}
+
+const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
+const OPENAI_MODEL = process.env.OPENAI_MODEL || "gpt-3.5-turbo";
+const OPENAI_API_BASE = process.env.OPENAI_API_BASE || "https://api.openai.com/v1";
+const CHATBOT_PROMPT_FILE = path.join(__dirname, "chatbot.md");
+const CHATBOT_ENQUIRIES_FILE = "chatbot_enquiries.json";
+
+function readChatbotEnquiries() {
+  return readJSON(CHATBOT_ENQUIRIES_FILE, []);
+}
+
+function saveChatbotEnquiries(enquiries) {
+  writeJSON(CHATBOT_ENQUIRIES_FILE, enquiries);
+}
+
+function addChatbotEnquiry(enquiry) {
+  const enquiries = readChatbotEnquiries();
+  enquiries.unshift(enquiry);
+  if (enquiries.length > 200) enquiries.length = 200;
+  saveChatbotEnquiries(enquiries);
+}
+
+async function importChatbotEnquiriesFromJson() {
+  const enquiries = readChatbotEnquiries();
+  if (!Array.isArray(enquiries) || enquiries.length === 0) return;
+
+  for (const enquiry of enquiries) {
+    try {
+      if (!enquiry.id) continue;
+      const existing = await ChatEnquiry.findByPk(enquiry.id);
+      if (existing) continue;
+
+      await ChatEnquiry.create({
+        id: enquiry.id,
+        service: enquiry.service || "",
+        project_type: enquiry.projectType || "",
+        budget: enquiry.budget || "",
+        timeline: enquiry.timeline || "",
+        contact_name: enquiry.contact?.name || "",
+        contact_business: enquiry.contact?.business || "",
+        contact_email: enquiry.contact?.email || "",
+        contact_phone: enquiry.contact?.phone || "",
+        contact_requirements: enquiry.contact?.requirements || "",
+        read: enquiry.read || false,
+        created_at: enquiry.createdAt ? new Date(enquiry.createdAt) : undefined,
+        updated_at: enquiry.updatedAt ? new Date(enquiry.updatedAt) : undefined,
+      });
+    } catch (err) {
+      console.error("Failed to import chatbot enquiry:", err);
+    }
+  }
+}
+
+function loadChatbotPrompt() {
+  if (fs.existsSync(CHATBOT_PROMPT_FILE)) {
+    return fs.readFileSync(CHATBOT_PROMPT_FILE, "utf-8").trim();
+  }
+
+  return `You are "Adway Creative Assistant", the premium AI consultant for Adway Creations.
+
+Your purpose is to help visitors discover the right branding, design, marketing, and development services while generating qualified leads.
+
+PERSONALITY:
+- Professional and premium
+- Friendly and confident
+- Short and clear responses
+- Solution-focused
+- Never use technical jargon unless requested
+
+IMPORTANT RULES:
+1. Keep responses under 80 words.
+2. Always guide users using selectable options.
+3. Never ask multiple open-ended questions.
+4. Present choices as buttons whenever possible.
+5. Focus on understanding business goals before discussing pricing.
+6. Collect lead information naturally after identifying needs.
+7. Highlight Adway Creations' expertise in:
+   - Brand Strategy
+   - Logo Design
+   - Visual Identity
+   - Website Development
+   - Social Media Marketing
+   - Video Production
+   - Performance Marketing
+8. Recommend services based on business goals.
+9. If unsure, ask users to choose from predefined options.
+10. Always move the conversation toward booking a consultation.
+
+WELCOME MESSAGE:
+
+👋 Welcome to Adway Creations.
+
+We help businesses build memorable brands, high-performing websites, and result-driven marketing campaigns.
+
+What would you like help with today?
+
+[Logo Design]
+[Brand Identity]
+[Website Development]
+[Social Media Marketing]
+[Video Production]
+[Marketing Strategy]
+
+When a service is selected, continue with guided questions and progressively qualify the lead.
+
+Once enough information is collected, ask:
+
+"Would you like a free consultation with our team?"
+
+[Book Consultation]
+[Request Proposal]
+[Talk to Expert]
+
+Collect:
+- Name
+- Business Name
+- Email
+- Phone Number
+- Project Requirements
+
+End with:
+
+"Thank you for choosing Adway Creations. Our team will reach out shortly with the next steps."`;
+}
+
+function loadChatbotKnowledge() {
+  const defaultKnowledge = {
+    brandName: "Adway",
+    brandTagline: "Creative branding, digital design, and motion marketing that helps businesses grow.",
+    description:
+      "Adway is a creative branding studio that builds modern brands, digital products, motion experiences, and marketing design for startups and growth teams.",
+    values: "Creativity, collaboration, quality, and brand-led growth.",
+    services: [
+      "Brand Strategy",
+      "Visual Identity",
+      "Digital Product Design",
+      "Motion Graphics",
+      "Brand Guidelines",
+      "Campaign Design",
+    ],
+    careers:
+      "We hire designers, strategists, marketing specialists, and creative talent. Visit the careers page for current openings and application details.",
+    contact: process.env.CLIENT_URL || "http://localhost:5173",
+  };
+
+  return { ...defaultKnowledge, ...readJSON("chatbot_knowledge.json", {}) };
+}
+
+function buildChatbotSystemMessage() {
+  return loadChatbotPrompt();
+}
+
+function getLocalChatbotReply(message, knowledge) {
+  const lower = message.toLowerCase();
+  if (lower.includes("service") || lower.includes("offer") || lower.includes("what do you")) {
+    return `Adway offers ${knowledge.services.join(", ")}. Each service is tailored to your business needs — from brand strategy and identity to digital product design, motion graphics, and brand growth.`;
+  }
+  if (
+    lower.includes("cost") ||
+    lower.includes("price") ||
+    lower.includes("pricing") ||
+    lower.includes("how much")
+  ) {
+    return "Our pricing is project-based and depends on scope, timeline, and deliverables. For the best estimate, please share more about your project so our team can tailor a proposal.";
+  }
+  if (
+    lower.includes("long") ||
+    lower.includes("timeline") ||
+    lower.includes("take") ||
+    lower.includes("duration")
+  ) {
+    return "Project timelines depend on the scope: identity work can take 6–8 weeks, while a full branding and digital design initiative can take 10–12 weeks or more. Let us know your goals so we can recommend the right pace.";
+  }
+  if (lower.includes("career") || lower.includes("job") || lower.includes("hiring") || lower.includes("apply")) {
+    return `${knowledge.careers} You can review current openings on the careers page and submit your application there.`;
+  }
+  if (lower.includes("portfolio") || lower.includes("work") || lower.includes("projects")) {
+    return "Adway creates brand-led digital experiences, identity systems, motion graphics, and product design work. Check our portfolio page to see recent projects and case studies.";
+  }
+  if (lower.includes("contact") || lower.includes("hire") || lower.includes("connect")) {
+    return `You can reach out through the contact page, or share your project details there and our team will respond.`;
+  }
+  return "Thanks for your question! For the most accurate answer, I recommend sharing a few details about your goals, and our team will be happy to help.";
+}
+
+
+
+async function getChatbotReply(message, history = []) {
+  const knowledge = loadChatbotKnowledge();
+  const messages = [
+    { role: "system", content: buildChatbotSystemMessage(knowledge) },
+    ...history,
+    { role: "user", content: message },
+  ];
+
+  if (OPENAI_API_KEY) {
+    try {
+      return await fetchOpenAIChatCompletion(messages);
+    } catch (error) {
+      console.error("OpenAI chatbot error, falling back:", error.message || error);
+    }
+  }
+
+  // This ensures a valid string reply is ALWAYS returned
+  return getLocalChatbotReply(message, knowledge);
 }
 
 function logActivity(action, userEmail, ip) {
@@ -393,6 +612,14 @@ app.post("/api/auth/logout", authMiddleware, (req, res) => {
 app.get("/api/admin/stats", authMiddleware, async (req, res) => {
   try {
     const messages = readJSON("messages.json", []);
+    const chatEnquiriesCount = await ChatEnquiry.count();
+    const chatEnquiriesNewCount = await ChatEnquiry.count({
+      where: {
+        created_at: {
+          [require("sequelize").Op.gte]: new Date(Date.now() - 7 * 86400000),
+        },
+      },
+    });
     const [portfolioRows] = await db.query("SELECT COUNT(*) as count FROM projects");
     const portfolioCount = portfolioRows[0].count;
     const applicationsCount = await Application.count();
@@ -404,14 +631,23 @@ app.get("/api/admin/stats", authMiddleware, async (req, res) => {
       },
     });
 
+    // ✅ ADDED: contact enquiries count
+    const [contactRows] = await db.query(
+      "SELECT COUNT(*) AS count FROM contact_enquiries"
+    );
+    const contactEnquiriesCount = Number(contactRows[0].count);
+
     res.json({
       applications: applicationsCount,
       messages: messages.length,
+      chatEnquiries: chatEnquiriesCount,
       portfolio: portfolioCount,
+      contactEnquiries: contactEnquiriesCount, // ✅ now included
       newApplications: newApplicationsCount,
       newMessages: messages.filter(
         (m) => Date.now() - new Date(m.createdAt).getTime() < 7 * 86400000,
       ).length,
+      newChatEnquiries: chatEnquiriesNewCount,
     });
   } catch (err) {
     res.status(500).json({ error: "Server error", details: err.message });
@@ -478,6 +714,71 @@ app.delete("/api/admin/messages/:id", authMiddleware, (req, res) => {
   msgs = msgs.filter((m) => m.id !== req.params.id);
   writeJSON("messages.json", msgs);
   res.json({ success: true });
+});
+
+app.get("/api/admin/chat-enquiries", authMiddleware, async (req, res) => {
+  try {
+    const enquiries = await ChatEnquiry.findAll({ order: [["created_at", "DESC"]] });
+    const mapped = enquiries.map((enquiry) => ({
+      id: enquiry.id,
+      service: enquiry.service,
+      projectType: enquiry.project_type,
+      budget: enquiry.budget,
+      timeline: enquiry.timeline,
+      contact: {
+        name: enquiry.contact_name,
+        business: enquiry.contact_business,
+        email: enquiry.contact_email,
+        phone: enquiry.contact_phone,
+        requirements: enquiry.contact_requirements,
+      },
+      read: enquiry.read,
+      createdAt: enquiry.created_at,
+      updatedAt: enquiry.updated_at,
+    }));
+    res.json(mapped);
+  } catch (err) {
+    res.status(500).json({ error: "Failed to fetch chat enquiries", details: err.message });
+  }
+});
+
+app.patch("/api/admin/chat-enquiries/:id/read", authMiddleware, async (req, res) => {
+  try {
+    const enquiry = await ChatEnquiry.findByPk(req.params.id);
+    if (!enquiry) return res.status(404).json({ error: "Not found" });
+
+    enquiry.read = !enquiry.read;
+    await enquiry.save();
+    res.json({
+      id: enquiry.id,
+      service: enquiry.service,
+      projectType: enquiry.project_type,
+      budget: enquiry.budget,
+      timeline: enquiry.timeline,
+      contact: {
+        name: enquiry.contact_name,
+        business: enquiry.contact_business,
+        email: enquiry.contact_email,
+        phone: enquiry.contact_phone,
+        requirements: enquiry.contact_requirements,
+      },
+      read: enquiry.read,
+      createdAt: enquiry.created_at,
+      updatedAt: enquiry.updated_at,
+    });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to update enquiry", details: err.message });
+  }
+});
+
+app.delete("/api/admin/chat-enquiries/:id", authMiddleware, async (req, res) => {
+  try {
+    const deleted = await ChatEnquiry.destroy({ where: { id: req.params.id } });
+    if (!deleted) return res.status(404).json({ error: "Not found" });
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to delete enquiry", details: err.message });
+  }
 });
 
 // Portfolio CRUD (Admin)
@@ -578,8 +879,8 @@ app.post(
 
       const [resultHeader] = await db.query(
         `INSERT INTO projects
-        (slug,title,category,\`desc\`,image,tags,year,client,challenge,result,images)
-        VALUES (?,?,?,?,?,?,?,?,?,?,?)`,
+        (slug,title,category,\`desc\`,image,tags,year,client,challenge,result,images,featured)
+        VALUES (?,?,?,?,?,?,?,?,?,?,?,?)`,
         [
           finalSlug,
           title,
@@ -591,7 +892,8 @@ app.post(
           client || "",
           challenge || "",
           result || "",
-          JSON.stringify(galleryImages)
+          JSON.stringify(galleryImages),
+          req.body.featured || 0
         ]
       );
 
@@ -621,6 +923,66 @@ app.post(
   }
 );
 
+app.delete("/api/admin/portfolio/:id", authMiddleware, async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    // First check if project exists
+    const [rows] = await db.query("SELECT id, image FROM projects WHERE id = ?", [id]);
+    if (rows.length === 0) {
+      return res.status(404).json({ error: "Project not found" });
+    }
+
+    // Delete the project from database
+    const [result] = await db.query("DELETE FROM projects WHERE id = ?", [id]);
+    
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: "Failed to delete project" });
+    }
+
+    res.json({ success: true, message: "Project deleted successfully" });
+  } catch (err) {
+    console.error("Delete project error:", err);
+    res.status(500).json({ error: "Failed to delete project", details: err.message });
+  }
+});
+
+// ✅ 1. STATIC ROUTES FIRST
+app.get("/api/projects/featured", async (req, res) => {
+  try {
+    const [rows] = await db.query(
+      "SELECT * FROM projects WHERE featured = 1 ORDER BY id DESC LIMIT 6"
+    );
+
+    const formattedProjects = rows.map((project) => ({
+      ...project,
+      tags: project.tags ? project.tags.split(",").map((t) => t.trim()) : [],
+      images: project.images ? JSON.parse(project.images) : [],
+    }));
+
+    res.json(formattedProjects);
+  } catch (error) {
+    console.error("Featured fetch error:", error);
+    res.status(500).json({ error: "Failed to fetch featured projects", details: error.message });
+  }
+});
+
+// ❌ 2. DYNAMIC PARAMETER ROUTES SECOND
+app.get("/api/projects/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const [rows] = await db.query("SELECT * FROM projects WHERE id = ? OR slug = ?", [id, id]);
+
+    if (rows.length === 0) {
+      return res.status(404).json({ error: "Project not found" });
+    }
+
+    res.json(rows[0]);
+  } catch (error) {
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
 app.patch(
   "/api/admin/portfolio/:id",
   authMiddleware,
@@ -646,13 +1008,23 @@ app.patch(
         year,
         client,
         challenge,
-        result
+        result,
+        featured // Destructured correctly here
       } = req.body;
 
       let coverImagePath = current.image;
-      let galleryImages = current.images ? JSON.parse(current.images) : [];
 
-      // ✅ HANDLE NEW COVER IMAGE
+      // Safe JSON parsing guard
+      let galleryImages = [];
+      if (current.images) {
+        try {
+          galleryImages = JSON.parse(current.images);
+        } catch (pErr) {
+          galleryImages = []; // Fallback if string is malformed
+        }
+      }
+
+      // ✅ HANDLE NEW COVER IMAGE (Requires Multer Memory Storage)
       if (req.files?.coverImage?.[0]) {
         const fileName = `${Date.now()}-cover.webp`;
 
@@ -679,18 +1051,31 @@ app.patch(
         }
       }
 
-      const finalSlug =
-        slug !== undefined ? slug : current.slug;
+      const finalSlug = slug !== undefined ? slug : current.slug;
 
       const finalTags =
         tags !== undefined
           ? (Array.isArray(tags) ? tags.join(", ") : tags)
           : current.tags;
 
+      // Handle boolean / integer value for 'featured' fallback safely
+      const finalFeatured = featured !== undefined ? featured : current.featured;
+
       await db.query(
         `UPDATE projects SET 
-          slug=?, title=?, category=?, \`desc\`=?, image=?, tags=?, year=?, client=?, challenge=?, result=?, images=?
-         WHERE id=?`,
+          slug=?,
+          title=?,
+          category=?,
+          \`desc\`=?,
+          image=?,
+          tags=?,
+          year=?,
+          client=?,
+          challenge=?,
+          result=?,
+          images=?,
+          featured=? 
+        WHERE id=?`,
         [
           finalSlug,
           title || current.title,
@@ -703,29 +1088,31 @@ app.patch(
           challenge || current.challenge,
           result || current.result,
           JSON.stringify(galleryImages),
-          id
+          finalFeatured, // Fixed: passing the correct variable here
+          id,
         ]
       );
 
       res.json({
         id,
         slug: finalSlug,
-        title,
-        category,
-        desc,
+        title: title || current.title,
+        category: category || current.category,
+        desc: desc || current.desc,
         image: coverImagePath,
         tags: finalTags
           ? finalTags.split(",").map((t) => t.trim()).filter(Boolean)
           : [],
-        year,
-        client,
-        challenge,
-        result,
-        images: galleryImages
+        year: year || current.year,
+        client: client || current.client,
+        challenge: challenge || current.challenge,
+        result: result || current.result,
+        images: galleryImages,
+        featured: finalFeatured
       });
 
     } catch (err) {
-      console.error(err);
+      console.error("PATCH ERROR:", err); // Clear terminal indicator
       res.status(500).json({
         error: "Server error",
         details: err.message
@@ -734,19 +1121,67 @@ app.patch(
   }
 );
 
-app.delete("/api/admin/portfolio/:id", authMiddleware, async (req, res) => {
+app.get("/api/admin/careers", authMiddleware, async (req, res) => {
   try {
-    const { id } = req.params;
-    const [resultHeader] = await db.query("DELETE FROM projects WHERE id = ?", [id]);
-    if (resultHeader.affectedRows === 0) return res.status(404).json({ error: "Not found" });
-    res.json({ success: true });
+    const categories = await getCareerJobsFromDb();
+    res.json(categories);
   } catch (err) {
-    console.error("PATCH ERROR:", err);
+    console.error("Failed to load career jobs:", err);
+    res.status(500).json({ error: "Failed to load career jobs", details: err.message });
+  }
+});
 
-    res.status(500).json({
-      error: "Server error",
-      details: err.message
+app.post("/api/admin/careers", authMiddleware, async (req, res) => {
+  try {
+    const { category, title, location, type, description } = req.body;
+    if (!category || !title || !location || !type) {
+      return res.status(400).json({ error: "Category, title, location, and type are required." });
+    }
+
+    const existing = await CareerJob.findOne({
+      where: {
+        category,
+        title,
+      },
     });
+
+    if (existing) {
+      return res.status(409).json({ error: "This role already exists in that category." });
+    }
+
+    await CareerJob.create({
+      category,
+      title,
+      location,
+      type,
+      description: description || "",
+    });
+
+    const categories = await getCareerJobsFromDb();
+    res.status(201).json({ success: true, categories });
+  } catch (err) {
+    console.error("Failed to save career job:", err);
+    res.status(500).json({ error: "Failed to save career job", details: err.message });
+  }
+});
+
+app.delete("/api/admin/careers", authMiddleware, async (req, res) => {
+  try {
+    const { id } = req.body;
+    if (!id) {
+      return res.status(400).json({ error: "Job id is required to delete a role." });
+    }
+
+    const deletedCount = await CareerJob.destroy({ where: { id } });
+    if (!deletedCount) {
+      return res.status(404).json({ error: "Role not found." });
+    }
+
+    const categories = await getCareerJobsFromDb();
+    res.json({ success: true, categories });
+  } catch (err) {
+    console.error("Failed to delete career job:", err);
+    res.status(500).json({ error: "Failed to delete career job", details: err.message });
   }
 });
 
@@ -774,16 +1209,19 @@ const careerJobs = [
         title: "Senior Brand Designer",
         location: "Remote / New York",
         type: "Full-time",
+        description: "Lead brand systems, motion assets, and campaign design for flagship clients.",
       },
       {
         title: "Digital Product Designer",
         location: "Remote / New York",
         type: "Full-time",
+        description: "Design product experiences for web and mobile that elevate brand storytelling.",
       },
       {
         title: "Motion Designer",
         location: "Remote",
         type: "Full-time",
+        description: "Create motion content for digital campaigns, presentations, and immersive launches.",
       },
     ],
   },
@@ -795,11 +1233,13 @@ const careerJobs = [
         title: "Brand Strategist",
         location: "Remote / London",
         type: "Full-time",
+        description: "Shape long-term positioning and brand storytelling across client portfolios.",
       },
       {
         title: "Operations Manager",
         location: "New York",
         type: "Full-time",
+        description: "Support growth operations, team coordination, and process optimization.",
       },
     ],
   },
@@ -811,11 +1251,13 @@ const careerJobs = [
         title: "Content Writer",
         location: "Remote",
         type: "Part-time",
+        description: "Write persuasive copy for brand campaigns, pitch decks, and editorial content.",
       },
       {
         title: "Marketing Analyst",
         location: "Remote",
         type: "Full-time",
+        description: "Analyze campaign performance and marketing data to drive growth decisions.",
       },
     ],
   },
@@ -855,8 +1297,128 @@ const careerPerks = [
   },
 ];
 
-app.get("/api/careers", (req, res) => {
-  res.json({ categories: careerJobs, stats: careerStats, perks: careerPerks });
+async function getCareerJobsFromDb() {
+  const jobs = await CareerJob.findAll({
+    raw: true,
+    order: [
+      ["category", "ASC"],
+      ["created_at", "ASC"],
+    ],
+  });
+
+  const categories = [];
+  jobs.forEach((job) => {
+    let category = categories.find((item) => item.title === job.category);
+    if (!category) {
+      category = {
+        title: job.category,
+        roles: [],
+      };
+      categories.push(category);
+    }
+
+    category.roles.push({
+      id: job.id,
+      title: job.title,
+      location: job.location,
+      type: job.type,
+      description: job.description || "",
+    });
+  });
+
+  return categories.map((category) => ({
+    ...category,
+    count: category.roles.length,
+  }));
+}
+
+async function seedCareerJobsIfEmpty() {
+  const remaining = await CareerJob.count();
+  if (remaining > 0) return;
+
+  const entries = careerJobs.flatMap((category) =>
+    category.roles.map((role) => ({
+      category: category.title,
+      title: role.title,
+      location: role.location,
+      type: role.type,
+      description: role.description || "",
+    })),
+  );
+
+  if (entries.length) {
+    await CareerJob.bulkCreate(entries);
+  }
+}
+
+app.get("/api/careers", async (req, res) => {
+  try {
+    res.json({ categories: await getCareerJobsFromDb(), stats: careerStats, perks: careerPerks });
+  } catch (err) {
+    console.error("Failed to load public career jobs:", err);
+    res.status(500).json({ error: "Failed to load career jobs", details: err.message });
+  }
+});
+
+app.post("/api/chatbot", async (req, res) => {
+  const { message, history } = req.body || {};
+  if (!message || typeof message !== "string") {
+    return res.status(400).json({ error: "Message text is required." });
+  }
+
+  try {
+    const reply = await getChatbotReply(message, Array.isArray(history) ? history : []);
+    res.json({ reply });
+  } catch (err) {
+    console.error("Chatbot request failed:", err);
+    res.status(500).json({ error: "Failed to generate chatbot reply.", details: err.message });
+  }
+});
+
+app.post("/api/chat-enquiries", async (req, res) => {
+  const { service, projectType, budget, timeline, contact } = req.body || {};
+
+  if (!service || !projectType || !budget || !timeline || !contact || !contact.name || !contact.email || !contact.phone) {
+    return res.status(400).json({ error: "Required inquiry fields are missing." });
+  }
+
+  try {
+    const enquiry = await ChatEnquiry.create({
+      service,
+      project_type: projectType,
+      budget,
+      timeline,
+      contact_name: contact.name,
+      contact_business: contact.business || "",
+      contact_email: contact.email,
+      contact_phone: contact.phone,
+      contact_requirements: contact.requirements || "",
+    });
+
+    res.status(201).json({
+      success: true,
+      enquiry: {
+        id: enquiry.id,
+        service: enquiry.service,
+        projectType: enquiry.project_type,
+        budget: enquiry.budget,
+        timeline: enquiry.timeline,
+        contact: {
+          name: enquiry.contact_name,
+          business: enquiry.contact_business,
+          email: enquiry.contact_email,
+          phone: enquiry.contact_phone,
+          requirements: enquiry.contact_requirements,
+        },
+        read: enquiry.read,
+        createdAt: enquiry.created_at,
+        updatedAt: enquiry.updated_at,
+      },
+    });
+  } catch (err) {
+    console.error("Chat enquiry save failed:", err);
+    res.status(500).json({ error: "Failed to save inquiry.", details: err.message });
+  }
 });
 
 app.get("/api/categories", async (req, res) => {
@@ -895,28 +1457,35 @@ app.get("/api/projects", async (req, res) => {
 app.get("/api/projects/:slug", async (req, res) => {
   try {
     const { slug } = req.params;
-    const [rows] = await db.query("SELECT * FROM projects WHERE slug = ?", [slug]);
+    const [rows] = await db.query("SELECT * FROM projects WHERE slug = ? OR id = ?", [slug, slug]);
     if (rows.length === 0) {
       return res.status(404).json({ error: "Project not found" });
     }
 
     const project = rows[0];
-    project.tags = project.tags ? project.tags.split(",").map((t) => t.trim()) : [];
+    // Parse tags and images properly
+    project.tags = project.tags ? project.tags.split(",").map((t) => t.trim()).filter(Boolean) : [];
     project.images = project.images ? JSON.parse(project.images) : [];
 
+    // Get all projects for navigation
     const [allProjects] = await db.query(
       "SELECT slug, title FROM projects ORDER BY id DESC"
     );
-    const currentIndex = allProjects.findIndex((item) => item.slug === slug);
-    const prevProject = allProjects[
-      (currentIndex - 1 + allProjects.length) % allProjects.length
-    ];
-    const nextProject = allProjects[
-      (currentIndex + 1) % allProjects.length
-    ];
+    const currentIndex = allProjects.findIndex((item) => item.slug === slug || item.id == slug);
+    
+    let prevProject = null;
+    let nextProject = null;
+    
+    if (currentIndex > 0) {
+      prevProject = allProjects[currentIndex - 1];
+    }
+    if (currentIndex < allProjects.length - 1) {
+      nextProject = allProjects[currentIndex + 1];
+    }
 
     res.json({ project, prevProject, nextProject });
   } catch (error) {
+    console.error("Error fetching project details:", error);
     res.status(500).json({ error: "Failed to fetch project details", details: error.message });
   }
 });
@@ -1091,13 +1660,139 @@ app.listen(PORT, async () => {
 
     await sequelize.authenticate();
     await Application.sync();
+    await CareerJob.sync();
+    await ChatEnquiry.sync();
+    await importChatbotEnquiriesFromJson();
+    await seedCareerJobsIfEmpty();
 
     console.log("✅ MySQL Connected successfully");
-    console.log("✅ Sequelize authenticated and application table synced");
+    console.log("✅ Sequelize authenticated and tables synced");
   } catch (err) {
     console.error("❌ Database Connection Warning:", err.message || err);
     console.log("👉 Please confirm your ./config/db file exports a clean mysql2/promise pool pool instance and your Sequelize config matches your DB.");
   }
 });
 
+
+app.post("/api/contact-enquiries", async (req, res) => {
+  try {
+    const { name, email, company, service, budget, message } = req.body;
+    if (!name || !email || !message) {
+      return res.status(400).json({ success: false, message: "Name, email and message are required" });
+    }
+    await db.query(
+      `INSERT INTO contact_enquiries (name, email, company, service, budget, message) VALUES (?, ?, ?, ?, ?, ?)`,
+      [name, email, company || null, service || null, budget || null, message]
+    );
+    res.status(201).json({ success: true, message: "Contact enquiry submitted successfully" });
+  } catch (error) {
+    console.error("CONTACT ENQUIRY ERROR:", error);
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
+app.get("/api/contact-enquiries", async (req, res) => {
+  try {
+    const [rows] = await db.query(`SELECT * FROM contact_enquiries ORDER BY createdAt DESC`);
+    res.json(rows);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
+app.delete("/api/admin/contact-enquiries/:id", authMiddleware, async (req, res) => {
+  try {
+    const [result] = await db.query("DELETE FROM contact_enquiries WHERE id = ?", [req.params.id]);
+    if (result.affectedRows === 0) return res.status(404).json({ error: "Not found" });
+    res.json({ success: true });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.get("/api/admin/stats/history", authMiddleware, async (req, res) => {
+  try {
+    const days = 7;
+    const labels = [];
+    const applications = [];
+    const messages = [];
+    const chat = [];
+    const contact = [];
+
+    const allMessages = readJSON("messages.json", []);
+
+    for (let i = days - 1; i >= 0; i--) {
+      const from = new Date();
+      from.setDate(from.getDate() - i);
+      from.setHours(0, 0, 0, 0);
+
+      const to = new Date(from);
+      to.setHours(23, 59, 59, 999);
+
+      labels.push(from.toLocaleDateString("en-US", { weekday: "short" }));
+
+      const appCount = await Application.count({
+        where: { created_at: { [require("sequelize").Op.between]: [from, to] } },
+      });
+      applications.push(appCount);
+
+      const chatCount = await ChatEnquiry.count({
+        where: { created_at: { [require("sequelize").Op.between]: [from, to] } },
+      });
+      chat.push(chatCount);
+
+      const msgCount = allMessages.filter((m) => {
+        const t = new Date(m.createdAt).getTime();
+        return t >= from.getTime() && t <= to.getTime();
+      }).length;
+      messages.push(msgCount);
+
+      const [contactRows] = await db.query(
+        `SELECT COUNT(*) AS count FROM contact_enquiries WHERE createdAt BETWEEN ? AND ?`,
+        [from, to]
+      );
+      contact.push(Number(contactRows[0].count));
+    }
+
+    res.json({ labels, applications, messages, chat, contact });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to fetch history", details: err.message });
+  }
+});
+
+
+app.post("/api/admin/send-email", authMiddleware, async (req, res) => {
+  try {
+    const { to, subject, message } = req.body;
+    if (!to || !subject || !message) {
+      return res.status(400).json({ error: "To, subject, and message are required." });
+    }
+
+    await transporter.sendMail({
+      from: `"Adway Admin" <${process.env.EMAIL_USER}>`,
+      to,
+      subject,
+      html: `
+        <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 580px; margin: 0 auto; padding: 40px 32px; background: #ffffff; border: 1px solid #e5e7eb; border-radius: 12px;">
+          <div style="margin-bottom: 32px;">
+            <img src="${process.env.CLIENT_URL}/logo.png" alt="Adway" style="height: 32px;" onerror="this.style.display='none'" />
+          </div>
+          <div style="font-size: 15px; line-height: 1.7; color: #374151; white-space: pre-wrap;">${message.replace(/\n/g, "<br/>")}</div>
+          <hr style="border: 0; border-top: 1px solid #e5e7eb; margin: 32px 0 20px;" />
+          <p style="font-size: 12px; color: #9ca3af; margin: 0;">Sent via Adway Admin · <a href="${process.env.CLIENT_URL}" style="color: #9ca3af;">${process.env.CLIENT_URL}</a></p>
+        </div>
+      `,
+    });
+
+    res.json({ success: true });
+  } catch (err) {
+    console.error("Send email error:", err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+
 module.exports = app;
+

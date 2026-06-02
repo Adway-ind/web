@@ -13,6 +13,7 @@ const projectsSeed = [
     result: "The rebrand contributed to a 40% increase in shelf appeal scores and a 28% lift in direct-to-consumer sales within the first quarter post-launch. The new identity system gave Lumina the flexibility to extend into new product lines while maintaining brand coherence.",
     tags: ["Logo Design", "Packaging", "Brand Guidelines", "Retail Design", "Typography"],
     image: "https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=800&q=80",
+    featured: 1,
     images: [
       "https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=1200&q=80",
       "https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=1200&q=80",
@@ -32,6 +33,7 @@ const projectsSeed = [
     result: "Within 6 months of launch, TechVault achieved 150% of their user acquisition target. Brand recall improved by 62% compared to category average, and their NPS score placed them in the top 10% of fintech brands.",
     tags: ["Strategy", "Positioning", "Naming", "Brand Architecture", "Visual Identity"],
     image: "https://images.unsplash.com/photo-1551288049-bebda4e15f92?w=800&q=80",
+    featured: 1,
     images: [
       "https://images.unsplash.com/photo-1551288049-bebda4e15f92?w=1200&q=80",
       "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=1200&q=80",
@@ -51,6 +53,7 @@ const projectsSeed = [
     result: "The redesigned platform saw a 3.2x increase in conversion rate and 85% improvement in mobile engagement. Average session duration increased by 4 minutes, and cart abandonment dropped by 35%.",
     tags: ["Web Design", "App Design", "E-commerce", "UX Research", "Design System"],
     image: "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=800&q=80",
+    featured: 1,
     images: [
       "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=1200&q=80",
       "https://images.unsplash.com/photo-1497435334941-8c899ee2737f?w=1200&q=80",
@@ -70,6 +73,7 @@ const projectsSeed = [
     result: "Post-rebrand, Artisan opened 3 new locations with the updated design language, achieving a 45% increase in foot traffic. Their packaged coffee line grew 200% in retail distribution within 8 months.",
     tags: ["Logo Design", "Packaging", "Interior", "Typography", "Signage"],
     image: "https://images.unsplash.com/photo-1495474472287-4d71bc2035a5?w=800&q=80",
+    featured: 1,
     images: [
       "https://images.unsplash.com/photo-1495474472287-4d71bc2035a5?w=1200&q=80",
       "https://images.unsplash.com/photo-1442512595490-9b4a8be7f2a0?w=1200&q=80",
@@ -195,6 +199,7 @@ async function migrate() {
         challenge TEXT NOT NULL,
         result TEXT NOT NULL,
         images TEXT NOT NULL,
+        featured TINYINT NOT NULL DEFAULT 0,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )
     `);
@@ -203,8 +208,8 @@ async function migrate() {
     console.log("Seeding projects...");
     for (const p of projectsSeed) {
       await db.query(
-        `INSERT INTO projects (slug, title, category, \`desc\`, image, tags, year, client, challenge, result, images)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        `INSERT INTO projects (slug, title, category, \`desc\`, image, tags, year, client, challenge, result, images, featured)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
         [
           p.slug,
           p.title,
@@ -216,7 +221,8 @@ async function migrate() {
           p.client,
           p.challenge,
           p.result,
-          JSON.stringify(p.images)
+          JSON.stringify(p.images),
+          p.featured || 0
         ]
       );
     }
