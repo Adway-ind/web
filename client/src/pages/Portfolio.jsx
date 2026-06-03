@@ -82,12 +82,20 @@ export default function Portfolio() {
             Explore a curated selection of brands we've helped build, transform,
             and elevate to new heights.
           </p>
+          <p className="mt-4 text-base text-white/40 max-w-3xl mx-auto leading-relaxed">
+            Our portfolio showcases the diversity and depth of our expertise across multiple industries and disciplines. From complete brand overhauls to targeted digital marketing campaigns, each project represents our commitment to excellence and our ability to deliver measurable results. Browse through our work to see how we've helped businesses like yours achieve their branding and marketing goals.
+          </p>
         </div>
       </section>
 
       {/* Filter + Projects */}
       <section className="py-24 bg-neutral-950">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center max-w-3xl mx-auto mb-12">
+            <p className="text-base text-white/50 leading-relaxed">
+              Filter projects by category to explore our work in specific areas. Each case study demonstrates our strategic approach to solving unique brand challenges and delivering exceptional results that drive business growth.
+            </p>
+          </div>
           {/* Category Filter */}
           <div className="flex flex-wrap items-center justify-center gap-3 mb-16">
             <Filter className="w-5 h-5 text-white/30 mr-2" />

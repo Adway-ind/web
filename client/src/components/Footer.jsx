@@ -18,6 +18,9 @@ export default function Footer() {
               <p className="text-white/60 mt-2 text-lg">
                 Let's create something extraordinary together.
               </p>
+              <p className="text-white/50 mt-2 text-base max-w-xl">
+                Whether you're launching a new brand, refreshing an existing one, or looking to expand your digital presence, our team is ready to help you achieve your goals with strategic creativity and proven expertise.
+              </p>
             </div>
             <Link
               to="/contact"
@@ -41,6 +44,9 @@ export default function Footer() {
             <p className="mt-4 text-black/50 leading-relaxed">
               We craft brands that resonate, inspire, and leave lasting
               impressions. Your vision, our expertise.
+            </p>
+            <p className="mt-3 text-black/40 text-sm leading-relaxed">
+              Adway is a full-service creative agency specializing in brand strategy, visual identity design, digital marketing, and web development. We partner with businesses worldwide to create compelling brand experiences that drive growth and build lasting customer relationships.
             </p>
           </div>
 

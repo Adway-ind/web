@@ -161,7 +161,15 @@ export default function About() {
                 personalized and cost-effective marketing solutions that
                 attract, engage, and convert audiences. With a focus on
                 creativity, performance, and results, we help businesses stand
-                out in today’s competitive digital landscape.
+                out in today's competitive digital landscape.
+              </p>
+              
+              <p className="mt-4 text-black/60 text-base leading-relaxed">
+                Our journey began with a simple vision: to make world-class branding accessible to businesses of all sizes. Over the years, we've grown from a small studio into a full-service creative agency, serving clients across industries and geographies. Our team brings together diverse expertise in design, technology, marketing, and strategy, enabling us to deliver comprehensive solutions that address every aspect of brand development and growth.
+              </p>
+              
+              <p className="mt-4 text-black/60 text-base leading-relaxed">
+                What sets us apart is our commitment to understanding each client's unique story and translating it into compelling brand experiences. We don't believe in one-size-fits-all approaches. Instead, we take the time to learn about your business, your audience, and your goals, then craft tailored strategies that deliver measurable results and long-term value.
               </p>
 
               {/* Color Picker */}
@@ -218,6 +226,9 @@ export default function About() {
             <h2 className="mt-4 text-4xl sm:text-5xl font-medium text-white tracking-tight">
               What drives us forward
             </h2>
+            <p className="mt-4 text-lg text-white/60">
+              Our core values shape every decision we make and every project we undertake. They guide our creative process, inform our client relationships, and define the culture we've built at Adway.
+            </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -252,6 +263,9 @@ export default function About() {
             <p className="mt-4 text-lg text-black/60">
               A diverse team of experts passionate about building remarkable
               brands.
+            </p>
+            <p className="mt-4 text-base text-black/60 max-w-2xl mx-auto">
+              Our team brings together strategists, designers, developers, and marketers who share a common passion for creative excellence. Each member contributes unique perspectives and specialized skills, enabling us to tackle complex branding challenges with innovative solutions. We foster a collaborative environment where ideas flourish and creativity thrives.
             </p>
           </div>
 

@@ -115,6 +115,11 @@ export default function Contact() {
       {/* Contact Info Cards */}
       <section className="py-16 bg-neutral-950">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center max-w-3xl mx-auto mb-12 -mt-8">
+            <p className="text-base text-white/50 leading-relaxed">
+              Ready to start your next project? We're here to help. Reach out to us through any of the channels below, or fill out the contact form and we'll get back to you within 24 hours. Whether you have a specific project in mind or just want to explore possibilities, we'd love to hear from you.
+            </p>
+          </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 -mt-24 relative z-10">
             {contactInfo.map((info) => (
               <div
@@ -164,6 +169,9 @@ export default function Contact() {
               <p className="mt-3 text-white/60 text-lg">
                 Fill out the form below and we'll get back to you within 24
                 hours.
+              </p>
+              <p className="mt-3 text-white/50 text-base">
+                The more details you provide about your project goals, timeline, and budget, the better we can tailor our response to your needs. All fields marked with an asterisk (*) are required.
               </p>
 
               {submitted ? (

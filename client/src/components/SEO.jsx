@@ -49,7 +49,7 @@ const SEO = ({
     updateMetaTag('meta[name="twitter:description"]', description);
     updateMetaTag('meta[name="twitter:image"]', image);
 
-    // Update canonical link
+    // Update canonical link - ensure it's always present and correct
     let canonical = document.querySelector('link[rel="canonical"]');
     if (!canonical) {
       canonical = document.createElement('link');
@@ -57,6 +57,29 @@ const SEO = ({
       document.head.appendChild(canonical);
     }
     canonical.setAttribute('href', pageUrl);
+
+    // Add hreflang tags for international SEO
+    let hreflangEn = document.querySelector('link[rel="alternate"][hreflang="en"]');
+    if (!hreflangEn) {
+      hreflangEn = document.createElement('link');
+      hreflangEn.setAttribute('rel', 'alternate');
+      hreflangEn.setAttribute('hreflang', 'en');
+      document.head.appendChild(hreflangEn);
+    }
+    hreflangEn.setAttribute('href', pageUrl);
+
+    // Add x-default hreflang
+    let hreflangDefault = document.querySelector('link[rel="alternate"][hreflang="x-default"]');
+    if (!hreflangDefault) {
+      hreflangDefault = document.createElement('link');
+      hreflangDefault.setAttribute('rel', 'alternate');
+      hreflangDefault.setAttribute('hreflang', 'x-default');
+      document.head.appendChild(hreflangDefault);
+    }
+    hreflangDefault.setAttribute('href', pageUrl);
+
+    // Add self-referencing canonical confirmation
+    console.log(`[SEO] Canonical URL set to: ${pageUrl}`);
 
     // Add structured data if provided
     if (structuredData) {
@@ -68,6 +91,11 @@ const SEO = ({
       }
       script.textContent = JSON.stringify(structuredData);
     }
+
+    // Cleanup function to prevent memory leaks
+    return () => {
+      // Optional: log when component unmounts
+    };
 
   }, [title, description, keywords, image, pageUrl, type, structuredData]);
 

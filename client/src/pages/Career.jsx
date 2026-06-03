@@ -331,10 +331,13 @@ export default function Career() {
           <p className="text-xs uppercase tracking-[0.25em] text-white/40 font-medium mb-4 text-center">
             Why Adway
           </p>
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-medium text-white tracking-[-0.02em] text-center mb-20">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-medium text-white tracking-[-0.02em] text-center mb-6">
             Perks that power
             <br className="sm:hidden" /> your best work
           </h2>
+          <p className="text-base text-white/40 max-w-2xl mx-auto text-center mb-20 leading-relaxed">
+            We believe that great work comes from happy, supported teams. That's why we've built a workplace culture that prioritizes well-being, professional growth, and work-life balance. Our comprehensive benefits package is designed to help you thrive both personally and professionally.
+          </p>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-12 gap-y-14">
             {perks.map((perk, i) => (
@@ -378,6 +381,9 @@ export default function Career() {
               <p className="mt-4 text-black/40 leading-relaxed font-medium">
                 No egos, no silos — just a shared passion for craft and impact.
                 We collaborate across disciplines and celebrate bold ideas.
+              </p>
+              <p className="mt-4 text-black/50 leading-relaxed text-base">
+                Our collaborative workspace encourages open communication, creative experimentation, and continuous learning. We host regular workshops, design critiques, and knowledge-sharing sessions to keep our team at the forefront of industry trends and best practices. Whether you're a seasoned professional or just starting your career, you'll find ample opportunities to grow, innovate, and make a meaningful impact.
               </p>
             </div>
 
@@ -429,6 +435,9 @@ export default function Career() {
             </h2>
             <p className="mt-6 text-base sm:text-lg text-white/40 font-light max-w-lg mx-auto">
               Become part of a high-performing & collaborative team
+            </p>
+            <p className="mt-4 text-base text-white/35 max-w-2xl mx-auto leading-relaxed">
+              We're always looking for talented individuals who share our passion for creative excellence and brand storytelling. If you don't see a role that matches your skills, we still encourage you to reach out with an open application. We believe in nurturing talent and creating opportunities for the right people.
             </p>
           </div>
 

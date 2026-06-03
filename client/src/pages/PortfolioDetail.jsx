@@ -101,7 +101,7 @@ function ImageSlider({ images, title }) {
                   : 'border-transparent opacity-50 hover:opacity-80'
               }`}
             >
-              <img src={img} alt="" className="w-full h-full object-cover" />
+              <img src={img} alt={`${title} thumbnail ${i + 1}`} className="w-full h-full object-cover" />
             </button>
           ))}
         </div>

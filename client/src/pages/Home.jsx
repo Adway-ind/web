@@ -541,7 +541,10 @@ export default function Home() {
             </h2>
             <p className="mt-4 text-lg text-white/60">
               We offer a complete suite of branding services designed to
-              transform your business into a memorable brand.
+              transform your business into a memorable brand. Our comprehensive approach combines strategic thinking with creative excellence to deliver measurable results.
+            </p>
+            <p className="mt-4 text-base text-white/50 max-w-2xl mx-auto">
+              From initial brand strategy and visual identity design to digital marketing campaigns and web development, we provide end-to-end solutions that help businesses stand out in competitive markets. Our team of experienced professionals works closely with each client to understand their unique challenges and goals, crafting customized strategies that drive growth and build lasting brand value.
             </p>
           </div>
 
@@ -621,6 +624,9 @@ export default function Home() {
             <h2 className="mt-4 text-4xl sm:text-5xl font-bold text-white tracking-tight">
               What our clients say
             </h2>
+            <p className="mt-4 text-lg text-white/60">
+              Don't just take our word for it. Here's what business owners and marketing leaders have to say about working with Adway. Our clients' success stories reflect our commitment to delivering exceptional branding and digital marketing solutions that drive real business growth.
+            </p>
           </div>
 
           <Swiper
@@ -676,6 +682,9 @@ export default function Home() {
               We craft premium branding, packaging, and digital experiences
               designed to elevate businesses in modern markets.
             </p>
+            <p className="mt-4 max-w-3xl mx-auto text-neutral-600 leading-relaxed text-base">
+              Our expertise spans across multiple disciplines, from strategic brand positioning and visual identity design to digital marketing campaigns and web development. We believe that great branding goes beyond aesthetics—it's about creating meaningful connections between businesses and their audiences. Every project we undertake is guided by thorough research, strategic thinking, and a deep understanding of market dynamics.
+            </p>
           </div>
 
           {/* Bento Grid */}
@@ -690,7 +699,7 @@ export default function Home() {
                   <div className="h-full w-full overflow-hidden">
                     <img
                       src={item.image}
-                      alt=""
+                      alt={item.title || "Branding showcase image"}
                       className="h-full w-full object-cover transition duration-700 group-hover:scale-105"
                     />
                   </div>
@@ -718,7 +727,7 @@ export default function Home() {
                       <div key={index} className="overflow-hidden bg-white">
                         <img
                           src={img}
-                          alt=""
+                          alt={`Creative branding gallery image ${index + 1}`}
                           className="h-full w-full object-cover transition duration-500 hover:scale-105"
                         />
                       </div>
@@ -741,6 +750,9 @@ export default function Home() {
             <h2 className="mt-4 text-4xl sm:text-5xl font-bold tracking-tight">
               How we bring your brand to life
             </h2>
+            <p className="mt-4 text-lg text-white/60">
+              Our proven four-step process ensures that every project delivers exceptional results. From initial discovery to final launch, we maintain transparent communication and collaborative workflows that keep you involved at every stage.
+            </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">

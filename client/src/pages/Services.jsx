@@ -173,6 +173,9 @@ export default function Services() {
             From strategy to execution, we provide a complete suite of branding
             services to help you stand out in a crowded marketplace.
           </p>
+          <p className="mt-4 text-base text-white/40 max-w-3xl mx-auto leading-relaxed">
+            Our comprehensive service offerings cover every aspect of brand development, from initial market research and strategic positioning to visual identity design and digital marketing implementation. We work with businesses of all sizes, from ambitious startups to established enterprises, helping them build stronger brands and achieve sustainable growth through creative excellence and data-driven strategies.
+          </p>
         </div>
       </section>
 
@@ -269,6 +272,9 @@ export default function Services() {
             </h2>
             <p className="mt-4 text-lg text-black/60">
               A structured approach that ensures exceptional results every time.
+            </p>
+            <p className="mt-4 text-base text-black/50 max-w-2xl mx-auto">
+              Our five-step process has been refined through years of experience and hundreds of successful projects. Each phase is designed to build upon the previous one, creating a solid foundation for your brand's success. We maintain transparent communication throughout, keeping you informed and involved at every stage of the journey.
             </p>
           </div>
 
