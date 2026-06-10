@@ -6,6 +6,9 @@ export default {
   ],
   theme: {
   extend: {
+    fontFamily: {
+      serif: ['"Fraunces"', 'serif'],
+    },
     animation: {
       marqueeRight: 'marqueeRight 22s linear infinite',
       float: 'float 3s ease-in-out infinite',

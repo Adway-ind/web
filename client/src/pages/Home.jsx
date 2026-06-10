@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { Link } from "react-router-dom";
 import {
   ArrowRight,
@@ -195,6 +195,23 @@ function HeroSlider() {
   const [current, setCurrent] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const total = heroSlides.length;
+  const sectionRef = useRef(null);
+  const [mouse, setMouse] = useState({ x: 50, y: 50 });
+
+  /* Track mouse position for spotlight gradient */
+  useEffect(() => {
+    const el = sectionRef.current;
+    if (!el) return;
+    const handleMove = (e) => {
+      const rect = el.getBoundingClientRect();
+      setMouse({
+        x: ((e.clientX - rect.left) / rect.width) * 100,
+        y: ((e.clientY - rect.top) / rect.height) * 100,
+      });
+    };
+    el.addEventListener("mousemove", handleMove);
+    return () => el.removeEventListener("mousemove", handleMove);
+  }, []);
 
   const goTo = useCallback(
     (index) => {
@@ -215,7 +232,15 @@ function HeroSlider() {
   }, [next]);
 
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-black">
+    <section ref={sectionRef} className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden bg-black">
+      {/* Mouse-following spotlight gradient */}
+      <div
+        className="absolute inset-0 z-[2] pointer-events-none transition-opacity duration-700"
+        style={{
+          background: `radial-gradient(600px circle at ${mouse.x}% ${mouse.y}%, rgba(168,85,247,0.12) 0%, rgba(99,102,241,0.06) 40%, transparent 70%)`,
+        }}
+      />
+
       {/* Antigravity 3D Effect Background */}
       <div className="absolute inset-0 w-full h-full z-[1] pointer-events-none">
         <Antigravity
@@ -242,84 +267,129 @@ function HeroSlider() {
           clickBurst={false}
         />
       </div>
-      {/* Single shared video backdrop */}
-      {/* <div className="absolute inset-0 w-full h-full overflow-hidden pointer-events-none select-none z-[2]">
-        <video
-          src={VideoSlide}
-          autoPlay
-          muted
-          loop
-          playsInline
-          className="w-full h-full object-cover scale-105 opacity-40"
-        />
-        <div className="absolute inset-0 bg-black/30" />
-        <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-black/60 opacity-90" />
-      </div> */}
-      {/* Grid overlay */}
+
+      {/* Subtle grid overlay */}
       <div
-        className="absolute inset-0 opacity-[0.03] z-[3] pointer-events-none"
+        className="absolute inset-0 opacity-[0.025] z-[3] pointer-events-none"
         style={{
           backgroundImage:
             "linear-gradient(rgba(255,255,255,.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.1) 1px, transparent 1px)",
-          backgroundSize: "60px 60px",
+          backgroundSize: "80px 80px",
         }}
       />
-      {/* Content Layer */}
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-32 text-center flex flex-col items-center justify-center min-h-screen w-full pointer-events-none">
+
+      {/* Floating badge — top */}
+      <div className="absolute top-24 sm:top-28 left-1/2 -translate-x-1/2 z-20 animate-fade-in-up">
+        <div className="flex items-center gap-2 px-4 py-2 rounded-full border border-white/10 bg-white/[0.04] backdrop-blur-xl">
+          <span className="relative flex h-2 w-2">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-400" />
+          </span>
+          <span className="text-white/70 text-xs sm:text-sm font-medium tracking-wide">
+            Trusted by 150+ Brands Worldwide
+          </span>
+        </div>
+      </div>
+
+      {/* Main Content Layer */}
+      <div className="relative z-10 max-w-7xl mx-auto px-6 sm:px-8 lg:px-10 text-center flex flex-col items-center justify-center min-h-screen w-full pointer-events-none">
         {heroSlides.map((slide, i) => (
           <div
             key={i}
-            className="absolute inset-0 flex flex-col items-center justify-center transition-all duration-[1200ms] ease-in-out px-2 sm:px-4 w-full max-w-7xl mx-auto"
+            className="absolute inset-0 flex flex-col items-center justify-center transition-all duration-[1200ms] ease-in-out px-4 sm:px-6 w-full max-w-7xl mx-auto"
             style={{
               opacity: i === current ? 1 : 0,
               pointerEvents: i === current ? "auto" : "none",
               transform:
                 i === current
                   ? "scale(1) translateY(0px)"
-                  : "scale(0.98) translateY(15px)",
+                  : "scale(0.97) translateY(20px)",
             }}
           >
-            <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold text-white leading-[1.1] sm:leading-[1.05] tracking-tight animate-fade-in-up animation-delay-200 mx-auto text-center pointer-events-auto">
+            {/* Overline tag */}
+            <span className="inline-block mb-6 sm:mb-8 px-4 py-1.5 rounded-full border border-white/10 bg-white/[0.03] backdrop-blur-sm text-white/50 text-[11px] sm:text-xs font-semibold uppercase tracking-[0.25em] animate-fade-in-up animation-delay-100 pointer-events-auto">
+              {slide.highlight}
+            </span>
+
+            {/* Main heading — large display type */}
+            <h1
+              className="text-5xl sm:text-7xl md:text-8xl lg:text-[8rem] font-bold text-white leading-[0.9] tracking-[-0.04em] animate-fade-in-up animation-delay-200 pointer-events-auto mx-auto"
+              style={{ fontFamily: "'Space Grotesk', sans-serif" }}
+            >
               {slide.title}
-              <span className="gradient-text ml-2 sm:ml-5">
+              <span className="block mt-5 bg-gradient-to-r from-white/40 via-white/20 to-white/40 bg-clip-text text-transparent">
                 {slide.highlight}
               </span>
             </h1>
 
-            <p className="mt-4 sm:mt-6 md:mt-8 text-sm sm:text-base md:text-lg lg:text-xl text-white/80 max-w-xl sm:max-w-2xl leading-relaxed animate-fade-in-up animation-delay-400 mx-auto text-center px-2 pointer-events-auto">
+            {/* Description */}
+            <p className="mt-6 sm:mt-8 text-sm sm:text-base md:text-lg text-white/50 max-w-lg sm:max-w-xl leading-relaxed animate-fade-in-up animation-delay-400 text-center pointer-events-auto font-light">
               {slide.paragraph}
             </p>
 
-            <div className="mt-6 sm:mt-8 md:mt-10 flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 animate-fade-in-up animation-delay-600 w-full px-2 pointer-events-auto">
+            {/* CTA Buttons */}
+            <div className="mt-8 sm:mt-10 flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-5 animate-fade-in-up animation-delay-600 pointer-events-auto">
               <Link
                 to="/contact"
-                className="group w-full sm:w-auto px-6 sm:px-8 py-3.5 sm:py-4 bg-white text-black rounded-md font-semibold text-[10px] sm:text-lg hover:bg-white/90 transition-all duration-300 shadow-lg shadow-white/10 hover:shadow-xl hover:shadow-white/20 hover:-translate-y-0.5 flex items-center justify-center gap-2"
+                className="group w-full sm:w-auto px-8 py-4 bg-white text-black rounded-full font-semibold text-sm sm:text-base hover:bg-white/90 transition-all duration-300 shadow-[0_0_40px_rgba(255,255,255,0.1)] hover:shadow-[0_0_60px_rgba(255,255,255,0.2)] hover:-translate-y-0.5 flex items-center justify-center gap-2.5"
               >
                 Start Your Project
-                <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-1 transition-transform" />
+                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </Link>
               <Link
                 to="/portfolio"
-                className="group relative overflow-hidden w-full sm:w-auto rounded-md p-[1px]"
+                className="group w-full sm:w-auto px-8 py-4 rounded-full border border-white/15 bg-white/[0.03] backdrop-blur-sm text-white font-semibold text-sm sm:text-base hover:bg-white/[0.08] hover:border-white/25 transition-all duration-300 flex items-center justify-center gap-2.5"
               >
-                {/* White Animated Border */}
-                <span className="absolute inset-[-1000%] animate-[spin_3s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,transparent_0%,white_40%,transparent_60%)]" />
-
-                {/* Button */}
-                <span className="relative z-10 flex items-center justify-center gap-2 px-6 sm:px-8 py-3.5 sm:py-4 bg-black/80 backdrop-blur-xl text-white border border-white/10 rounded-md font-semibold text-[10px] sm:text-lg hover:bg-white/10 transition-all duration-300">
-                  View Our Work
-                  <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-1 transition-transform duration-300" />
-                </span>
+                View Our Work
+                <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-300" />
               </Link>
             </div>
           </div>
         ))}
       </div>
+
+      {/* Slide indicators */}
+      <div className="absolute bottom-28 sm:bottom-32 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2 pointer-events-auto">
+        {heroSlides.map((_, i) => (
+          <button
+            key={i}
+            onClick={() => goTo(i)}
+            className={`h-1 rounded-full transition-all duration-500 ${
+              i === current
+                ? "w-8 bg-white"
+                : "w-3 bg-white/20 hover:bg-white/40"
+            }`}
+            aria-label={`Go to slide ${i + 1}`}
+          />
+        ))}
+      </div>
+
+      {/* Bottom stats bar */}
+      <div className="absolute bottom-0 left-0 right-0 z-20 border-t border-white/[0.06]">
+        <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-10 py-5 flex flex-wrap items-center justify-center sm:justify-between gap-6 sm:gap-8">
+          {[
+            { value: "150+", label: "Brands Served" },
+            { value: "8+", label: "Years Experience" },
+            { value: "500+", label: "Projects Delivered" },
+            { value: "98%", label: "Client Satisfaction" },
+          ].map((stat) => (
+            <div key={stat.label} className="flex items-center gap-3">
+              <span className="text-white text-lg sm:text-xl font-bold tracking-tight">
+                {stat.value}
+              </span>
+              <span className="text-white/30 text-xs sm:text-sm font-medium">
+                {stat.label}
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
+
       {/* Scroll indicator */}
-      {/* <div className="absolute bottom-8 z-10 left-1/2 -translate-x-1/2 pointer-events-none">
-        <p className="text-white/40 text-sm tracking-widest animate-bounce">
-          SCROLL
-        </p>
+      {/* <div className="absolute bottom-20 sm:bottom-24 left-1/2 -translate-x-1/2 z-20 pointer-events-none flex flex-col items-center gap-2">
+        <div className="w-5 h-8 rounded-full border border-white/20 flex items-start justify-center p-1.5">
+          <div className="w-1 h-2 rounded-full bg-white/60 animate-bounce" />
+        </div>
       </div> */}
     </section>
   );
@@ -360,7 +430,7 @@ function FeaturedPortfolio() {
             <span className="text-white/50 font-semibold text-sm uppercase tracking-wider">
               Our Work
             </span>
-            <h2 className="mt-4 text-4xl sm:text-5xl font-bold text-black tracking-tight">
+            <h2 className="mt-4 text-4xl text-center sm:text-left sm:text-5xl font-bold text-black tracking-tight">
               Featured projects
             </h2>
             <p className=" text-center sm:text-left mt-4 text-lg text-black/60 max-w-xl">
@@ -488,34 +558,34 @@ export default function Home() {
   const structuredData = {
     "@context": "https://schema.org",
     "@type": "Organization",
-    "name": "Adway",
-    "url": "https://adway.agency",
-    "logo": "https://adway.agency/favicon.svg",
-    "description": "Premium Branding & Digital Marketing Agency",
-    "address": {
+    name: "Adway",
+    url: "https://adway.agency",
+    logo: "https://adway.agency/favicon.svg",
+    description: "Premium Branding & Digital Marketing Agency",
+    address: {
       "@type": "PostalAddress",
-      "streetAddress": "123 Creative Ave",
-      "addressLocality": "Design District",
-      "addressRegion": "NY",
-      "postalCode": "10001",
-      "addressCountry": "US"
+      streetAddress: "123 Creative Ave",
+      addressLocality: "Design District",
+      addressRegion: "NY",
+      postalCode: "10001",
+      addressCountry: "US",
     },
-    "contactPoint": {
+    contactPoint: {
       "@type": "ContactPoint",
-      "telephone": "+1-555-123-4567",
-      "contactType": "Customer Service"
+      telephone: "+1-555-123-4567",
+      contactType: "Customer Service",
     },
-    "sameAs": [
+    sameAs: [
       "https://facebook.com/adway",
       "https://instagram.com/adway",
       "https://linkedin.com/company/adway",
-      "https://twitter.com/adway"
-    ]
+      "https://twitter.com/adway",
+    ],
   };
 
   return (
     <>
-      <SEO 
+      <SEO
         title="Adway - Premium Branding & Digital Marketing Agency"
         description="Transform your brand with Adway's expert branding, digital marketing, web development, and strategic consulting services. We create impactful brand experiences."
         keywords="branding agency, digital marketing, web development, creative branding, marketing strategy, brand identity, logo design"
@@ -532,19 +602,19 @@ export default function Home() {
         <div className="absolute top-1/2 left-1/3 w-[400px] h-[400px] rounded-full bg-fuchsia-500/10 blur-[100px] pointer-events-none mix-blend-screen" />
 
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center max-w-3xl mx-auto mb-16">
+          <div className="text-center max-w-5xl mx-auto mb-16">
             <span className="text-white/50 font-semibold text-sm uppercase tracking-wider">
               What We Do
             </span>
-            <h2 className="mt-4 text-4xl sm:text-5xl font-bold text-white tracking-tight">
+            <h2 className="mt-4 text-3xl sm:text-5xl font-bold max-w-5xl mx-auto text-white tracking-tight">
               Services built for impact
             </h2>
-            <p className="mt-4 text-lg text-white/60">
-              We offer a complete suite of branding services designed to
-              transform your business into a memorable brand. Our comprehensive approach combines strategic thinking with creative excellence to deliver measurable results.
-            </p>
-            <p className="mt-4 text-base text-white/50 max-w-2xl mx-auto">
-              From initial brand strategy and visual identity design to digital marketing campaigns and web development, we provide end-to-end solutions that help businesses stand out in competitive markets. Our team of experienced professionals works closely with each client to understand their unique challenges and goals, crafting customized strategies that drive growth and build lasting brand value.
+            <p className="mt-4 text-base text-white/60 max-w-4xl mx-auto text-justify sm:text-center">
+              We provide complete branding solutions that help businesses build
+              strong, memorable brands. From brand strategy and visual identity
+              design to digital marketing and web development, we create
+              tailored solutions that drive growth, strengthen brand presence,
+              and deliver measurable results.
             </p>
           </div>
 
@@ -617,15 +687,19 @@ export default function Home() {
       {/* Testimonials */}
       <section className="py-24 bg-black">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center max-w-3xl mx-auto mb-16">
+          <div className="text-center max-w-4xl mx-auto mb-16">
             <span className="text-white/50 font-semibold text-sm uppercase tracking-wider">
               Testimonials
             </span>
             <h2 className="mt-4 text-4xl sm:text-5xl font-bold text-white tracking-tight">
               What our clients say
             </h2>
-            <p className="mt-4 text-lg text-white/60">
-              Don't just take our word for it. Here's what business owners and marketing leaders have to say about working with Adway. Our clients' success stories reflect our commitment to delivering exceptional branding and digital marketing solutions that drive real business growth.
+            <p className="mt-4 text-lg text-justify sm:text-center text-white/60">
+              Don't just take our word for it. Here's what business owners and
+              marketing leaders have to say about working with Adway. Our
+              clients' success stories reflect our commitment to delivering
+              exceptional branding and digital marketing solutions that drive
+              real business growth.
             </p>
           </div>
 
@@ -677,13 +751,22 @@ export default function Home() {
             <h2 className="mt-4 text-4xl md:text-5xl font-semibold tracking-tight text-neutral-900">
               Creative Branding Experience
             </h2>
-
-            <p className="mt-5 max-w-2xl mx-auto text-neutral-600 leading-relaxed">
+            {/* 
+            <p className="mt-5 max-w-3xl mx-auto text-neutral-600 leading-relaxed">
               We craft premium branding, packaging, and digital experiences
               designed to elevate businesses in modern markets.
-            </p>
-            <p className="mt-4 max-w-3xl mx-auto text-neutral-600 leading-relaxed text-base">
-              Our expertise spans across multiple disciplines, from strategic brand positioning and visual identity design to digital marketing campaigns and web development. We believe that great branding goes beyond aesthetics—it's about creating meaningful connections between businesses and their audiences. Every project we undertake is guided by thorough research, strategic thinking, and a deep understanding of market dynamics.
+            </p> */}
+            <p className="mt-4 max-w-7xl mx-auto text-neutral-600 leading-relaxed text-justify sm:text-center">
+              Our expertise spans across multiple disciplines, from strategic
+              brand positioning and visual identity design to digital marketing
+              campaigns and web development. We believe that great branding goes
+              beyond aesthetics—it's about creating meaningful connections
+              between businesses and their audiences. Every project we undertake
+              is guided by thorough research, strategic thinking, and a deep
+              understanding of market dynamics. Whether you're looking to revamp
+              your brand's image or develop a new digital presence, our team of
+              experienced or develop a new digital presence, our team of
+              experienced professionals is here to help you achieve your goals.
             </p>
           </div>
 
@@ -747,11 +830,14 @@ export default function Home() {
             <span className="text-white/50 font-semibold text-sm uppercase tracking-wider">
               Our Process
             </span>
-            <h2 className="mt-4 text-4xl sm:text-5xl font-bold tracking-tight">
+            <h2 className="mt-4 text-2xl sm:text-5xl font-bold tracking-tight">
               How we bring your brand to life
             </h2>
-            <p className="mt-4 text-lg text-white/60">
-              Our proven four-step process ensures that every project delivers exceptional results. From initial discovery to final launch, we maintain transparent communication and collaborative workflows that keep you involved at every stage.
+            <p className="mt-4 text-base text-center text-white/60">
+              Our proven four-step process ensures that every project delivers
+              exceptional results. From initial discovery to final launch, we
+              maintain transparent communication and collaborative workflows
+              that keep you involved at every stage.
             </p>
           </div>
 

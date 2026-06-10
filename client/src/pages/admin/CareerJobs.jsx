@@ -85,7 +85,7 @@ export default function CareerJobs() {
       <div className="rounded-[32px] border border-white/10 bg-neutral-950 p-8 shadow-xl shadow-black/20">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <p className="text-sm uppercase tracking-[0.25em] text-white/40 font-medium mb-2">
+            <p className="text-sm uppercase tracking-[0.25em] text-white/40 font-medium mb-2 mt-[50px]">
               Career management
             </p>
             <h1 className="text-3xl font-semibold text-white">Add a new career opening</h1>

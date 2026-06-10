@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { ArrowRight, Filter } from "lucide-react";
+import { ArrowUpRight, SlidersHorizontal } from "lucide-react";
 import Video from "../assets/video/portfolio-one.mp4";
 import { API } from "../config/api";
 import SEO from "../components/SEO";
+import Client from "../components/ClientsSection";
 
 const resolveImageUrl = (url) => {
   if (!url) return "";
@@ -17,7 +18,6 @@ export default function Portfolio() {
   const [categories, setCategories] = useState(["All"]);
   const [loading, setLoading] = useState(true);
 
-  // Fetch categories on mount
   useEffect(() => {
     fetch(`${API}/api/categories`)
       .then((res) => (res.ok ? res.json() : Promise.reject()))
@@ -25,7 +25,6 @@ export default function Portfolio() {
       .catch((err) => console.error("Error fetching categories:", err));
   }, []);
 
-  // Fetch projects when category changes
   useEffect(() => {
     setLoading(true);
     const url =
@@ -42,159 +41,176 @@ export default function Portfolio() {
 
   return (
     <>
-      <SEO 
+      <SEO
         title="Our Portfolio - Branding & Digital Projects | Adway"
-        description="Explore Adway's portfolio of successful branding, digital marketing, and web development projects. See how we've transformed brands across industries."
+        description="Explore Adway's portfolio of successful branding, digital marketing, and web development projects."
         keywords="portfolio, branding projects, digital marketing, web development portfolio, creative work"
         url="/portfolio"
       />
-      {/* Hero */}
-      <section className="relative pt-32 pb-24 bg-black overflow-hidden">
-        <div className="absolute inset-0">
-          <div className="absolute top-0 right-1/4 w-96 h-96 bg-white/5 rounded-full blur-3xl" />
-          <div className="absolute bottom-0 left-1/3 w-72 h-72 bg-purple-500/5 rounded-full blur-3xl" />
-        </div>
 
-        {/* Background Video */}
+      {/* ── Hero ── */}
+      <section className="relative bg-black pt-32 pb-20 overflow-hidden">
+        {/* Background video — dimmed */}
         <video
-          autoPlay
-          muted
-          loop
-          playsInline
-          preload="auto"
-          className="absolute inset-0 w-full h-full object-cover"
+          autoPlay muted loop playsInline preload="auto"
+          className="absolute inset-0 w-full h-full object-cover opacity-50"
         >
           <source src={Video} type="video/mp4" />
         </video>
 
-        {/* Overlay */}
-        <div className="absolute inset-0 bg-black/70" />
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <span className="inline-block px-4 py-2 bg-white/10 border border-white/20 text-white rounded-full text-sm font-medium mb-6">
-            Our Portfolio
-          </span>
-          <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-[88px] font-bold text-white leading-[1.05] tracking-[-0.02em]">
-            Work that speaks
-            <br />
-            <span className="gradient-text">for itself</span>
+        <div className="relative max-w-7xl mx-auto px-6 lg:px-12">
+          {/* Eyebrow rule */}
+          <div className="flex items-center gap-4 mb-10">
+            <span className="text-[11px] tracking-[0.12em] uppercase text-white/50">
+              Adway Studio — Portfolio
+            </span>
+            <div className="flex-1 h-px bg-white/15" />
+          </div>
+
+          {/* Headline */}
+          <h1
+            className="font-medium text-white leading-[1.0] tracking-[-0.03em]"
+            style={{ fontVariationSettings: "'opsz' 144", fontSize: "clamp(52px, 8vw, 88px)" }}
+          >
+            Work that<br />
+            speaks{" "}
+            <em className="text-blue-500" style={{ fontStyle: "italic" }}>
+              for itself.
+            </em>
           </h1>
-          <p className="mt-6 text-lg text-white/50 max-w-2xl mx-auto leading-relaxed">
-            Explore a curated selection of brands we've helped build, transform,
-            and elevate to new heights.
+
+          <p className="mt-5 text-[15px] text-white/50 leading-relaxed max-w-sm font-light">
+            A curated selection of brands we've helped build, transform, and elevate.
           </p>
-          <p className="mt-4 text-base text-white/40 max-w-3xl mx-auto leading-relaxed">
-            Our portfolio showcases the diversity and depth of our expertise across multiple industries and disciplines. From complete brand overhauls to targeted digital marketing campaigns, each project represents our commitment to excellence and our ability to deliver measurable results. Browse through our work to see how we've helped businesses like yours achieve their branding and marketing goals.
-          </p>
+
+          {/* Stats + scroll hint */}
+          
         </div>
       </section>
 
-      {/* Filter + Projects */}
-      <section className="py-24 bg-neutral-950">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center max-w-3xl mx-auto mb-12">
-            <p className="text-base text-white/50 leading-relaxed">
-              Filter projects by category to explore our work in specific areas. Each case study demonstrates our strategic approach to solving unique brand challenges and delivering exceptional results that drive business growth.
+      {/* ── Filter + Grid ── */}
+      <section className="bg-white pt-10 pb-0">
+        <div className="max-w-7xl mx-auto px-6 lg:px-12">
+          {/* Filter bar */}
+          <div className="flex items-center justify-between mb-0 pb-5 border-b border-black/15">
+            <div className="flex items-center gap-3">
+              <SlidersHorizontal className="w-3.5 h-3.5 text-black/50" />
+              <div className="flex border border-black/15 rounded-[3px] overflow-hidden">
+                {categories.map((cat) => (
+                  <button
+                    key={cat}
+                    onClick={() => setActiveCategory(cat)}
+                    className={`px-4 py-2 text-[12px] tracking-[0.04em] font-medium border-r border-black/15 last:border-r-0 transition-all duration-150 ${
+                      activeCategory === cat
+                        ? "bg-black text-white hover:bg-black hover:text-white"
+                        : "bg-transparent text-black hover:bg-white hover:text-black"
+                    }`}
+                  >
+                    {cat}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <span className="text-[12px] text-white tracking-[0.04em]">
+              {projects.length} project{projects.length !== 1 ? "s" : ""}
+            </span>
+          </div>
+        </div>
+
+        {/* Grid */}
+        {loading ? (
+          <div className="flex items-center justify-center py-32">
+            <div className="w-5 h-5 border border-white border-t-transparent rounded-full animate-spin" />
+          </div>
+        ) : projects.length === 0 ? (
+          <div className="max-w-7xl mx-auto px-6 lg:px-12 py-24 text-center">
+            <p className="text-white/50 text-sm">No projects in this category yet.</p>
+          </div>
+        ) : (
+          <div className="max-w-7xl mx-auto px-6 lg:px-12 pb-12">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 bg-white/5">
+              {projects.map((project) => {
+                const projectTags = Array.isArray(project.tags)
+                  ? project.tags
+                  : typeof project.tags === "string"
+                  ? project.tags.split(",").map((t) => t.trim()).filter(Boolean)
+                  : [];
+
+                return (
+                  <Link
+                    key={project.slug || project.id}
+                    to={`/portfolio/${project.slug}`}
+                    className="group relative bg-[#0a0a0a] hover:bg-[#141414] transition-colors duration-200 overflow-hidden flex flex-col"
+                  >
+                    {/* Arrow icon — top-right corner with highlight border on hover */}
+                    <div className="absolute top-4 right-4 z-20 w-10 h-10 rounded-full border-2 border-white/20 bg-black/60 backdrop-blur-sm flex items-center justify-center text-white/60 transition-all duration-300 group-hover:border-white group-hover:bg-white group-hover:text-black group-hover:scale-110">
+                      <ArrowUpRight className="w-4 h-4 transition-transform duration-300 group-hover:-rotate-45" />
+                    </div>
+
+                    {/* Image — fixed height */}
+                    <div className="relative overflow-hidden flex-shrink-0 h-[300px] md:h-[360px]">
+                      <img
+                        src={resolveImageUrl(project.image)}
+                        alt={project.title}
+                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.04]"
+                      />
+                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300" />
+                    </div>
+
+                    {/* Content — fixed height bottom area */}
+                    <div className="flex flex-col flex-1 min-h-[90px] px-5 pt-4 pb-4">
+                      <span className="text-[10px] tracking-[0.1em] uppercase text-white/50 mb-1.5">
+                        {project.category}
+                      </span>
+                      <h3 className="font-serif text-[17px] text-white leading-tight line-clamp-2">
+                        {project.title}
+                      </h3>
+
+                      {/* <div className="mt-auto pt-3">
+                        {projectTags.length > 0 && (
+                          <div className="flex gap-1.5 flex-wrap">
+                            {projectTags.map((tag) => (
+                              <span
+                                key={tag}
+                                className="text-[10px] tracking-[0.06em] uppercase text-white/40 px-2 py-1 border border-white/15 rounded-[2px]"
+                              >
+                                {tag}
+                              </span>
+                            ))}
+                          </div>
+                        )}
+                      </div> */}
+                    </div>
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
+        )}
+      </section>
+
+      <Client />
+
+      {/* ── CTA ── */}
+      {/* <section className="bg-black py-16 px-6 lg:px-12 border-t border-white/10">
+        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-start md:items-center justify-between gap-8">
+          <div>
+            <h2 className="font-serif text-[28px] md:text-[36px] text-white italic leading-tight">
+              Like what you see?
+            </h2>
+            <p className="text-[13px] text-white/40 mt-2 font-light">
+              Let's create something just as impressive for your brand.
             </p>
           </div>
-          {/* Category Filter */}
-          <div className="flex flex-wrap items-center justify-center gap-3 mb-16">
-            <Filter className="w-5 h-5 text-white/30 mr-2" />
-            {categories.map((cat) => (
-              <button
-                key={cat}
-                onClick={() => setActiveCategory(cat)}
-                className={`px-5 py-2.5 rounded-full text-sm font-medium transition-all duration-300 ${
-                  activeCategory === cat
-                    ? "bg-white text-black shadow-lg"
-                    : "bg-white/5 text-white/60 hover:bg-white/10 border border-white/10"
-                }`}
-              >
-                {cat}
-              </button>
-            ))}
-          </div>
-
-          {/* Projects Grid */}
-          {loading ? (
-            <div className="flex items-center justify-center py-24">
-              <div className="w-8 h-8 border-2   rounded-full animate-spin" />
-            </div>
-          ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {projects.map((project) => {
-              // Ensure tags is an array
-              const projectTags = Array.isArray(project.tags) 
-                ? project.tags 
-                : typeof project.tags === 'string'
-                ? project.tags.split(',').map(t => t.trim()).filter(Boolean)
-                : [];
-
-              return (
-              <Link
-                to={`/portfolio/${project.slug}`}
-                key={project.slug || project.id}
-                className="group relative rounded-2xl overflow-hidden bg-white/5 border border-white/10 hover:border-white/25 hover:shadow-xl transition-all duration-500"
-              >
-                {/* Project Image */}
-                <div className="aspect-[4/3] relative overflow-hidden">
-                  <img
-                    src={resolveImageUrl(project.image)}
-                    alt={project.title}
-                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                  />
-                  <div className="absolute inset-0 bg-black/10 group-hover:bg-black/20 transition-colors duration-300" />
-                  {/* Hover overlay */}
-                  <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                    <div className="px-5 py-2.5 bg-white rounded-full text-black text-sm font-semibold flex items-center gap-2 shadow-lg">
-                      View Project
-                      <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                    </div>
-                  </div>
-                </div>
-                {/* Info */}
-                <div className="p-6">
-                  <span className="text-white/50 text-sm font-medium">
-                    {project.category}
-                  </span>
-                  <h3 className="text-xl font-bold text-white mt-1 group-hover:text-white/90 transition-colors">
-                    {project.title}
-                  </h3>
-                  
-                </div>
-              </Link>
-            );
-            })}
-          </div>
-          )}
-
-          {!loading && projects.length === 0 && (
-            <div className="text-center py-16">
-              <p className="text-white/30 text-lg">
-                No projects found in this category.
-              </p>
-            </div>
-          )}
-        </div>
-      </section>
-
-      {/* CTA */}
-      <section className="py-24 bg-black">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-4xl sm:text-5xl font-bold text-white tracking-tight">
-            Like what you see?
-          </h2>
-          <p className="mt-4 text-lg text-white/60">
-            Let's create something just as impressive for your brand.
-          </p>
           <Link
             to="/contact"
-            className="group inline-flex items-center gap-2 mt-8 px-8 py-4 bg-white text-black rounded-full font-semibold text-lg hover:bg-white/90 transition-all duration-300 shadow-lg"
+            className="inline-flex items-center gap-2 px-7 py-3.5 border border-white/20 text-white text-[12px] tracking-[0.08em] uppercase rounded-[3px] hover:bg-white hover:text-black hover:border-white transition-all duration-200"
           >
-            Start a Project
-            <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+            Start a project
+            <ArrowUpRight className="w-3.5 h-3.5" />
           </Link>
         </div>
-      </section>
+      </section> */}
     </>
   );
 }

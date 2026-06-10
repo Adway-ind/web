@@ -222,7 +222,7 @@ export default function Dashboard() {
     <div className="space-y-8">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-white">Dashboard</h1>
+        <h1 className="text-2xl font-bold text-white mt-[50px]">Dashboard</h1>
         <p className="text-white/40 text-sm mt-1">
           Overview of your Adway admin panel
         </p>

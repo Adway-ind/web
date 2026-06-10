@@ -56,7 +56,7 @@ export default function Contact() {
             "Content-Type": "application/json",
           },
           body: JSON.stringify(formData),
-        }
+        },
       );
 
       const data = await response.json();
@@ -84,42 +84,53 @@ export default function Contact() {
 
   return (
     <>
-      <SEO 
+      <SEO
         title="Contact Adway - Get In Touch | Branding Agency"
         description="Get in touch with Adway for your branding and digital marketing needs. Contact us for a consultation about your project."
         keywords="contact adway, branding agency contact, digital marketing consultation"
         url="/contact"
       />
       {/* Hero */}
-      <section className="relative pt-32 pb-24 bg-black overflow-hidden">
-        <div className="absolute inset-0">
-          <div className="absolute top-0 left-1/2 w-96 h-96 bg-white/5 rounded-full blur-3xl" />
-          <div className="absolute bottom-0 right-1/3 w-72 h-72 bg-purple-500/5 rounded-full blur-3xl" />
-        </div>
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <span className="inline-block px-4 py-2 bg-white/10 border border-white/20 text-white rounded-full text-sm font-medium mb-6">
-            Contact Us
-          </span>
-          <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-[88px] font-bold text-white leading-[1.05] tracking-[-0.02em]">
+      <section className="relative bg-black pt-32 pb-20 overflow-hidden">
+        <div className="relative max-w-7xl mx-auto px-6 lg:px-12">
+          {/* Eyebrow rule */}
+          <div className="flex items-center gap-4 mb-10">
+            <span className="text-[11px] tracking-[0.12em] uppercase text-white/50">
+              Adway Studio — Contact
+            </span>
+            <div className="flex-1 h-px bg-white/15" />
+          </div>
+
+          {/* Headline */}
+          <h1
+            className="text-white leading-[1.0] tracking-[-0.03em] font-medium"
+            style={{
+              fontVariationSettings: "'opsz' 144",
+              fontSize: "clamp(52px, 8vw, 88px)",
+            }}
+          >
             Let's start
-            <br />
-            <span className="gradient-text">something great</span>
+            <br />{" "}
+            <em className="text-blue-500" style={{ fontStyle: "italic" }}>
+              something great
+            </em>
           </h1>
-          <p className="mt-6 text-lg text-white/50 max-w-2xl mx-auto leading-relaxed">
-            Have a project in mind? We'd love to hear about it. Drop us a line
-            and let's explore how we can bring your vision to life.
+
+          <p className="mt-5 text-[15px] text-white/50 leading-relaxed max-w-lg font-light">
+            Ready to start your next project? We're here to help. Reach out to
+            us through any of the channels below, or fill out the contact form
+            and we'll get back to you within 24 hours. Whether you have a
+            specific project in mind or just want to explore possibilities, we'd
+            love to hear from you.
           </p>
+
+          {/* Stats + scroll hint */}
         </div>
       </section>
 
       {/* Contact Info Cards */}
       <section className="py-16 bg-neutral-950">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center max-w-3xl mx-auto mb-12 -mt-8">
-            <p className="text-base text-white/50 leading-relaxed">
-              Ready to start your next project? We're here to help. Reach out to us through any of the channels below, or fill out the contact form and we'll get back to you within 24 hours. Whether you have a specific project in mind or just want to explore possibilities, we'd love to hear from you.
-            </p>
-          </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 -mt-24 relative z-10">
             {contactInfo.map((info) => (
               <div
@@ -171,7 +182,9 @@ export default function Contact() {
                 hours.
               </p>
               <p className="mt-3 text-white/50 text-base">
-                The more details you provide about your project goals, timeline, and budget, the better we can tailor our response to your needs. All fields marked with an asterisk (*) are required.
+                The more details you provide about your project goals, timeline,
+                and budget, the better we can tailor our response to your needs.
+                All fields marked with an asterisk (*) are required.
               </p>
 
               {submitted ? (

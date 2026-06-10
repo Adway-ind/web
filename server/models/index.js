@@ -21,6 +21,7 @@ const User = require("./user")(sequelize, DataTypes);
 const Message = require("./message")(sequelize, DataTypes);
 const CareerJob = require("./careerJob")(sequelize, DataTypes);
 const ChatEnquiry = require("./chatEnquiry")(sequelize, DataTypes);
+const Client = require("./client")(sequelize, DataTypes);
 
 module.exports = {
   sequelize,
@@ -31,4 +32,5 @@ module.exports = {
   Message,
   CareerJob,
   ChatEnquiry,
+  Client,
 };

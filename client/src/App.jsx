@@ -9,8 +9,8 @@ import Contact from "./pages/Contact";
 import Career from "./pages/Career";
 import Apply from "./pages/Apply";
 import Social from "./pages/Social";
+import Clients from "./pages/Clients";
 import PortfolioDetail from "./pages/PortfolioDetail";
-import CustomCursor from "./custom/CustomCursor";
 import ChatBot from "./components/ChatBot";
 import Loader from "./components/Loader";
 import { AuthProvider } from "./context/AuthContext";
@@ -23,6 +23,7 @@ import Messages from "./pages/admin/Messages";
 import ChatEnquiries from "./pages/admin/ChatEnquiries";
 import AdminSettings from "./pages/admin/Settings";
 import AdminPortfolio from "./pages/admin/Portfolio";
+import AdminClients from "./pages/admin/Clients";
 import CareerJobs from "./pages/admin/CareerJobs";
 import ContactEnquiries from "./pages/admin/contact_enquiries";
 import "./App.css";
@@ -30,7 +31,6 @@ import "./App.css";
 function App() {
   return (
     <AuthProvider>
-      <CustomCursor />
 
       <div className="min-h-screen flex flex-col bg-black text-white">
         <Routes>
@@ -42,7 +42,6 @@ function App() {
                 <Loader />
                 <Navbar />
                 <main className="flex-1">
-                  <CustomCursor />
                   <Routes>
                     <Route path="/" element={<Home />} />
                     <Route path="/about" element={<About />} />
@@ -57,6 +56,7 @@ function App() {
                     <Route path="/apply" element={<Apply />} />
                     <Route path="/apply/:slug" element={<Apply />} />
                     <Route path="/social" element={<Social />} />
+                    <Route path="/clients" element={<Clients />} />
                   </Routes>
                 </main>
                 <Footer />
@@ -85,6 +85,7 @@ function App() {
             <Route path="contact-enquiries" element={<ContactEnquiries />} />
             <Route path="settings" element={<AdminSettings />} />
             <Route path="portfolio" element={<AdminPortfolio />} />
+            <Route path="clients" element={<AdminClients />} />
           </Route>
         </Routes>
       </div>

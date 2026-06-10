@@ -90,47 +90,57 @@ export default function About() {
   const [color, setColor] = useState("#2563eb");
   return (
     <>
-      <SEO 
+      <SEO
         title="About Adway - Our Story & Team | Branding Agency"
         description="Learn about Adway's journey, our passionate team of brand strategists and designers, and our mission to transform brands through creative excellence."
         keywords="about adway, branding team, brand strategists, creative agency, our story"
         url="/about"
       />
       {/* Hero */}
-      <section className="relative h-[600px] overflow-hidden bg-black">
-        {/* Background Video */}
+      <section className="relative bg-black pt-32 pb-20 overflow-hidden">
+        {/* Background video — dimmed */}
         <video
           autoPlay
           muted
           loop
           playsInline
           preload="auto"
-          className="absolute inset-0 w-full h-full object-cover"
+          className="absolute inset-0 w-full h-full object-cover opacity-50"
         >
-          <source src={Video} type="video/webm" />
+          <source src={Video} type="video/mp4" />
         </video>
 
-        {/* Overlay */}
-        <div className="absolute inset-0 bg-black/20" />
-
-        {/* Content */}
-        <div className="relative z-10 h-full flex items-center justify-center">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <span className="inline-block px-4 py-2 bg-white/10 border border-white/20 text-white rounded-full text-sm font-medium mb-6">
-              About Us
+        <div className="relative max-w-7xl mx-auto px-6 lg:px-12">
+          {/* Eyebrow rule */}
+          <div className="flex items-center gap-4 mb-10">
+            <span className="text-[11px] tracking-[0.12em] uppercase text-white/50">
+              Adway Studio — About
             </span>
-
-            <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-[88px] font-bold text-white leading-[1.05] tracking-[-0.02em]">
-              The story behind
-              <br />
-              <span className="gradient-text">the brand</span>
-            </h1>
-
-            <p className="mt-6 text-lg text-white/60 max-w-2xl mx-auto leading-relaxed">
-              We're a team of strategists, designers, and dreamers dedicated to
-              building brands that make a lasting impact.
-            </p>
+            <div className="flex-1 h-px bg-white/15" />
           </div>
+
+          {/* Headline */}
+          <h1
+            className="font-medium   text-white leading-[1.0] tracking-[-0.03em]"
+            style={{
+              fontVariationSettings: "'opsz' 144",
+              fontSize: "clamp(52px, 8vw, 88px)",
+            }}
+          >
+            The story
+            <br />  
+            behind{" "}
+            <em className="text-blue-500" style={{ fontStyle: "italic" }}>
+              the brand.
+            </em>
+          </h1>
+
+          <p className="mt-5 text-[15px] text-white/50 leading-relaxed max-w-sm font-light">
+            We're a team of strategists, designers, and dreamers dedicated to
+            building brands that make a lasting impact.
+          </p>
+
+          {/* Stats + scroll hint */}
         </div>
       </section>
 
@@ -148,28 +158,24 @@ export default function About() {
                 Building brands since 2014
               </h2>
 
-              <p className="mt-6 text-black/60 text-lg leading-relaxed">
+              <p className="mt-6 text-black text-lg text-justify leading-relaxed">
                 At Adway, we help brands grow through creative digital
                 marketing, branding, content creation, SEO, SEM, and eCommerce
                 solutions. Based in Kochi, Kerala, we combine strategy,
                 innovation, and design to build strong online experiences that
-                drive real business growth.
-              </p>
-
-              <p className="mt-4 text-black/60 text-lg leading-relaxed">
-                From startups and SMEs to global brands, Adway delivers
-                personalized and cost-effective marketing solutions that
-                attract, engage, and convert audiences. With a focus on
-                creativity, performance, and results, we help businesses stand
-                out in today's competitive digital landscape.
-              </p>
-              
-              <p className="mt-4 text-black/60 text-base leading-relaxed">
-                Our journey began with a simple vision: to make world-class branding accessible to businesses of all sizes. Over the years, we've grown from a small studio into a full-service creative agency, serving clients across industries and geographies. Our team brings together diverse expertise in design, technology, marketing, and strategy, enabling us to deliver comprehensive solutions that address every aspect of brand development and growth.
-              </p>
-              
-              <p className="mt-4 text-black/60 text-base leading-relaxed">
-                What sets us apart is our commitment to understanding each client's unique story and translating it into compelling brand experiences. We don't believe in one-size-fits-all approaches. Instead, we take the time to learn about your business, your audience, and your goals, then craft tailored strategies that deliver measurable results and long-term value.
+                drive real business growth.From startups and SMEs to global
+                brands, Adway delivers personalized and cost-effective marketing
+                solutions that attract, engage, and convert audiences. With a
+                focus on creativity, performance, and results, we help
+                businesses stand out in today's competitive digital
+                landscape.Our journey began with a simple vision: to make
+                world-class branding accessible to businesses of all sizes. Over
+                the years, we've grown from a small studio into a full-service
+                creative agency, serving clients across industries and
+                geographies. Our team brings together diverse expertise in
+                design, technology, marketing, and strategy, enabling us to
+                deliver comprehensive solutions that address every aspect of
+                brand development and growth.
               </p>
 
               {/* Color Picker */}
@@ -227,7 +233,9 @@ export default function About() {
               What drives us forward
             </h2>
             <p className="mt-4 text-lg text-white/60">
-              Our core values shape every decision we make and every project we undertake. They guide our creative process, inform our client relationships, and define the culture we've built at Adway.
+              Our core values shape every decision we make and every project we
+              undertake. They guide our creative process, inform our client
+              relationships, and define the culture we've built at Adway.
             </p>
           </div>
 
@@ -253,20 +261,19 @@ export default function About() {
       {/* Team */}
       <section className="py-24 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center max-w-3xl mx-auto mb-16">
+          <div className="text-center max-w-5xl mx-auto mb-16">
             <span className="text-black/50 font-semibold text-sm uppercase tracking-wider">
               Our Team
             </span>
             <h2 className="mt-4 text-4xl sm:text-5xl font-medium text-black tracking-tight">
               The creative minds
             </h2>
-            <p className="mt-4 text-lg text-black/60">
-              A diverse team of experts passionate about building remarkable
-              brands.
+            <p className="mt-4 text-2xl text-black text-center">
+              A passionate team of strategists, designers, developers, and
+              marketers dedicated to building remarkable brands through
+              creativity and innovation.
             </p>
-            <p className="mt-4 text-base text-black/60 max-w-2xl mx-auto">
-              Our team brings together strategists, designers, developers, and marketers who share a common passion for creative excellence. Each member contributes unique perspectives and specialized skills, enabling us to tackle complex branding challenges with innovative solutions. We foster a collaborative environment where ideas flourish and creativity thrives.
-            </p>
+            <p className="mt-4 text-base text-black/60 max-w-2xl mx-auto"></p>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">

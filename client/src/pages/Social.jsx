@@ -8,35 +8,54 @@ const INSTAGRAM_URL = `https://www.instagram.com/${INSTAGRAM_HANDLE}/`;
 export default function Social() {
   return (
     <>
-      <SEO 
+      <SEO
         title="Follow Adway on Social Media | Branding Agency"
         description="Follow Adway on social media for the latest branding inspiration, design trends, and creative insights. Connect with our community."
         keywords="adway social media, branding inspiration, design trends, creative community"
         url="/social"
       />
       {/* Hero */}
-      <section className="relative pt-32 pb-20 bg-black overflow-hidden">
-        <div className="absolute inset-0">
-          <div className="absolute top-0 left-1/3 w-96 h-96 bg-violet-500/5 rounded-full blur-3xl" />
-          <div className="absolute bottom-0 right-1/4 w-72 h-72 bg-pink-500/5 rounded-full blur-3xl" />
-        </div>
+      <section className="relative bg-black pt-32 pb-20 overflow-hidden">
+        {/* Background video — dimmed */}
+        {/* <video
+          autoPlay
+          muted
+          loop
+          playsInline
+          preload="auto"
+          className="absolute inset-0 w-full h-full object-cover opacity-50"
+        >
+          <source src={Video} type="video/mp4" />
+        </video> */}
 
-        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <span className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 border border-white/20 text-white rounded-full text-sm font-medium mb-6">
-            <FaInstagramSquare  className="w-4 h-4" />
-            @{INSTAGRAM_HANDLE}
-          </span>
+        <div className="relative max-w-7xl mx-auto px-6 lg:px-12">
+          {/* Eyebrow rule */}
+          <div className="flex items-center gap-4 mb-10">
+            <span className="text-[11px] tracking-[0.12em] uppercase text-white/50">
+              Adway Studio — Service
+            </span>
+            <div className="flex-1 h-px bg-white/15" />
+          </div>
 
-          <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-[88px] font-bold text-white leading-[1.05] tracking-[-0.02em]">
-            Behind the
+          {/* Headline */}
+          <h1
+            className=" text-white leading-[1.0] tracking-[-0.03em] font-medium"
+            style={{
+              fontVariationSettings: "'opsz' 144",
+              fontSize: "clamp(52px, 8vw, 88px)",
+            }}
+          >
+            Everything
             <br />
-            <span className="gradient-text">scenes</span>
+            Your{" "}
+            <em className="text-blue-500" style={{ fontStyle: "italic" }}>
+              brand needs.
+            </em>
           </h1>
 
-          <p className="mt-6 text-lg text-white/50 max-w-2xl mx-auto leading-relaxed">
-            Design & Printing — Branding | Advertising | Logo Design | Social
-            Media Posters | Packaging. Follow our creative journey from
-            Kattappana.
+          <p className="mt-5 text-[15px] text-white/50 leading-relaxed max-w-sm font-light">
+            From strategy to execution, we provide a complete suite of branding
+            services to help you stand out in a crowded marketplace.
           </p>
 
           {/* Follow CTA */}
@@ -46,13 +65,12 @@ export default function Social() {
             rel="noopener noreferrer"
             className="group inline-flex items-center gap-2 mt-8 px-8 py-4 bg-gradient-to-r from-violet-600 to-pink-500 text-white rounded-full font-semibold text-lg hover:opacity-90 transition-all duration-300 shadow-lg shadow-violet-500/20"
           >
-            <FaInstagramSquare  className="w-5 h-5" />
+            <FaInstagramSquare className="w-5 h-5" />
             Follow on Instagram
             <ExternalLink className="w-4 h-4 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
           </a>
 
           {/* Stats */}
-          
         </div>
       </section>
 
@@ -84,7 +102,7 @@ export default function Social() {
               rel="noopener noreferrer"
               className="group inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-violet-600 to-pink-500 text-white rounded-full font-semibold hover:opacity-90 transition-all duration-300"
             >
-              <FaInstagramSquare  className="w-5 h-5" />
+              <FaInstagramSquare className="w-5 h-5" />
               Follow @{INSTAGRAM_HANDLE}
               <ExternalLink className="w-4 h-4 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
             </a>

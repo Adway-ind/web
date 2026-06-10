@@ -222,19 +222,7 @@ body {
   left: 100%;
 }
 
-* {
-  cursor: none !important;
-}
 
-.cursor-ring.cursor-hover {
-  width: 56px !important;
-  height: 56px !important;
-  opacity: 1 !important;
-}
-
-.cursor-dot.cursor-hover-dot {
-  transform: translate(-50%, -50%) scale(0) !important;
-}
 
 @keyframes fadeLetter {
   from {
@@ -263,6 +251,7 @@ body {
 
 @theme inline {
   --font-heading: var(--font-sans);
+  --font-display: 'Space Grotesk', sans-serif;
   --font-sans: 'Geist Variable', sans-serif;
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);

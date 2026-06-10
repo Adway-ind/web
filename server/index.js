@@ -16,6 +16,7 @@ const UPLOAD_DIR = path.join(__dirname, "uploads");
 const COVER_DIR = path.join(UPLOAD_DIR, "covers");
 const GALLERY_DIR = path.join(UPLOAD_DIR, "gallery");
 const RESUME_DIR = path.join(UPLOAD_DIR, "resumes");
+const LOGO_DIR = path.join(UPLOAD_DIR, "logos");
 const nodemailer = require("nodemailer")
 
 if (!fs.existsSync(COVER_DIR)) {
@@ -30,8 +31,12 @@ if (!fs.existsSync(RESUME_DIR)) {
   fs.mkdirSync(RESUME_DIR, { recursive: true });
 }
 
+if (!fs.existsSync(LOGO_DIR)) {
+  fs.mkdirSync(LOGO_DIR, { recursive: true });
+}
+
 const db = require("./config/db");
-const { sequelize, Application, CareerJob, ChatEnquiry } = require("./models");
+const { sequelize, Application, CareerJob, ChatEnquiry, Client } = require("./models");
 
 const app = express();
 console.log("📁 Server directory:", __dirname);
@@ -1662,6 +1667,7 @@ app.listen(PORT, async () => {
     await Application.sync();
     await CareerJob.sync();
     await ChatEnquiry.sync();
+    await Client.sync();
     await importChatbotEnquiriesFromJson();
     await seedCareerJobsIfEmpty();
 
@@ -1795,4 +1801,98 @@ app.post("/api/admin/send-email", authMiddleware, async (req, res) => {
 
 
 module.exports = app;
+
+/* ═══ CLIENTS API ═══ */
+
+// Public: fetch all clients ordered by position
+app.get("/api/clients", async (req, res) => {
+  try {
+    const clients = await Client.findAll({ order: [["position", "ASC"], ["created_at", "ASC"]] });
+    res.json(clients);
+  } catch (err) {
+    console.error("Failed to fetch clients:", err);
+    res.status(500).json({ error: "Failed to fetch clients", details: err.message });
+  }
+});
+
+// Admin: fetch all clients (auth required)
+app.get("/api/admin/clients", authMiddleware, async (req, res) => {
+  try {
+    const clients = await Client.findAll({ order: [["position", "ASC"], ["created_at", "ASC"]] });
+    res.json(clients);
+  } catch (err) {
+    console.error("Failed to fetch admin clients:", err);
+    res.status(500).json({ error: "Failed to fetch clients", details: err.message });
+  }
+});
+
+// Admin: create client with optional logo upload
+app.post("/api/admin/clients", authMiddleware, upload.single("logo"), async (req, res) => {
+  try {
+    const { name, position } = req.body;
+    if (!name) return res.status(400).json({ error: "Client name is required" });
+
+    let logoPath = "";
+    if (req.file) {
+      const fileName = `${Date.now()}-${Math.random().toString(36).substring(2, 8)}.webp`;
+      await sharp(req.file.buffer)
+        .resize({ width: 400, fit: "inside", withoutEnlargement: true })
+        .webp({ quality: 85 })
+        .toFile(path.join(LOGO_DIR, fileName));
+      logoPath = `/uploads/logos/${fileName}`;
+    }
+
+    const maxPos = await Client.max("position") || 0;
+    const client = await Client.create({
+      name,
+      logo: logoPath,
+      position: position !== undefined && position !== "" ? Number(position) : maxPos + 1,
+    });
+
+    res.status(201).json(client);
+  } catch (err) {
+    console.error("Create client error:", err);
+    res.status(500).json({ error: "Failed to create client", details: err.message });
+  }
+});
+
+// Admin: update client
+app.patch("/api/admin/clients/:id", authMiddleware, upload.single("logo"), async (req, res) => {
+  try {
+    const client = await Client.findByPk(req.params.id);
+    if (!client) return res.status(404).json({ error: "Client not found" });
+
+    const { name, position } = req.body;
+
+    if (req.file) {
+      const fileName = `${Date.now()}-${Math.random().toString(36).substring(2, 8)}.webp`;
+      await sharp(req.file.buffer)
+        .resize({ width: 400, fit: "inside", withoutEnlargement: true })
+        .webp({ quality: 85 })
+        .toFile(path.join(LOGO_DIR, fileName));
+      client.logo = `/uploads/logos/${fileName}`;
+    }
+
+    if (name !== undefined) client.name = name;
+    if (position !== undefined && position !== "") client.position = Number(position);
+
+    await client.save();
+    res.json(client);
+  } catch (err) {
+    console.error("Update client error:", err);
+    res.status(500).json({ error: "Failed to update client", details: err.message });
+  }
+});
+
+// Admin: delete client
+app.delete("/api/admin/clients/:id", authMiddleware, async (req, res) => {
+  try {
+    const deleted = await Client.destroy({ where: { id: req.params.id } });
+    if (!deleted) return res.status(404).json({ error: "Client not found" });
+    res.json({ success: true });
+  } catch (err) {
+    console.error("Delete client error:", err);
+    res.status(500).json({ error: "Failed to delete client", details: err.message });
+  }
+});
 

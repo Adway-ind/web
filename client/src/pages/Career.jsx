@@ -11,7 +11,6 @@ function useCountUp(end, duration = 2000) {
   const ref = useRef(null);
   const started = useRef(false);
 
-
   useEffect(() => {
     const obs = new IntersectionObserver(
       ([e]) => {
@@ -60,19 +59,22 @@ const defaultCategories = [
         title: "Senior Brand Designer",
         location: "Remote / New York",
         type: "Full-time",
-        description: "Lead visual storytelling and brand systems across digital product launches.",
+        description:
+          "Lead visual storytelling and brand systems across digital product launches.",
       },
       {
         title: "Digital Product Designer",
         location: "Remote / New York",
         type: "Full-time",
-        description: "Design seamless product experiences that align with brand strategy.",
+        description:
+          "Design seamless product experiences that align with brand strategy.",
       },
       {
         title: "Motion Designer",
         location: "Remote",
         type: "Full-time",
-        description: "Create motion assets for campaigns, presentations, and web interactions.",
+        description:
+          "Create motion assets for campaigns, presentations, and web interactions.",
       },
     ],
   },
@@ -84,13 +86,15 @@ const defaultCategories = [
         title: "Brand Strategist",
         location: "Remote / London",
         type: "Full-time",
-        description: "Shape positioning and campaign strategy for our most ambitious clients.",
+        description:
+          "Shape positioning and campaign strategy for our most ambitious clients.",
       },
       {
         title: "Operations Manager",
         location: "New York",
         type: "Full-time",
-        description: "Oversee team operations, resourcing, and process improvements.",
+        description:
+          "Oversee team operations, resourcing, and process improvements.",
       },
     ],
   },
@@ -102,13 +106,15 @@ const defaultCategories = [
         title: "Content Writer",
         location: "Remote",
         type: "Part-time",
-        description: "Craft compelling copy for brands, campaigns, and client narratives.",
+        description:
+          "Craft compelling copy for brands, campaigns, and client narratives.",
       },
       {
         title: "Marketing Analyst",
         location: "Remote",
         type: "Full-time",
-        description: "Analyze marketing insights and recommend growth-focused strategies.",
+        description:
+          "Analyze marketing insights and recommend growth-focused strategies.",
       },
     ],
   },
@@ -154,8 +160,9 @@ function AccordionRow({ category, index, isOpen, onToggle }) {
     <div>
       <button
         onClick={onToggle}
-        className={`w-full flex items-center justify-between px-0 sm:px-2 transition-colors duration-300 group ${isOpen ? "bg-transparent" : "hover:bg-white/5"
-          }`}
+        className={`w-full flex items-center justify-between px-0 sm:px-2 transition-colors duration-300 group ${
+          isOpen ? "bg-transparent" : "hover:bg-white/5"
+        }`}
         style={{ height: "88px" }}
       >
         <div className="flex items-center gap-4 sm:gap-6">
@@ -177,8 +184,9 @@ function AccordionRow({ category, index, isOpen, onToggle }) {
       </button>
 
       <div
-        className={`overflow-hidden transition-all duration-400 ease-in-out ${isOpen ? "max-h-[600px] opacity-100" : "max-h-0 opacity-0"
-          }`}
+        className={`overflow-hidden transition-all duration-400 ease-in-out ${
+          isOpen ? "max-h-[600px] opacity-100" : "max-h-0 opacity-0"
+        }`}
       >
         <div className="pb-8 pl-8 sm:pl-14">
           {category.roles.map((role) => (
@@ -235,9 +243,7 @@ export default function Career() {
 
   const [showAll, setShowAll] = useState(false);
 
-  const displayedCategories = showAll
-    ? categories
-    : categories.slice(0, 5);
+  const displayedCategories = showAll ? categories : categories.slice(0, 5);
 
   useEffect(() => {
     fetch(`${API}/api/careers`)
@@ -254,74 +260,56 @@ export default function Career() {
 
   return (
     <>
-      <SEO 
+      <SEO
         title="Careers at Adway - Join Our Team | Branding Agency"
         description="Join Adway's talented team of creatives, strategists, and developers. Explore career opportunities in branding, design, and digital marketing."
         keywords="careers at adway, creative jobs, branding careers, design jobs, digital marketing careers"
         url="/career"
       />
       {/* ═══ HERO ═══ */}
-      <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden bg-black ">
-        <div className="absolute inset-0">
-          <div className="absolute inset-0">
-            <div className="absolute top-0 right-0 w-96 h-96 bg-white/5 rounded-full blur-3xl" />
-            <div className="absolute bottom-0 left-0 w-72 h-72 bg-purple-500/5 rounded-full blur-3xl" />
+      <section className="relative bg-black pt-32 pb-20 overflow-hidden">
+        {/* Background video — dimmed */}
+        <video
+          autoPlay
+          muted
+          loop
+          playsInline
+          preload="auto"
+          className="absolute inset-0 w-full h-full object-cover opacity-40"
+        >
+          <source src={Video} type="video/mp4" />
+        </video>
+
+        <div className="relative max-w-7xl mx-auto px-6 lg:px-12">
+          {/* Eyebrow rule */}
+          <div className="flex items-center gap-4 mb-10">
+            <span className="text-[11px] tracking-[0.12em] uppercase text-white/50">
+              Adway Studio — Carrer
+            </span>
+            <div className="flex-1 h-px bg-white/15" />
           </div>
-          <video
-            autoPlay
-            muted
-            loop
-            playsInline
-            preload="auto"
-            className="absolute inset-0 w-full h-full object-cover"
+
+          {/* Headline */}
+          <h1
+            className="text-white leading-[1.0] tracking-[-0.03em] font-medium"
+            style={{
+              fontVariationSettings: "'opsz' 144",
+              fontSize: "clamp(52px, 8vw, 88px)",
+            }}
           >
-            <source src={Video} type="video/mp4" />
-          </video>
-
-          {/* Overlay */}
-          <div className="absolute inset-0 bg-black/70" />
-        </div>
-
-        <div
-          className="absolute inset-0 opacity-[0.025]"
-          style={{
-            backgroundImage:
-              "linear-gradient(rgba(255,255,255,.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.1) 1px, transparent 1px)",
-            backgroundSize: "80px 80px",
-          }}
-        />
-
-        <div className="relative z-10 max-w-4xl mx-auto px-6 lg:px-8 py-32 text-center">
-          <p className="text-xs uppercase tracking-[0.25em] text-white/40 font-medium mb-8">
-            Careers at Adway
-          </p>
-
-          <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-[88px] font-bold text-white leading-[1.05] tracking-[-0.02em]">
-            Shape the future
-            <br />
-            <span className="gradient-text font-bold">of branding</span>
+            Shape the <br />
+            future{" "}
+            <em className="text-blue-500" style={{ fontStyle: "italic" }}>
+               of branding
+            </em>
           </h1>
 
-          <p className="mt-8 text-base sm:text-lg text-white/40 max-w-xl mx-auto leading-relaxed font-light">
+          <p className="mt-5 text-[15px] text-white/50 leading-relaxed max-w-sm font-light">
             Join a team of strategists, designers, and dreamers building brands
             that leave a mark.
           </p>
 
-          <div className="mt-12 flex flex-col sm:flex-row items-center justify-center gap-4">
-            <a
-              href="#openings"
-              className="group inline-flex items-center gap-2 text-sm font-medium text-white bg-white/10 hover:bg-white/15 border border-white/10 hover:border-white/20 px-7 py-3.5 rounded-full transition-all duration-300"
-            >
-              View Open Roles
-              <ArrowDown className="w-4 h-4" />
-            </a>
-          </div>
-
-          {/* <div className="mt-24 grid grid-cols-2 md:grid-cols-4 gap-12 max-w-2xl mx-auto">
-            {values.map((v) => (
-              <Stat key={v.label} number={v.number} label={v.label} />
-            ))}
-          </div> */}
+          {/* Stats + scroll hint */}
         </div>
       </section>
 
@@ -335,8 +323,12 @@ export default function Career() {
             Perks that power
             <br className="sm:hidden" /> your best work
           </h2>
-          <p className="text-base text-white/40 max-w-2xl mx-auto text-center mb-20 leading-relaxed">
-            We believe that great work comes from happy, supported teams. That's why we've built a workplace culture that prioritizes well-being, professional growth, and work-life balance. Our comprehensive benefits package is designed to help you thrive both personally and professionally.
+          <p className="text-base text-white/40 max-w-4xl mx-auto text-center mb-20 leading-relaxed">
+            We believe that great work comes from happy, supported teams. That's
+            why we've built a workplace culture that prioritizes well-being,
+            professional growth, and work-life balance. Our comprehensive
+            benefits package is designed to help you thrive both personally and
+            professionally.
           </p>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-12 gap-y-14">
@@ -373,17 +365,23 @@ export default function Career() {
                 <br />
                 meets purpose
               </h2>
-              <p className="mt-8 text-black/40 leading-relaxed font-medium">
-                At Adway, you won't just make things look good — you'll make
-                them mean something. Every brand has a story worth telling, and
-                every team member has a voice worth hearing.
+              <p className="mt-8 text-black/40 leading-relaxed font-medium ">
+                At Adway, you won't just make things look good you'll make them
+                mean something. Every brand has a story worth telling, and every
+                team member has a voice worth hearing.
               </p>
               <p className="mt-4 text-black/40 leading-relaxed font-medium">
-                No egos, no silos — just a shared passion for craft and impact.
-                We collaborate across disciplines and celebrate bold ideas.
+                No egos, no silos just a shared passion for craft and impact. We
+                collaborate across disciplines and celebrate bold ideas.
               </p>
-              <p className="mt-4 text-black/50 leading-relaxed text-base">
-                Our collaborative workspace encourages open communication, creative experimentation, and continuous learning. We host regular workshops, design critiques, and knowledge-sharing sessions to keep our team at the forefront of industry trends and best practices. Whether you're a seasoned professional or just starting your career, you'll find ample opportunities to grow, innovate, and make a meaningful impact.
+              <p className="mt-4 text-black/50 leading-relaxed font-medium text-base">
+                Our collaborative workspace encourages open communication,
+                creative experimentation, and continuous learning. We host
+                regular workshops, design critiques, and knowledge-sharing
+                sessions to keep our team at the forefront of industry trends
+                and best practices. Whether you're a seasoned professional or
+                just starting your career, you'll find ample opportunities to
+                grow, innovate, and make a meaningful impact.
               </p>
             </div>
 
@@ -436,8 +434,12 @@ export default function Career() {
             <p className="mt-6 text-base sm:text-lg text-white/40 font-light max-w-lg mx-auto">
               Become part of a high-performing & collaborative team
             </p>
-            <p className="mt-4 text-base text-white/35 max-w-2xl mx-auto leading-relaxed">
-              We're always looking for talented individuals who share our passion for creative excellence and brand storytelling. If you don't see a role that matches your skills, we still encourage you to reach out with an open application. We believe in nurturing talent and creating opportunities for the right people.
+            <p className="mt-4 text-base text-white/35 max-w-5xl mx-auto leading-relaxed">
+              We're always looking for talented individuals who share our
+              passion for creative excellence and brand storytelling. If you
+              don't see a role that matches your skills, we still encourage you
+              to reach out with an open application. We believe in nurturing
+              talent and creating opportunities for the right people.
             </p>
           </div>
 

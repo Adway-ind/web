@@ -134,48 +134,57 @@ const process = [
 export default function Services() {
   return (
     <>
-      <SEO 
+      <SEO
         title="Our Services - Branding, Digital Marketing & Web Development | Adway"
         description="Explore Adway's comprehensive services: brand strategy, visual identity, digital design, motion graphics, and brand growth solutions for modern businesses."
         keywords="branding services, digital marketing, web development, visual identity, brand strategy, motion graphics"
         url="/services"
       />
       {/* Hero */}
-      <section className="relative pt-32 pb-24 bg-black overflow-hidden">
-        <div className="absolute inset-0">
-          <div className="absolute top-0 left-1/3 w-96 h-96 bg-white/5 rounded-full blur-3xl" />
-          <div className="absolute bottom-0 right-1/4 w-72 h-72 bg-purple-500/5 rounded-full blur-3xl" />
-        </div>
+      <section className="relative bg-black pt-32 pb-20 overflow-hidden">
+        {/* Background video — dimmed */}
         <video
           autoPlay
           muted
           loop
           playsInline
           preload="auto"
-          className="absolute inset-0 w-full h-full object-cover"
+          className="absolute inset-0 w-full h-full object-cover opacity-50"
         >
           <source src={Video} type="video/mp4" />
         </video>
 
-        {/* Overlay */}
-        <div className="absolute inset-0 bg-black/70" />
+        <div className="relative max-w-7xl mx-auto px-6 lg:px-12">
+          {/* Eyebrow rule */}
+          <div className="flex items-center gap-4 mb-10">
+            <span className="text-[11px] tracking-[0.12em] uppercase text-white/50">
+              Adway Studio — Service
+            </span>
+            <div className="flex-1 h-px bg-white/15" />
+          </div>
 
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <span className="inline-block px-4 py-2 bg-white/10 border border-white/20 text-white rounded-full text-sm font-medium mb-6">
-            Our Services
-          </span>
-          <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-[88px] font-bold text-white leading-[1.05] tracking-[-0.02e">
-            Everything your
+          {/* Headline */}
+          <h1
+            className="font-medium  text-white leading-[1.0] tracking-[-0.03em]"
+            style={{
+              fontVariationSettings: "'opsz' 144",
+              fontSize: "clamp(52px, 8vw, 88px)",
+            }}
+          >
+            Everything
             <br />
-            <span className="gradient-text">brand needs</span>
+            Your{" "}
+            <em className="text-blue-500" style={{ fontStyle: "italic" }}>
+              brand needs.
+            </em>
           </h1>
-          <p className="mt-6 text-lg text-white/50 max-w-2xl mx-auto leading-relaxed">
+
+          <p className="mt-5 text-[15px] text-white/50 leading-relaxed max-w-sm font-light">
             From strategy to execution, we provide a complete suite of branding
             services to help you stand out in a crowded marketplace.
           </p>
-          <p className="mt-4 text-base text-white/40 max-w-3xl mx-auto leading-relaxed">
-            Our comprehensive service offerings cover every aspect of brand development, from initial market research and strategic positioning to visual identity design and digital marketing implementation. We work with businesses of all sizes, from ambitious startups to established enterprises, helping them build stronger brands and achieve sustainable growth through creative excellence and data-driven strategies.
-          </p>
+
+          {/* Stats + scroll hint */}
         </div>
       </section>
 
@@ -263,7 +272,7 @@ export default function Services() {
       {/* Process */}
       <section className="py-24 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center max-w-3xl mx-auto mb-16">
+          <div className="text-center max-w-5xl mx-auto mb-16">
             <span className="text-black/50 font-semibold text-sm uppercase tracking-wider">
               How It Works
             </span>
@@ -274,7 +283,11 @@ export default function Services() {
               A structured approach that ensures exceptional results every time.
             </p>
             <p className="mt-4 text-base text-black/50 max-w-2xl mx-auto">
-              Our five-step process has been refined through years of experience and hundreds of successful projects. Each phase is designed to build upon the previous one, creating a solid foundation for your brand's success. We maintain transparent communication throughout, keeping you informed and involved at every stage of the journey.
+              Our five-step process has been refined through years of experience
+              and hundreds of successful projects. Each phase is designed to
+              build upon the previous one, creating a solid foundation for your
+              brand's success. We maintain transparent communication throughout,
+              keeping you informed and involved at every stage of the journey.
             </p>
           </div>
 
