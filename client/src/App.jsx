@@ -11,6 +11,8 @@ import Apply from "./pages/Apply";
 import Social from "./pages/Social";
 import Clients from "./pages/Clients";
 import PortfolioDetail from "./pages/PortfolioDetail";
+import Blog from "./pages/Blog";
+import BlogDetail from "./pages/BlogDetail";
 import ChatBot from "./components/ChatBot";
 import Loader from "./components/Loader";
 import { AuthProvider } from "./context/AuthContext";
@@ -26,6 +28,7 @@ import AdminPortfolio from "./pages/admin/Portfolio";
 import AdminClients from "./pages/admin/Clients";
 import CareerJobs from "./pages/admin/CareerJobs";
 import ContactEnquiries from "./pages/admin/contact_enquiries";
+import AdminBlog from "./pages/admin/Blog";
 import "./App.css";
 
 function App() {
@@ -57,6 +60,8 @@ function App() {
                     <Route path="/apply/:slug" element={<Apply />} />
                     <Route path="/social" element={<Social />} />
                     <Route path="/clients" element={<Clients />} />
+                    <Route path="/blog" element={<Blog />} />
+                    <Route path="/blog/:slug" element={<BlogDetail />} />
                   </Routes>
                 </main>
                 <Footer />
@@ -86,6 +91,7 @@ function App() {
             <Route path="settings" element={<AdminSettings />} />
             <Route path="portfolio" element={<AdminPortfolio />} />
             <Route path="clients" element={<AdminClients />} />
+            <Route path="blog" element={<AdminBlog />} />
           </Route>
         </Routes>
       </div>

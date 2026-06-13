@@ -17,6 +17,7 @@ const COVER_DIR = path.join(UPLOAD_DIR, "covers");
 const GALLERY_DIR = path.join(UPLOAD_DIR, "gallery");
 const RESUME_DIR = path.join(UPLOAD_DIR, "resumes");
 const LOGO_DIR = path.join(UPLOAD_DIR, "logos");
+const BLOG_DIR = path.join(UPLOAD_DIR, "blogs");
 const nodemailer = require("nodemailer")
 
 if (!fs.existsSync(COVER_DIR)) {
@@ -35,8 +36,12 @@ if (!fs.existsSync(LOGO_DIR)) {
   fs.mkdirSync(LOGO_DIR, { recursive: true });
 }
 
+if (!fs.existsSync(BLOG_DIR)) {
+  fs.mkdirSync(BLOG_DIR, { recursive: true });
+}
+
 const db = require("./config/db");
-const { sequelize, Application, CareerJob, ChatEnquiry, Client } = require("./models");
+const { sequelize, Application, CareerJob, ChatEnquiry, Client, Blog } = require("./models");
 
 const app = express();
 console.log("📁 Server directory:", __dirname);
@@ -1668,6 +1673,7 @@ app.listen(PORT, async () => {
     await CareerJob.sync();
     await ChatEnquiry.sync();
     await Client.sync();
+    await Blog.sync();
     await importChatbotEnquiriesFromJson();
     await seedCareerJobsIfEmpty();
 
@@ -1799,6 +1805,168 @@ app.post("/api/admin/send-email", authMiddleware, async (req, res) => {
   }
 });
 
+
+/* ═══ BLOG API ═══ */
+
+// Public: list published blogs
+app.get("/api/blogs", async (req, res) => {
+  try {
+    const { category } = req.query;
+    const where = { published: 1 };
+    if (category && category !== "All") where.category = category;
+
+    const blogs = await Blog.findAll({
+      where,
+      order: [[sequelize.col("created_at"), "DESC"]],
+      attributes: { exclude: ["content"] },
+    });
+    res.json(blogs);
+  } catch (err) {
+    console.error("Blog list error:", err);
+    res.status(500).json({ error: "Failed to fetch blogs", details: err.message });
+  }
+});
+
+// Public: blog categories
+app.get("/api/blogs/categories", async (req, res) => {
+  try {
+    const [rows] = await db.query(
+      "SELECT DISTINCT category FROM blogs WHERE published = 1 AND category IS NOT NULL AND category != ''"
+    );
+    const cats = rows.map((r) => r.category);
+    res.json(["All", ...cats]);
+  } catch (err) {
+    res.status(500).json({ error: "Failed to fetch blog categories", details: err.message });
+  }
+});
+
+// Public: single blog by slug
+app.get("/api/blogs/:slug", async (req, res) => {
+  try {
+    const blog = await Blog.findOne({ where: { slug: req.params.slug, published: 1 } });
+    if (!blog) return res.status(404).json({ error: "Blog post not found" });
+
+    // Navigation
+    const allBlogs = await Blog.findAll({
+      where: { published: 1 },
+      order: [[sequelize.col("created_at"), "DESC"]],
+      attributes: ["slug", "title"],
+    });
+    const idx = allBlogs.findIndex((b) => b.slug === req.params.slug);
+    const prevBlog = idx > 0 ? allBlogs[idx - 1] : null;
+    const nextBlog = idx < allBlogs.length - 1 ? allBlogs[idx + 1] : null;
+
+    res.json({ blog, prevBlog, nextBlog });
+  } catch (err) {
+    console.error("Blog detail error:", err);
+    res.status(500).json({ error: "Failed to fetch blog", details: err.message });
+  }
+});
+
+// Admin: list all blogs (including drafts)
+app.get("/api/admin/blogs", authMiddleware, async (req, res) => {
+  try {
+    const blogs = await Blog.findAll({ order: [[sequelize.col("created_at"), "DESC"]] });
+    res.json(blogs);
+  } catch (err) {
+    res.status(500).json({ error: "Failed to fetch blogs", details: err.message });
+  }
+});
+
+// Admin: create blog
+app.post("/api/admin/blogs", authMiddleware, upload.single("coverImage"), async (req, res) => {
+  try {
+    const { title, excerpt, content, author, category, tags, published } = req.body;
+    if (!title || !content) {
+      return res.status(400).json({ error: "Title and content are required" });
+    }
+
+    const slug =
+      title
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/(^-|-$)/g, "") + "-" + Date.now();
+
+    let coverImagePath = "";
+    if (req.file) {
+      const fileName = `${Date.now()}-blog.webp`;
+      await sharp(req.file.buffer)
+        .resize({ width: 1200, fit: "inside", withoutEnlargement: true })
+        .webp({ quality: 78 })
+        .toFile(path.join(BLOG_DIR, fileName));
+      coverImagePath = `/uploads/blogs/${fileName}`;
+    }
+
+    const wordCount = content.split(/\s+/).length;
+    const readingTime = Math.max(1, Math.ceil(wordCount / 200));
+
+    const blog = await Blog.create({
+      title,
+      slug,
+      excerpt: excerpt || content.substring(0, 200),
+      content,
+      coverImage: coverImagePath,
+      author: author || "Adway Team",
+      category: category || "",
+      tags: tags || "",
+      readingTime,
+      published: published ? 1 : 0,
+    });
+
+    res.status(201).json(blog);
+  } catch (err) {
+    console.error("Blog create error:", err);
+    res.status(500).json({ error: "Failed to create blog", details: err.message });
+  }
+});
+
+// Admin: update blog
+app.patch("/api/admin/blogs/:id", authMiddleware, upload.single("coverImage"), async (req, res) => {
+  try {
+    const blog = await Blog.findByPk(req.params.id);
+    if (!blog) return res.status(404).json({ error: "Blog not found" });
+
+    const { title, excerpt, content, author, category, tags, published } = req.body;
+
+    if (req.file) {
+      const fileName = `${Date.now()}-blog.webp`;
+      await sharp(req.file.buffer)
+        .resize({ width: 1200, fit: "inside", withoutEnlargement: true })
+        .webp({ quality: 78 })
+        .toFile(path.join(BLOG_DIR, fileName));
+      blog.coverImage = `/uploads/blogs/${fileName}`;
+    }
+
+    if (title !== undefined) blog.title = title;
+    if (excerpt !== undefined) blog.excerpt = excerpt;
+    if (content !== undefined) {
+      blog.content = content;
+      blog.readingTime = Math.max(1, Math.ceil(content.split(/\s+/).length / 200));
+    }
+    if (author !== undefined) blog.author = author;
+    if (category !== undefined) blog.category = category;
+    if (tags !== undefined) blog.tags = tags;
+    if (published !== undefined) blog.published = published ? 1 : 0;
+
+    await blog.save();
+    res.json(blog);
+  } catch (err) {
+    console.error("Blog update error:", err);
+    res.status(500).json({ error: "Failed to update blog", details: err.message });
+  }
+});
+
+// Admin: delete blog
+app.delete("/api/admin/blogs/:id", authMiddleware, async (req, res) => {
+  try {
+    const deleted = await Blog.destroy({ where: { id: req.params.id } });
+    if (!deleted) return res.status(404).json({ error: "Blog not found" });
+    res.json({ success: true });
+  } catch (err) {
+    console.error("Blog delete error:", err);
+    res.status(500).json({ error: "Failed to delete blog", details: err.message });
+  }
+});
 
 module.exports = app;
 

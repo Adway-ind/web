@@ -14,6 +14,7 @@ import {
   ChevronRight,
   FilePlus,
   Users,
+  PenSquare,
 } from "lucide-react";
 
 const navItems = [
@@ -23,6 +24,7 @@ const navItems = [
   { to: "/admin/chat-enquiries", icon: MessageSquare, label: "Chat Enquiries" },
   { to: "/admin/contact-enquiries", icon: FilePlus, label: "Contact Enquiries" },
   { to: "/admin/clients", icon: Users, label: "Clients" },
+  { to: "/admin/blog", icon: PenSquare, label: "Blog" },
   { to: "/admin/settings", icon: Settings, label: "Settings" },
   { to: "/admin/portfolio", icon: LuFileStack, label: "Portfolio" },
 ];
@@ -203,6 +205,7 @@ function OutletBreadcrumb() {
   if (path.includes("contact-enquiries")) return "Contact Enquiries";
   if (path.includes("portfolio")) return "Portfolio";
   if (path.includes("clients")) return "Clients";
+  if (path.includes("blog")) return "Blog";
   if (path.includes("settings")) return "Settings";
   return "Admin";
 }

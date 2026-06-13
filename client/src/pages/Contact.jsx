@@ -103,20 +103,20 @@ export default function Contact() {
 
           {/* Headline */}
           <h1
-            className="text-white leading-[1.0] tracking-[-0.03em] font-medium"
+            className="text-white text-center leading-[1.0] tracking-[-0.03em] font-medium"
             style={{
               fontVariationSettings: "'opsz' 144",
               fontSize: "clamp(52px, 8vw, 88px)",
             }}
           >
             Let's start
-            <br />{" "}
+            <br />{" "} 
             <em className="text-blue-500" style={{ fontStyle: "italic" }}>
               something great
             </em>
           </h1>
 
-          <p className="mt-5 text-[15px] text-white/50 leading-relaxed max-w-lg font-light">
+          <p className="mt-5 text-[15px] text-white/50 text-center leading-relaxed max-w-7xl font-light">
             Ready to start your next project? We're here to help. Reach out to
             us through any of the channels below, or fill out the contact form
             and we'll get back to you within 24 hours. Whether you have a

@@ -165,7 +165,7 @@ export default function Services() {
 
           {/* Headline */}
           <h1
-            className="font-medium  text-white leading-[1.0] tracking-[-0.03em]"
+            className="font-medium text-center text-white leading-[1.0] tracking-[-0.03em]"
             style={{
               fontVariationSettings: "'opsz' 144",
               fontSize: "clamp(52px, 8vw, 88px)",
@@ -179,7 +179,7 @@ export default function Services() {
             </em>
           </h1>
 
-          <p className="mt-5 text-[15px] text-white/50 leading-relaxed max-w-sm font-light">
+          <p className="mt-5 text-[15px] text-center text-white/50 leading-relaxed max-w-7xl font-light">
             From strategy to execution, we provide a complete suite of branding
             services to help you stand out in a crowded marketplace.
           </p>

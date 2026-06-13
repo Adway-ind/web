@@ -39,7 +39,7 @@ export default function Social() {
 
           {/* Headline */}
           <h1
-            className=" text-white leading-[1.0] tracking-[-0.03em] font-medium"
+            className="text-white text-center leading-[1.0] tracking-[-0.03em] font-medium"
             style={{
               fontVariationSettings: "'opsz' 144",
               fontSize: "clamp(52px, 8vw, 88px)",
@@ -53,22 +53,21 @@ export default function Social() {
             </em>
           </h1>
 
-          <p className="mt-5 text-[15px] text-white/50 leading-relaxed max-w-sm font-light">
+          <p className="mt-5 text-[15px] text-center text-white/50 leading-relaxed max-w-7xl  font-light">
             From strategy to execution, we provide a complete suite of branding
             services to help you stand out in a crowded marketplace.
           </p>
 
           {/* Follow CTA */}
-          <a
+          {/* <a
             href={INSTAGRAM_URL}
             target="_blank"
             rel="noopener noreferrer"
-            className="group inline-flex items-center gap-2 mt-8 px-8 py-4 bg-gradient-to-r from-violet-600 to-pink-500 text-white rounded-full font-semibold text-lg hover:opacity-90 transition-all duration-300 shadow-lg shadow-violet-500/20"
-          >
+            className="group inline-flex items-center text-align-center justify-center gap-2 mt-8 px-8 py-4 bg-gradient-to-r from-violet-600 to-pink-500 text-white rounded-full font-semibold text-lg hover:opacity-90 transition-all duration-300 shadow-lg shadow-violet-500/20 mx-auto">
             <FaInstagramSquare className="w-5 h-5" />
             Follow on Instagram
             <ExternalLink className="w-4 h-4 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
-          </a>
+          </a> */}
 
           {/* Stats */}
         </div>
