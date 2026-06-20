@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import amalImage from "../assets/image/person/amal.jpeg";
 import Adway from "../assets/image/person/adway.jpeg";
+import sony from "../assets/image/person/sony.png";
 import Video from "../assets/video/softaurora.webm";
 import { Canvas } from "@react-three/fiber";
 import { useGLTF, OrbitControls, Environment } from "@react-three/drei";
@@ -23,7 +24,7 @@ import SEO from "../components/SEO";
 
 const team = [
   { name: "Anadhu", role: "Brand Strategist", image: Adway },
-  { name: "Sony", role: "Lead Designer", image: Adway },
+  { name: "Sony", role: "Lead Designer", image: sony },
   { name: "Amal P Anil", role: "Creative Developer", image: amalImage },
 ];
 
@@ -283,7 +284,7 @@ export default function About() {
                   <img
                     src={member.image}
                     alt={member.name}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500"
                   />
                 </div>
                 <h3 className="text-lg font-bold text-black">{member.name}</h3>

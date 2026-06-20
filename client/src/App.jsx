@@ -13,6 +13,7 @@ import Clients from "./pages/Clients";
 import PortfolioDetail from "./pages/PortfolioDetail";
 import Blog from "./pages/Blog";
 import BlogDetail from "./pages/BlogDetail";
+import NotFound from "./pages/NotFound";
 import ChatBot from "./components/ChatBot";
 import Loader from "./components/Loader";
 import { AuthProvider } from "./context/AuthContext";
@@ -62,6 +63,7 @@ function App() {
                     <Route path="/clients" element={<Clients />} />
                     <Route path="/blog" element={<Blog />} />
                     <Route path="/blog/:slug" element={<BlogDetail />} />
+                    <Route path="*" element={<NotFound />} />
                   </Routes>
                 </main>
                 <Footer />

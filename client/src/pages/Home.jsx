@@ -12,16 +12,24 @@ import {
   Quote,
   ChevronRight,
   Image as ImageIcon,
+  Play,
+  Volume2,
+  VolumeX,
 } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 
 import Client from "../components/ClientsSection";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay } from "swiper/modules";
 import VideoSlide from "../assets/video/slide/video-slide-3.mp4";
+import VideoSlide1 from "../assets/video/slide/video-slide.mp4";
+import VideoSlide2 from "../assets/video/slide/video-slide-2.mp4";
 import { API } from "../config/api";
 import { useAuth } from "../context/AuthContext";
 import Antigravity from "../components/Antigravity";
 import SEO from "../components/SEO";
+import BG from "../assets/video/bg.mp4";
+import CurvedTextDivider from "../components/CurvedTextDivider";
 
 import "swiper/css";
 
@@ -32,97 +40,98 @@ const resolveImageUrl = (url) => {
   return `${API}${url}`;
 };
 
-/* ───── Hero text slides (video is the shared background) ───── */
+/* ───── Hero slide data with videos ───── */
 const heroSlides = [
   {
+    video: VideoSlide1,
     title: "Digital",
     highlight: "Marketing",
+    tagline: "01",
     paragraph:
-      "We are a leading Digital marketing agency with award-winning creative strategists and technologists.",
+      "We are a leading digital marketing agency with award-winning creative strategists and technologists.",
   },
   {
+    video: VideoSlide2,
     title: "Strategic",
     highlight: "Consulting",
+    tagline: "02",
     paragraph:
       "We specialize in establishing your brand and marketing strategy to attract consumers.",
   },
   {
+    video: VideoSlide,
     title: "Creative",
     highlight: "Branding",
+    tagline: "03",
     paragraph:
       "We are experts in logo design, packaging design, and brand communications design.",
   },
   {
+    video: VideoSlide1,
     title: "Technology",
     highlight: "Solutions",
+    tagline: "04",
     paragraph:
-      "We have deep expertise and experts in responsive web design and CMS web development",
+      "We have deep expertise in responsive web design and CMS web development.",
   },
 ];
 
-const showcaseData = [
-  {
+const showcaseData = {
+  featured: {
     id: 1,
     type: "image",
-    image:
-      "https://images.unsplash.com/photo-1523726491678-bf852e717f6a?q=80&w=1200&auto=format&fit=crop",
-    className: "col-span-1 row-span-2",
+    image: "https://images.unsplash.com/photo-1634942537034-2531766767d1?w=800",
+    tag: "Brand Identity",
+    title: "Meridian Visual Identity System",
   },
-  {
+  gallery: {
     id: 2,
-    type: "content",
-    title: "International Packaging Designs and Quality",
-    desc: "We create impactful branding and packaging experiences that blend creativity, strategy, and functionality for modern businesses.",
-    className: "col-span-1 row-span-1",
-  },
-  {
-    id: 3,
     type: "gallery",
     images: [
-      "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=800&auto=format&fit=crop",
-      "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?q=80&w=800&auto=format&fit=crop",
-      "https://images.unsplash.com/photo-1520607162513-77705c0f0d4a?q=80&w=800&auto=format&fit=crop",
-      "https://images.unsplash.com/photo-1496171367470-9ed9a91ea931?q=80&w=800&auto=format&fit=crop",
-      "https://images.unsplash.com/photo-1516321497487-e288fb19713f?q=80&w=800&auto=format&fit=crop",
-      "https://images.unsplash.com/photo-1455390582262-044cdead277a?q=80&w=800&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1561070791-2526d30994b5?w=400",
+      "https://images.unsplash.com/photo-1558655146-9f40138edfeb?w=400",
+      "https://images.unsplash.com/photo-1572044162444-ad60f128bdea?w=400",
+      "https://images.unsplash.com/photo-1609921212029-bb5a28e60960?w=400",
     ],
-    className: "col-span-1 row-span-1",
   },
-  {
+  insight1: {
+    id: 3,
+    type: "content",
+    num: "01 — Strategy",
+    title: "Brand positioning that cuts through noise",
+    desc: "We identify the white space where your brand can own a unique and defensible position.",
+    accent: "Discovery",
+  },
+  stat: {
     id: 4,
-    type: "content",
-    title: "150+ Brand Identities Created",
-    desc: "We build memorable visual identities that connect brands with audiences through timeless and strategic design systems.",
-    className: "col-span-1 row-span-1",
+    type: "stat",
+    number: "240+",
+    label: "across 18 industries",
+    tags: ["Identity", "Motion", "Digital", "Print"],
+    desc: "From launch-stage startups to Fortune 500 rebrands.",
   },
-  {
+  insight2: {
     id: 5,
-    type: "image",
-    image:
-      "https://images.unsplash.com/photo-1558655146-9f40138edfeb?q=80&w=1200&auto=format&fit=crop",
-    className: "col-span-1 row-span-1",
-  },
-  {
-    id: 6,
     type: "content",
-    title: "Brand Communications & Experience",
-    desc: "From digital campaigns to storytelling, we help brands create meaningful customer experiences across every touchpoint.",
-    className: "col-span-1 row-span-1",
+    num: "02 — Visual",
+    title: "Systems built to scale with your ambition",
+    desc: "Modular design systems that stay coherent across every touchpoint and medium.",
+    accent: "Systems",
   },
-  {
+  campaign: {
+    id: 6,
+    type: "image",
+    image: "https://images.unsplash.com/photo-1542744094-3a31f272c490?w=800",
+    tag: "Campaign",
+    title: "Storytelling that builds lasting brand equity",
+  },
+  feature: {
     id: 7,
-    type: "image",
-    image: "https://images.pexels.com/photos/7675029/pexels-photo-7675029.jpeg",
-    className: "col-span-1 row-span-1",
+    type: "feature",
+    title: "Measurable brand impact",
+    desc: "Every creative decision is anchored in strategy and tested against real audience insight.",
   },
-  {
-    id: 6,
-    type: "content",
-    title: "Modern Web Experiences",
-    desc: "We design and develop fast, responsive, and visually engaging websites that enhance user experience and help brands grow online.",
-    className: "col-span-1 row-span-1",
-  },
-];
+};
 
 const services = [
   {
@@ -190,207 +199,347 @@ const testimonials = [
   },
 ];
 
+/* ───── Animation variants ───── */
+const textVariants = {
+  hidden: { opacity: 0, y: 60 },
+  visible: (i = 0) => ({
+    opacity: 1,
+    y: 0,
+    transition: { delay: i * 0.12, duration: 0.8, ease: [0.22, 1, 0.36, 1] },
+  }),
+  exit: { opacity: 0, y: -30, transition: { duration: 0.4, ease: "easeIn" } },
+};
+
+const staggerContainer = {
+  hidden: {},
+  visible: { transition: { staggerChildren: 0.12, delayChildren: 0.3 } },
+  exit: { transition: { staggerChildren: 0.06, staggerDirection: -1 } },
+};
+
+/* ───── Scroll fade-in wrapper ───── */
+const fadeInUp = {
+  hidden: { opacity: 0, y: 40 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.8, ease: [0.22, 1, 0.36, 1] },
+  },
+};
+
+function FadeIn({ children, delay = 0, className = "", direction = "up" }) {
+  const dirMap = {
+    up: { opacity: 0, y: 40 },
+    down: { opacity: 0, y: -40 },
+    left: { opacity: 0, x: 40 },
+    right: { opacity: 0, x: -40 },
+    none: { opacity: 0 },
+  };
+  return (
+    <motion.div
+      initial={dirMap[direction] ?? dirMap.up}
+      whileInView={{ opacity: 1, y: 0, x: 0 }}
+      viewport={{ once: true, margin: "-60px" }}
+      transition={{ duration: 0.8, delay, ease: [0.22, 1, 0.36, 1] }}
+      className={className}
+    >
+      {children}
+    </motion.div>
+  );
+}
+
 /* ───── Hero Slider Component ───── */
 function HeroSlider() {
   const [current, setCurrent] = useState(0);
-  const [isTransitioning, setIsTransitioning] = useState(false);
+  const [isMuted, setIsMuted] = useState(true);
+  const [progress, setProgress] = useState(0);
   const total = heroSlides.length;
-  const sectionRef = useRef(null);
-  const [mouse, setMouse] = useState({ x: 50, y: 50 });
+  const videoRefs = useRef([]);
+  const timerRef = useRef(null);
+  const progressRef = useRef(null);
+  const SLIDE_DURATION = 7000;
 
-  /* Track mouse position for spotlight gradient */
-  useEffect(() => {
-    const el = sectionRef.current;
-    if (!el) return;
-    const handleMove = (e) => {
-      const rect = el.getBoundingClientRect();
-      setMouse({
-        x: ((e.clientX - rect.left) / rect.width) * 100,
-        y: ((e.clientY - rect.top) / rect.height) * 100,
-      });
-    };
-    el.addEventListener("mousemove", handleMove);
-    return () => el.removeEventListener("mousemove", handleMove);
-  }, []);
+  const nextIndex = (current + 1) % total;
 
   const goTo = useCallback(
     (index) => {
-      if (isTransitioning) return;
-      setIsTransitioning(true);
-      setCurrent((index + total) % total);
-      setTimeout(() => setIsTransitioning(false), 900);
+      setCurrent(index);
+      setProgress(0);
     },
-    [isTransitioning, total],
+    [],
   );
 
-  const next = useCallback(() => goTo(current + 1), [current, goTo]);
+  const next = useCallback(() => goTo((current + 1) % total), [current, goTo]);
 
-  /* Auto-play */
+  /* Auto-play timer */
   useEffect(() => {
-    const timer = setInterval(next, 5000);
-    return () => clearInterval(timer);
-  }, [next]);
+    setProgress(0);
+    const start = Date.now();
+    progressRef.current = setInterval(() => {
+      const elapsed = Date.now() - start;
+      setProgress(Math.min(elapsed / SLIDE_DURATION, 1));
+    }, 30);
+    timerRef.current = setTimeout(next, SLIDE_DURATION);
+    return () => {
+      clearTimeout(timerRef.current);
+      clearInterval(progressRef.current);
+    };
+  }, [current, next]);
+
+  /* Pause videos that aren't current */
+  useEffect(() => {
+    videoRefs.current.forEach((vid, i) => {
+      if (!vid) return;
+      if (i === current) {
+        vid.currentTime = 0;
+        vid.play().catch(() => { });
+      } else {
+        vid.pause();
+      }
+    });
+  }, [current]);
 
   return (
-    <section ref={sectionRef} className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden bg-black">
-      {/* Mouse-following spotlight gradient */}
-      <div
-        className="absolute inset-0 z-[2] pointer-events-none transition-opacity duration-700"
-        style={{
-          background: `radial-gradient(600px circle at ${mouse.x}% ${mouse.y}%, rgba(168,85,247,0.12) 0%, rgba(99,102,241,0.06) 40%, transparent 70%)`,
-        }}
-      />
+    <section className="relative h-screen w-full overflow-hidden bg-black">
+      {/* ── Background Videos ── */}
+      {heroSlides.map((slide, i) => (
+        <div
+          key={i}
+          className="absolute inset-0 transition-opacity duration-[1500ms] ease-in-out"
+          style={{ opacity: i === current ? 1 : 0, zIndex: i === current ? 1 : 0 }}
+        >
+          <video
+            ref={(el) => (videoRefs.current[i] = el)}
+            src={slide.video}
+            className="absolute inset-0 w-full h-full object-cover"
+            muted={isMuted}
+            loop
+            playsInline
+            preload="auto"
+          />
+        </div>
+      ))}
 
-      {/* Antigravity 3D Effect Background */}
-      <div className="absolute inset-0 w-full h-full z-[1] pointer-events-none">
-        <Antigravity
-          color="#A855F7"
-          colorTwo="#6366F1"
-          ringCount={6}
-          speed={1}
-          attenuation={10}
-          lineThickness={2}
-          baseRadius={0.35}
-          radiusStep={0.1}
-          scaleRate={0.1}
-          opacity={1}
-          blur={0}
-          noiseAmount={0.1}
-          rotation={0}
-          ringGap={1.5}
-          fadeIn={0.7}
-          fadeOut={0.5}
-          followMouse={false}
-          mouseInfluence={0.2}
-          hoverScale={1.2}
-          parallax={0.05}
-          clickBurst={false}
-        />
-      </div>
+      {/* ── Dark Overlay ── */}
+      <div className="absolute inset-0 z-[2] bg-gradient-to-r from-black/80 via-black/50 to-black/30" />
+      <div className="absolute inset-0 z-[2] bg-gradient-to-t from-black/90 via-transparent to-black/40" />
 
-      {/* Subtle grid overlay */}
+      {/* ── Subtle grain texture ── */}
       <div
-        className="absolute inset-0 opacity-[0.025] z-[3] pointer-events-none"
+        className="absolute inset-0 z-[3] opacity-[0.03] pointer-events-none mix-blend-overlay"
         style={{
           backgroundImage:
-            "linear-gradient(rgba(255,255,255,.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.1) 1px, transparent 1px)",
-          backgroundSize: "80px 80px",
+            "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")",
         }}
       />
 
-      {/* Floating badge — top */}
-      {/* <div className="absolute top-24 sm:top-28 left-1/2 -translate-x-1/2 z-20 animate-fade-in-up">
-        <div className="flex items-center gap-2 px-4 py-2 rounded-full border border-white/10 bg-white/[0.04] backdrop-blur-xl">
-          <span className="relative flex h-2 w-2">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-            <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-400" />
-          </span>
-          <span className="text-white/70 text-xs sm:text-sm font-medium tracking-wide">
-            Trusted by 150+ Brands Worldwide
+      {/* ── Top nav bar area ── */}
+      <div className="absolute top-0 left-0 right-0 z-30 flex items-center justify-between px-6 sm:px-10 lg:px-16 py-6">
+        <div className="flex items-center gap-3">
+          <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+          <span className="text-white/60 text-xs sm:text-sm font-medium tracking-wider uppercase">
+            Creative Agency
           </span>
         </div>
-      </div> */}
+        <div className="hidden sm:flex items-center gap-6 text-white/40 text-xs font-medium tracking-wider uppercase">
+          <span className="text-white">{String(current + 1).padStart(2, "0")}</span>
+          <span>/</span>
+          <span>{String(total).padStart(2, "0")}</span>
+        </div>
+      </div>
 
-      {/* Main Content Layer */}
-      <div className="relative z-10 max-w-7xl mx-auto px-6 sm:px-8 lg:px-10 text-center flex flex-col items-center justify-center min-h-screen w-full pointer-events-none">
-        {heroSlides.map((slide, i) => (
-          <div
-            key={i}
-            className="absolute inset-0 flex flex-col items-center justify-center transition-all duration-[1200ms] ease-in-out px-4 sm:px-6 w-full max-w-7xl mx-auto"
-            style={{
-              opacity: i === current ? 1 : 0,
-              pointerEvents: i === current ? "auto" : "none",
-              transform:
-                i === current
-                  ? "scale(1) translateY(0px)"
-                  : "scale(0.97) translateY(20px)",
-            }}
-          >
-            {/* Overline tag */}
-            <span className="inline-block mb-6 sm:mb-8 px-4 py-1.5 rounded-full border border-white/10 bg-white/[0.03] backdrop-blur-sm text-white/50 text-[11px] sm:text-xs font-semibold uppercase tracking-[0.25em] animate-fade-in-up animation-delay-100 pointer-events-auto">
-              {slide.highlight}
-            </span>
-
-            {/* Main heading — large display type */}
-            <h1
-              className="text-5xl sm:text-7xl md:text-8xl lg:text-[8rem] font-bold text-white leading-[0.9] tracking-[-0.04em] animate-fade-in-up animation-delay-200 pointer-events-auto mx-auto"
-              style={{ fontFamily: "'Space Grotesk', sans-serif" }}
-            >
-              {slide.title}
-              <span className="block mt-5 bg-gradient-to-r from-white/40 via-white/20 to-white/40 bg-clip-text text-transparent">
-                {slide.highlight}
-              </span>
-            </h1>
-
-            {/* Description */}
-            <p className="mt-6 sm:mt-8 text-sm sm:text-base md:text-lg text-white/50 max-w-lg sm:max-w-xl leading-relaxed animate-fade-in-up animation-delay-400 text-center pointer-events-auto font-light">
-              {slide.paragraph}
-            </p>
-
-            {/* CTA Buttons */}
-            <div className="mt-8 sm:mt-10 flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-5 animate-fade-in-up animation-delay-600 pointer-events-auto">
-              <Link
-                to="/contact"
-                className="group w-full sm:w-auto px-8 py-4 bg-white text-black rounded-full font-semibold text-sm sm:text-base hover:bg-white/90 transition-all duration-300 shadow-[0_0_40px_rgba(255,255,255,0.1)] hover:shadow-[0_0_60px_rgba(255,255,255,0.2)] hover:-translate-y-0.5 flex items-center justify-center gap-2.5"
+      {/* ── Main Content ── */}
+      <div className="relative z-20 h-full w-full flex flex-col justify-end px-6 sm:px-10 lg:px-16 pb-28 sm:pb-32">
+        <div className="max-w-7xl mx-auto w-full flex flex-col lg:flex-row items-end justify-between gap-10 lg:gap-16">
+          {/* ── Left: Animated Text Content ── */}
+          <div className="flex-1 max-w-2xl">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={current}
+                variants={staggerContainer}
+                initial="hidden"
+                animate="visible"
+                exit="exit"
+                className="flex flex-col"
               >
-                Start Your Project
-                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-              </Link>
-              <Link
-                to="/portfolio"
-                className="group w-full sm:w-auto px-8 py-4 rounded-full border border-white/15 bg-white/[0.03] backdrop-blur-sm text-white font-semibold text-sm sm:text-base hover:bg-white/[0.08] hover:border-white/25 transition-all duration-300 flex items-center justify-center gap-2.5"
-              >
-                View Our Work
-                <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-300" />
-              </Link>
-            </div>
+                {/* Tagline */}
+                <motion.span
+                  variants={textVariants}
+                  custom={0}
+                  className="inline-flex items-center gap-3 mb-5"
+                >
+                  <span className="block w-10 h-[1px] bg-white/40" />
+                  <span className="text-white/50 text-xs sm:text-sm font-semibold uppercase tracking-[0.3em]">
+                    {heroSlides[current].tagline} — {heroSlides[current].highlight}
+                  </span>
+                </motion.span>
+
+                {/* Title */}
+                <motion.h1
+                  variants={textVariants}
+                  custom={1}
+                  className="text-5xl sm:text-7xl md:text-8xl lg:text-[9rem] font-bold text-white leading-[0.88] tracking-[-0.04em]"
+                  style={{ fontFamily: "'Space Grotesk', sans-serif" }}
+                >
+                  {heroSlides[current].title}
+                  <span className="block mt-2 bg-gradient-to-r from-purple-400 via-violet-400 to-indigo-400 bg-clip-text text-transparent">
+                    {heroSlides[current].highlight}
+                  </span>
+                </motion.h1>
+
+                {/* Description */}
+                <motion.p
+                  variants={textVariants}
+                  custom={2}
+                  className="mt-6 sm:mt-8 text-sm sm:text-base md:text-lg text-white/50 max-w-md leading-relaxed font-light"
+                >
+                  {heroSlides[current].paragraph}
+                </motion.p>
+
+                {/* CTA Buttons */}
+                <motion.div
+                  variants={textVariants}
+                  custom={3}
+                  className="mt-8 flex flex-col sm:flex-row items-start gap-3 sm:gap-4"
+                >
+                  <Link
+                    to="/contact"
+                    className="group px-7 py-3.5 bg-white text-black rounded-full font-semibold text-sm hover:bg-white/90 transition-all duration-300 shadow-[0_0_40px_rgba(255,255,255,0.08)] hover:shadow-[0_0_60px_rgba(255,255,255,0.15)] hover:-translate-y-0.5 flex items-center gap-2.5"
+                  >
+                    Start Your Project
+                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                  </Link>
+                  <Link
+                    to="/portfolio"
+                    className="group px-7 py-3.5 rounded-full border border-white/15 bg-white/[0.04] backdrop-blur-sm text-white font-semibold text-sm hover:bg-white/[0.1] hover:border-white/25 transition-all duration-300 flex items-center gap-2.5"
+                  >
+                    View Our Work
+                    <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-300" />
+                  </Link>
+                </motion.div>
+              </motion.div>
+            </AnimatePresence>
           </div>
-        ))}
+
+          {/* ── Right: Glassmorphism Next-Video Preview Card ── */}
+          <div className="hidden lg:block flex-shrink-0">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={nextIndex}
+                initial={{ opacity: 0, scale: 0.9, x: 20 }}
+                animate={{ opacity: 1, scale: 1, x: 0 }}
+                exit={{ opacity: 0, scale: 0.9, x: 20 }}
+                transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+                onClick={() => goTo(nextIndex)}
+                className="group cursor-pointer w-[220px] xl:w-[260px] rounded-2xl overflow-hidden border border-white/[0.08] bg-white/[0.04] backdrop-blur-xl shadow-2xl shadow-black/40 hover:border-white/[0.15] hover:bg-white/[0.07] transition-all duration-500"
+              >
+                {/* Preview video thumbnail */}
+                <div className="relative aspect-video overflow-hidden">
+                  <video
+                    src={heroSlides[nextIndex].video}
+                    className="w-full h-full object-cover opacity-70 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700"
+                    muted
+                    loop
+                    playsInline
+                    preload="metadata"
+                    onMouseEnter={(e) => e.target.play().catch(() => { })}
+                    onMouseLeave={(e) => { e.target.pause(); e.target.currentTime = 0; }}
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                  {/* Play icon */}
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="w-10 h-10 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center group-hover:scale-110 group-hover:bg-white/20 transition-all duration-300">
+                      <Play className="w-4 h-4 text-white fill-white ml-0.5" />
+                    </div>
+                  </div>
+                  {/* Up Next label */}
+                  <div className="absolute top-3 left-3">
+                    <span className="px-2.5 py-1 rounded-full bg-black/40 backdrop-blur-sm border border-white/10 text-white/70 text-[10px] font-semibold uppercase tracking-wider">
+                      Up Next
+                    </span>
+                  </div>
+                </div>
+                {/* Card info */}
+                <div className="p-4">
+                  <p className="text-white/80 font-semibold text-sm">
+                    {heroSlides[nextIndex].title}
+                    <span className="text-white/40 font-normal ml-1.5">
+                      {heroSlides[nextIndex].highlight}
+                    </span>
+                  </p>
+                  <p className="text-white/30 text-xs mt-1.5 line-clamp-2">
+                    {heroSlides[nextIndex].paragraph}
+                  </p>
+                </div>
+              </motion.div>
+            </AnimatePresence>
+          </div>
+        </div>
       </div>
 
-      {/* Slide indicators */}
-      <div className="absolute bottom-28 sm:bottom-32 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2 pointer-events-auto">
-        {heroSlides.map((_, i) => (
-          <button
-            key={i}
-            onClick={() => goTo(i)}
-            className={`h-1 rounded-full transition-all duration-500 ${
-              i === current
-                ? "w-8 bg-white"
-                : "w-3 bg-white/20 hover:bg-white/40"
-            }`}
-            aria-label={`Go to slide ${i + 1}`}
-          />
-        ))}
-      </div>
-
-      {/* Bottom stats bar */}
-      <div className="absolute bottom-0 left-0 right-0 z-20 border-t border-white/[0.06]">
-        <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-10 py-5 flex flex-wrap items-center justify-center sm:justify-between gap-6 sm:gap-8">
-          {[
-            { value: "150+", label: "Brands Served" },
-            { value: "8+", label: "Years Experience" },
-            { value: "500+", label: "Projects Delivered" },
-            { value: "98%", label: "Client Satisfaction" },
-          ].map((stat) => (
-            <div key={stat.label} className="flex items-center gap-3">
-              <span className="text-white text-lg sm:text-xl font-bold tracking-tight">
-                {stat.value}
-              </span>
-              <span className="text-white/30 text-xs sm:text-sm font-medium">
-                {stat.label}
-              </span>
-            </div>
+      {/* ── Bottom: Progress Indicators + Controls ── */}
+      <div className="absolute bottom-0 left-0 right-0 z-30">
+        {/* Progress bars */}
+        <div className="flex items-center gap-1.5 px-6 sm:px-10 lg:px-16 pb-2">
+          {heroSlides.map((_, i) => (
+            <button
+              key={i}
+              onClick={() => goTo(i)}
+              className="flex-1 h-[2px] rounded-full bg-white/10 overflow-hidden transition-all"
+              aria-label={`Go to slide ${i + 1}`}
+            >
+              <div
+                className="h-full rounded-full bg-white transition-none"
+                style={{
+                  width:
+                    i < current
+                      ? "100%"
+                      : i === current
+                        ? `${progress * 100}%`
+                        : "0%",
+                  transition: i === current ? "none" : "width 0.5s ease",
+                }}
+              />
+            </button>
           ))}
         </div>
-      </div>
 
-      {/* Scroll indicator */}
-      {/* <div className="absolute bottom-20 sm:bottom-24 left-1/2 -translate-x-1/2 z-20 pointer-events-none flex flex-col items-center gap-2">
-        <div className="w-5 h-8 rounded-full border border-white/20 flex items-start justify-center p-1.5">
-          <div className="w-1 h-2 rounded-full bg-white/60 animate-bounce" />
+        {/* Bottom bar */}
+        <div className="border-t border-white/[0.06] bg-black/30 backdrop-blur-sm">
+          <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16 py-4 flex items-center justify-between">
+            {/* Stats */}
+
+
+            {/* Slide nav */}
+            {/* <div className="flex items-center gap-4">
+              <button
+                onClick={() => goTo((current - 1 + total) % total)}
+                className="w-9 h-9 rounded-full border border-white/10 bg-white/[0.03] hover:bg-white/[0.1] flex items-center justify-center transition-all"
+                aria-label="Previous slide"
+              >
+                <ChevronRight className="w-4 h-4 text-white rotate-180" />
+              </button>
+              <button
+                onClick={next}
+                className="w-9 h-9 rounded-full border border-white/10 bg-white/[0.03] hover:bg-white/[0.1] flex items-center justify-center transition-all"
+                aria-label="Next slide"
+              >
+                <ChevronRight className="w-4 h-4 text-white" />
+              </button>
+              <button
+                onClick={() => setIsMuted((v) => !v)}
+                className="w-9 h-9 rounded-full border border-white/10 bg-white/[0.03] hover:bg-white/[0.1] flex items-center justify-center transition-all ml-2"
+                aria-label={isMuted ? "Unmute" : "Mute"}
+              >
+                {isMuted ? (
+                  <VolumeX className="w-4 h-4 text-white/60" />
+                ) : (
+                  <Volume2 className="w-4 h-4 text-white" />
+                )}
+              </button>
+            </div> */}
+          </div>
         </div>
-      </div> */}
+      </div>
     </section>
   );
 }
@@ -422,29 +571,41 @@ function FeaturedPortfolio() {
   const visibleProjects = showAll ? projects : projects.slice(0, 6);
 
   return (
-    <section className="py-24 bg-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section className="relative overflow-hidden py-24 bg-black">
+      <video
+        src={BG}
+        autoPlay
+        muted
+        loop
+        playsInline
+        preload="metadata"
+        className="absolute inset-0 h-full w-full object-cover"
+      />
+      <div className="absolute inset-0 bg-black/5" />
+      <div className="absolute inset-0 bg-gradient-to-br from-black/70 via-black/45 to-black/80" />
+
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-16">
+        <FadeIn delay={0.1} className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-16">
           <div>
-            <span className="text-white/50 font-semibold text-sm uppercase tracking-wider">
+            <span className="text-white/70 font-semibold text-sm uppercase tracking-wider">
               Our Work
             </span>
-            <h2 className="mt-4 text-4xl text-center sm:text-left sm:text-5xl font-bold text-black tracking-tight">
+            <h2 className="mt-4 text-4xl text-center sm:text-left sm:text-5xl font-bold text-white tracking-tight">
               Featured projects
             </h2>
-            <p className=" text-center sm:text-left mt-4 text-lg text-black/60 max-w-xl">
+            <p className="text-center sm:text-left mt-4 text-lg text-white/75 max-w-xl">
               A selection of brands we've helped build, transform, and grow.
             </p>
           </div>
           <Link
             to="/portfolio"
-            className="group inline-flex items-center justify-center gap-2 text-black font-semibold hover:gap-3 transition-all shrink-0"
+            className="group inline-flex items-center justify-center gap-2 text-white font-semibold hover:gap-3 transition-all shrink-0"
           >
             View All Projects
             <ArrowRight className="w-4 h-4" />
           </Link>
-        </div>
+        </FadeIn>
 
         {/* Loading state */}
         {loading && (
@@ -456,21 +617,21 @@ function FeaturedPortfolio() {
         {/* Empty state — no featured projects yet */}
         {!loading && projects.length === 0 && (
           <div className="flex flex-col items-center justify-center h-64 gap-4 text-center">
-            <div className="w-14 h-14 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center">
-              <ImageIcon className="w-6 h-6 text-white/20" />
+            <div className="w-14 h-14 rounded-2xl bg-white/10 border border-white/15 flex items-center justify-center">
+              <ImageIcon className="w-6 h-6 text-white/40" />
             </div>
             <div>
-              <p className="text-white/40 font-medium">
+              <p className="text-white/85 font-medium">
                 No featured projects yet
               </p>
-              <p className="text-white/25 text-sm mt-1">
+              <p className="text-white/65 text-sm mt-1">
                 Mark projects as featured in the admin panel to display them
                 here.
               </p>
             </div>
             <Link
               to="/portfolio"
-              className="mt-2 inline-flex items-center gap-2 text-sm text-violet-400 hover:text-violet-300 font-medium transition-colors"
+              className="mt-2 inline-flex items-center gap-2 text-sm text-violet-300 hover:text-violet-200 font-medium transition-colors"
             >
               Browse all projects <ArrowRight className="w-3.5 h-3.5" />
             </Link>
@@ -480,60 +641,69 @@ function FeaturedPortfolio() {
         {/* Projects Grid */}
         {!loading && visibleProjects.length > 0 && (
           <>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {visibleProjects.map((item) => (
-                <Link
-                  to={`/portfolio/${item.slug || item.id}`}
+            <FadeIn delay={0.2} className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {visibleProjects.map((item, index) => (
+                <FadeIn
                   key={item.id}
-                  className="group relative overflow-hidden rounded-2xl aspect-[4/3] cursor-pointer"
+                  delay={0.15 + index * 0.08}
+                  direction="up"
+                  className="group relative overflow-hidden rounded-2xl aspect-[4/3] cursor-pointer bg-white shadow-sm hover:shadow-xl transition-all duration-500"
                 >
-                  {item.image ? (
-                    <img
-                      src={resolveImageUrl(item.image)}
-                      alt={item.title}
-                      className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                    />
-                  ) : (
-                    <div className="absolute inset-0 w-full h-full bg-white/5 flex items-center justify-center">
-                      <ImageIcon className="w-10 h-10 text-white/10" />
-                    </div>
-                  )}
-
-                  <div className="absolute inset-0 bg-black/30 group-hover:bg-black/50 transition-colors duration-300" />
-
-                  {/* Featured badge */}
-                  <div className="absolute top-4 left-4">
-                    <span className="px-2.5 py-1 rounded-full bg-violet-500/30 border border-violet-400/40 backdrop-blur-sm text-[11px] font-semibold text-violet-300 tracking-wide">
-                      Featured
-                    </span>
-                  </div>
-
-                  <div className="absolute inset-0 flex flex-col justify-end p-8">
-                    <span className="text-white/60 text-sm font-medium">
-                      {item.category}
-                    </span>
-                    <h3 className="text-2xl sm:text-3xl font-bold text-white mt-1">
-                      {item.title}
-                    </h3>
-                    {item.client && (
-                      <p className="text-white/50 text-sm mt-1">
-                        {item.client}
-                      </p>
+                  <Link
+                    to={`/portfolio/${item.slug || item.id}`}
+                    className="block w-full h-full"
+                  >
+                    {item.image ? (
+                      <img
+                        src={resolveImageUrl(item.image)}
+                        alt={item.title}
+                        className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                      />
+                    ) : (
+                      <div className="absolute inset-0 w-full h-full bg-gray-100 flex items-center justify-center">
+                        <ImageIcon className="w-10 h-10 text-gray-300" />
+                      </div>
                     )}
-                    <div className="mt-4 flex items-center gap-2 text-white/80 text-sm font-medium opacity-0 group-hover:opacity-100 translate-y-4 group-hover:translate-y-0 transition-all duration-300">
-                      View Project <ArrowRight className="w-4 h-4" />
-                    </div>
-                  </div>
-                </Link>
-              ))}
-            </div>
 
-            {/* Show more / show less toggle (only if there are more than 4 featured) */}
+                    {/* White Card Overlay at the bottom */}
+                    <div className="absolute bottom-0 left-0 right-0 bg-white p-8 translate-y-4 group-hover:translate-y-0 transition-all duration-500">
+                      {/* Featured badge - now on white card */}
+                      <div className="mb-4">
+                        <span className="px-2.5 py-1 rounded-full bg-violet-500/10 border border-violet-200 text-[11px] font-semibold text-violet-700 tracking-wide">
+                          Featured
+                        </span>
+                      </div>
+
+                      <span className="text-violet-600 text-sm font-medium">
+                        {item.category}
+                      </span>
+                      <h3 className="text-2xl sm:text-3xl font-bold text-gray-900 mt-1">
+                        {item.title}
+                      </h3>
+                      {item.client && (
+                        <p className="text-gray-600 text-sm mt-1">
+                          {item.client}
+                        </p>
+                      )}
+
+                      <div className="mt-6 flex items-center gap-2 text-violet-600 text-sm font-semibold opacity-0 group-hover:opacity-100 transition-all">
+                        View Project <ArrowRight className="w-4 h-4" />
+                      </div>
+                    </div>
+
+                    {/* Subtle gradient at the top of the white card for smooth blend */}
+                    <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-white via-white to-transparent pointer-events-none" />
+                  </Link>
+                </FadeIn>
+              ))}
+            </FadeIn>
+
+            {/* Show more / show less toggle */}
             {projects.length > 6 && (
-              <div className="mt-10 text-center">
+              <FadeIn delay={0.35} className="mt-10 text-center">
                 <button
                   onClick={() => setShowAll((v) => !v)}
-                  className="inline-flex items-center gap-2 px-6 py-3 rounded-xl border border-white/10 bg-white/[0.03] hover:bg-white/[0.07] text-white/70 hover:text-white text-sm font-semibold transition-all"
+                  className="inline-flex items-center gap-2 px-6 py-3 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 hover:text-gray-900 text-sm font-semibold transition-all"
                 >
                   {showAll ? (
                     <>Show Less</>
@@ -544,12 +714,147 @@ function FeaturedPortfolio() {
                     </>
                   )}
                 </button>
-              </div>
+              </FadeIn>
             )}
           </>
         )}
       </div>
     </section>
+  );
+}
+
+/* ───── Helper cards used in the expertise section ───── */
+function ImageCard({ item, minHeight = "min-h-[260px]" }) {
+  return (
+    <div
+      className={`group relative overflow-hidden rounded-[20px] border border-black/5 bg-neutral-100 ${minHeight} h-full`}
+    >
+      <img
+        src={item.image}
+        alt={item.title}
+        className="absolute inset-0 h-full w-full object-cover object-center transition duration-700 group-hover:scale-105"
+      />
+      <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-black/10 to-transparent" />
+
+      <div className="absolute top-4 left-4 rounded-full bg-black/20 backdrop-blur-md border border-white/15 px-3 py-1">
+        <span className="text-[10px] tracking-[0.3em] uppercase text-white/75">
+          Featured
+        </span>
+      </div>
+
+      <div className="absolute bottom-0 left-0 right-0 p-5">
+        <p className="text-[10px] tracking-[0.3em] uppercase text-white/60">
+          {item.tag}
+        </p>
+        <h3 className="mt-2 text-lg font-medium text-white leading-tight">
+          {item.title}
+        </h3>
+      </div>
+    </div>
+  );
+}
+
+function GalleryCard({ item }) {
+  return (
+    <div className="group relative overflow-hidden rounded-[20px] border border-black/5 bg-white h-full min-h-[280px]">
+      <div className="absolute top-4 right-4 z-10 rounded-full bg-black/20 backdrop-blur-md border border-white/15 px-3 py-1">
+        <span className="text-[10px] tracking-[0.3em] uppercase text-white/75">
+          Gallery
+        </span>
+      </div>
+      <div className="grid grid-cols-2 gap-1.5 p-1.5 h-full min-h-[280px]">
+        {item.images.map((img, i) => (
+          <div key={i} className="overflow-hidden rounded-[14px] bg-neutral-100">
+            <img
+              src={img}
+              alt={`Gallery image ${i + 1}`}
+              className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+            />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function ContentCard({ item }) {
+  return (
+    <div className="flex flex-col justify-center rounded-[20px] border border-black/5 bg-white px-8 py-10 h-full min-h-[220px]">
+      <p className="text-[11px] tracking-[0.25em] uppercase text-neutral-400 mb-4">
+        {item.num}
+      </p>
+      <h3 className="text-xl font-medium text-neutral-900 leading-snug mb-3">
+        {item.title}
+      </h3>
+      <p className="text-sm text-neutral-500 leading-relaxed">{item.desc}</p>
+      <div className="flex items-center gap-2.5 mt-5">
+        <span className="w-7 h-0.5 bg-violet-500 rounded-full inline-block" />
+        <span className="text-[10px] tracking-[0.25em] uppercase text-neutral-400">
+          {item.accent}
+        </span>
+      </div>
+    </div>
+  );
+}
+
+function StatCard({ item }) {
+  return (
+    <div className="flex flex-col justify-between rounded-[20px] border border-black/5 bg-neutral-50 px-8 py-10 h-full min-h-[220px]">
+      <div>
+        <p className="text-[11px] tracking-[0.25em] uppercase text-neutral-400 mb-3">
+          Projects delivered
+        </p>
+        <p className="text-5xl font-medium text-neutral-900 leading-none">
+          {item.number}
+        </p>
+        <p className="text-xs text-neutral-400 mt-1.5">{item.label}</p>
+      </div>
+      <div>
+        <div className="flex flex-wrap gap-1.5 mb-4">
+          {item.tags.map((tag) => (
+            <span
+              key={tag}
+              className="inline-block rounded-full border border-neutral-200 bg-white px-3 py-1 text-[11px] text-neutral-500"
+            >
+              {tag}
+            </span>
+          ))}
+        </div>
+        <p className="text-xs text-neutral-400 leading-relaxed border-t border-neutral-200 pt-3">
+          {item.desc}
+        </p>
+      </div>
+    </div>
+  );
+}
+
+function FeatureCard({ item }) {
+  return (
+    <div className="flex items-center rounded-[20px] border border-black/5 bg-white px-8 py-10 h-full min-h-[200px]">
+      <div>
+        <div className="w-10 h-10 rounded-xl bg-neutral-100 flex items-center justify-center mb-5">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className="text-neutral-500"
+          >
+            <polyline points="22 7 13.5 15.5 8.5 10.5 2 17" />
+            <polyline points="16 7 22 7 22 13" />
+          </svg>
+        </div>
+        <h3 className="text-base font-medium text-neutral-900 mb-2">
+          {item.title}
+        </h3>
+        <p className="text-sm text-neutral-500 leading-relaxed">{item.desc}</p>
+      </div>
+    </div>
   );
 }
 
@@ -583,8 +888,16 @@ export default function Home() {
     ],
   };
 
+  const marqueeServices = [...services, ...services];
+
   return (
     <>
+      <style>{`
+        @keyframes servicesMarquee {
+          from { transform: translateX(0); }
+          to { transform: translateX(-50%); }
+        }
+      `}</style>
       <SEO
         title="Adway - Premium Branding & Digital Marketing Agency"
         description="Transform your brand with Adway's expert branding, digital marketing, web development, and strategic consulting services. We create impactful brand experiences."
@@ -596,13 +909,13 @@ export default function Home() {
       <HeroSlider />
 
       {/* Services Overview */}
-      <section className="relative py-24 bg-black overflow-hidden">
+      <section className="relative py-20 bg-black overflow-hidden">
         <div className="absolute top-1/4 left-[-10%] w-[500px] h-[500px] rounded-full bg-purple-600/20 blur-[120px] pointer-events-none mix-blend-screen animate-pulse duration-[6000ms]" />
         <div className="absolute bottom-1/4 right-[-10%] w-[600px] h-[600px] rounded-full bg-blue-600/15 blur-[140px] pointer-events-none mix-blend-screen animate-pulse duration-[8000ms]" />
         <div className="absolute top-1/2 left-1/3 w-[400px] h-[400px] rounded-full bg-fuchsia-500/10 blur-[100px] pointer-events-none mix-blend-screen" />
 
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center max-w-5xl mx-auto mb-16">
+          <FadeIn className="text-center max-w-5xl mx-auto mb-16">
             <span className="text-white/50 font-semibold text-sm uppercase tracking-wider">
               What We Do
             </span>
@@ -616,60 +929,79 @@ export default function Home() {
               tailored solutions that drive growth, strengthen brand presence,
               and deliver measurable results.
             </p>
-          </div>
+          </FadeIn>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {services.map((service) => (
+          <FadeIn className="relative">
+            <div className="absolute inset-y-0 left-0 w-20 bg-gradient-to-r from-black via-black/80 to-transparent z-20" />
+            <div className="absolute inset-y-0 right-0 w-20 bg-gradient-to-l from-black via-black/80 to-transparent z-20" />
+            <div className="overflow-hidden">
               <div
-                key={service.title}
-                className="group relative p-8 rounded-2xl overflow-hidden border border-white/20 bg-gradient-to-br from-white/[0.07] to-white/[0.01] backdrop-blur-xl shadow-2xl shadow-black/40 hover:border-white/30 hover:from-white/[0.12] hover:to-white/[0.03] hover:-translate-y-1 transition-all duration-500"
-                onMouseMove={(e) => {
-                  const rect = e.currentTarget.getBoundingClientRect();
-                  const x = (
-                    ((e.clientX - rect.left) / rect.width) *
-                    100
-                  ).toFixed(1);
-                  const y = (
-                    ((e.clientY - rect.top) / rect.height) *
-                    100
-                  ).toFixed(1);
-                  e.currentTarget.style.setProperty("--gx", `${x}%`);
-                  e.currentTarget.style.setProperty("--gy", `${y}%`);
+                className="flex w-max gap-6"
+                style={{ animation: "servicesMarquee 32s linear infinite" }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.animationPlayState = "paused";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.animationPlayState = "running";
                 }}
               >
-                {/* Noise texture */}
-                <div
-                  className="absolute inset-0 opacity-[0.03] mix-blend-overlay pointer-events-none select-none"
-                  style={{
-                    backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
-                  }}
-                />
-                {/* Top sheen */}
-                <div className="absolute inset-0 bg-gradient-to-b from-white/[0.05] to-transparent pointer-events-none" />
-                {/* Glare layer */}
-                <div
-                  className="absolute inset-0 pointer-events-none rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                  style={{
-                    background:
-                      "radial-gradient(circle at var(--gx, 50%) var(--gy, 50%), rgba(255,255,255,0.13) 0%, rgba(255,255,255,0.04) 40%, transparent 70%)",
-                  }}
-                />
-                <div className="relative z-10">
-                  <div className="w-14 h-14 bg-gradient-to-br from-white/10 to-white/[0.02] border border-white/20 backdrop-blur-md rounded-xl flex items-center justify-center mb-6 group-hover:bg-white group-hover:scale-110 transition-all duration-300">
-                    <service.icon className="w-7 h-7 text-white group-hover:text-black transition-colors" />
-                  </div>
-                  <h3 className="text-xl font-bold text-white mb-3 tracking-wide">
-                    {service.title}
-                  </h3>
-                  <p className="text-white/70 text-sm leading-relaxed font-light">
-                    {service.desc}
-                  </p>
-                </div>
+                {marqueeServices.map((service, idx) => (
+                  <FadeIn
+                    key={`${service.title}-${idx}`}
+                    delay={(idx % services.length) * 0.04}
+                  >
+                    <div
+                      className="group relative h-full min-h-[280px] p-8 rounded-2xl overflow-hidden border border-white/20 bg-gradient-to-br from-white/[0.07] to-white/[0.01] backdrop-blur-xl shadow-2xl shadow-black/40 hover:border-white/30 hover:from-white/[0.12] hover:to-white/[0.03] hover:-translate-y-1 transition-all duration-500 w-[320px] sm:w-[360px] shrink-0"
+                      onMouseMove={(e) => {
+                        const rect = e.currentTarget.getBoundingClientRect();
+                        const x = (
+                          ((e.clientX - rect.left) / rect.width) *
+                          100
+                        ).toFixed(1);
+                        const y = (
+                          ((e.clientY - rect.top) / rect.height) *
+                          100
+                        ).toFixed(1);
+                        e.currentTarget.style.setProperty("--gx", `${x}%`);
+                        e.currentTarget.style.setProperty("--gy", `${y}%`);
+                      }}
+                    >
+                      {/* Noise texture */}
+                      <div
+                        className="absolute inset-0 opacity-[0.03] mix-blend-overlay pointer-events-none select-none"
+                        style={{
+                          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
+                        }}
+                      />
+                      {/* Top sheen */}
+                      <div className="absolute inset-0 bg-gradient-to-b from-white/[0.05] to-transparent pointer-events-none" />
+                      {/* Glare layer */}
+                      <div
+                        className="absolute inset-0 pointer-events-none rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                        style={{
+                          background:
+                            "radial-gradient(circle at var(--gx, 50%) var(--gy, 50%), rgba(255,255,255,0.13) 0%, rgba(255,255,255,0.04) 40%, transparent 70%)",
+                        }}
+                      />
+                      <div className="relative z-10">
+                        <div className="w-14 h-14 bg-gradient-to-br from-white/10 to-white/[0.02] border border-white/20 backdrop-blur-md rounded-xl flex items-center justify-center mb-6 group-hover:bg-white group-hover:scale-110 transition-all duration-300">
+                          <service.icon className="w-7 h-7 text-white group-hover:text-black transition-colors" />
+                        </div>
+                        <h3 className="text-xl font-bold text-white mb-3 tracking-wide">
+                          {service.title}
+                        </h3>
+                        <p className="text-white/70 text-sm leading-relaxed font-light">
+                          {service.desc}
+                        </p>
+                      </div>
+                    </div>
+                  </FadeIn>
+                ))}
               </div>
-            ))}
-          </div>
+            </div>
+          </FadeIn>
 
-          <div className="text-center mt-12">
+          <FadeIn className="text-center mt-16 pb-8">
             <Link
               to="/services"
               className="group inline-flex items-center gap-2 text-white font-semibold hover:gap-3 transition-all"
@@ -677,17 +1009,21 @@ export default function Home() {
               Explore All Services
               <ArrowRight className="w-4 h-4" />
             </Link>
-          </div>
+          </FadeIn>
         </div>
       </section>
 
+      <CurvedTextDivider />
+
       {/* ── Featured Portfolio (API-driven) ── */}
-      <FeaturedPortfolio />
+      <section className="pt-24 pb-8 bg-white">
+        <FeaturedPortfolio />
+      </section>
 
       {/* Testimonials */}
       <section className="py-24 bg-black">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center max-w-4xl mx-auto mb-16">
+          <FadeIn className="text-center max-w-4xl mx-auto mb-16">
             <span className="text-white/50 font-semibold text-sm uppercase tracking-wider">
               Testimonials
             </span>
@@ -701,177 +1037,210 @@ export default function Home() {
               exceptional branding and digital marketing solutions that drive
               real business growth.
             </p>
-          </div>
+          </FadeIn>
 
-          <Swiper
-            modules={[Autoplay]}
-            spaceBetween={30}
-            slidesPerView={1}
-            loop={true}
-            autoplay={{ delay: 3000, disableOnInteraction: false }}
-            breakpoints={{
-              768: { slidesPerView: 2 },
-              1024: { slidesPerView: 3 },
-            }}
-          >
-            {testimonials.map((t) => (
-              <SwiperSlide key={t.name}>
-                <div className="relative p-8 rounded-2xl bg-white/5 border border-white/10 hover:border-white/25 hover:shadow-lg transition-all duration-300 h-full">
-                  <Quote className="w-10 h-10 text-white/10 mb-4" />
-                  <p className="text-white/70 leading-relaxed mb-6">{t.text}</p>
-                  <div className="flex items-center gap-1 mb-4">
-                    {[...Array(t.rating)].map((_, j) => (
-                      <Star
-                        key={j}
-                        className="w-4 h-4 text-amber-400 fill-amber-400"
-                      />
-                    ))}
+          <FadeIn>
+            <Swiper
+              modules={[Autoplay]}
+              spaceBetween={30}
+              slidesPerView={1}
+              loop={true}
+              autoplay={{ delay: 3000, disableOnInteraction: false }}
+              breakpoints={{
+                768: { slidesPerView: 2 },
+                1024: { slidesPerView: 3 },
+              }}
+            >
+              {testimonials.map((t) => (
+                <SwiperSlide key={t.name}>
+                  <div className="relative p-8 rounded-2xl bg-white/5 border border-white/10 hover:border-white/25 hover:shadow-lg transition-all duration-300 h-full">
+                    <Quote className="w-10 h-10 text-white/10 mb-4" />
+                    <p className="text-white/70 leading-relaxed mb-6">{t.text}</p>
+                    <div className="flex items-center gap-1 mb-4">
+                      {[...Array(t.rating)].map((_, j) => (
+                        <Star
+                          key={j}
+                          className="w-4 h-4 text-amber-400 fill-amber-400"
+                        />
+                      ))}
+                    </div>
+                    <div>
+                      <div className="font-semibold text-white">{t.name}</div>
+                      <div className="text-sm text-white/50">{t.role}</div>
+                    </div>
                   </div>
-                  <div>
-                    <div className="font-semibold text-white">{t.name}</div>
-                    <div className="text-sm text-white/50">{t.role}</div>
-                  </div>
-                </div>
-              </SwiperSlide>
-            ))}
-          </Swiper>
+                </SwiperSlide>
+              ))}
+            </Swiper>
+          </FadeIn>
         </div>
       </section>
 
       <Client />
 
-      <section className="bg-white py-20">
-        <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Heading */}
-          <div className="text-center mb-14">
-            <span className="text-sm tracking-[0.3em] uppercase text-neutral-500 font-medium">
+      <section className="relative overflow-hidden bg-[#f7f5f2] py-20">
+        {/* Subtle background texture */}
+        <div
+          className="absolute inset-0 opacity-[0.03]"
+          style={{
+            backgroundImage:
+              "linear-gradient(rgba(15,23,42,0.4) 1px, transparent 1px), linear-gradient(90deg, rgba(15,23,42,0.4) 1px, transparent 1px)",
+            backgroundSize: "36px 36px",
+          }}
+        />
+
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Header */}
+          <div className="mb-12">
+            <span className="text-[11px] tracking-[0.25em] uppercase text-neutral-400 font-medium">
               Our Expertise
             </span>
-
-            <h2 className="mt-4 text-4xl md:text-5xl font-semibold tracking-tight text-neutral-900">
-              Creative Branding Experience
-            </h2>
-            {/* 
-            <p className="mt-5 max-w-3xl mx-auto text-neutral-600 leading-relaxed">
-              We craft premium branding, packaging, and digital experiences
-              designed to elevate businesses in modern markets.
-            </p> */}
-            <p className="mt-4 max-w-7xl mx-auto text-neutral-600 leading-relaxed text-justify sm:text-center">
-              Our expertise spans across multiple disciplines, from strategic
-              brand positioning and visual identity design to digital marketing
-              campaigns and web development. We believe that great branding goes
-              beyond aesthetics—it's about creating meaningful connections
-              between businesses and their audiences. Every project we undertake
-              is guided by thorough research, strategic thinking, and a deep
-              understanding of market dynamics. Whether you're looking to revamp
-              your brand's image or develop a new digital presence, our team of
-              experienced or develop a new digital presence, our team of
-              experienced professionals is here to help you achieve your goals.
-            </p>
+            <div className="mt-6 flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+              <h2 className="text-4xl md:text-5xl font-medium tracking-tight text-neutral-900 max-w-md leading-[1.15]">
+                Creative Branding Experience
+              </h2>
+              <div>
+                <div className="hidden lg:block w-8 h-px bg-neutral-300 mb-3" />
+                <p className="text-sm leading-7 text-neutral-500 max-w-xs">
+                  We blend strategy, visual systems, storytelling, and digital
+                  execution to build brands that move culture, not just trends.
+                </p>
+              </div>
+            </div>
           </div>
 
-          {/* Bento Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 auto-rows-[320px] gap-[1px] bg-neutral-300 overflow-hidden rounded-3xl">
-            {showcaseData.map((item) => (
-              <div
-                key={item.id}
-                className={`bg-white ${item.className} overflow-hidden group`}
-              >
-                {/* Single Image */}
-                {item.type === "image" && (
-                  <div className="h-full w-full overflow-hidden">
-                    <img
-                      src={item.image}
-                      alt={item.title || "Branding showcase image"}
-                      className="h-full w-full object-cover transition duration-700 group-hover:scale-105"
-                    />
-                  </div>
-                )}
+          {/* Grid */}
+          <div className="grid grid-cols-12 gap-3">
 
-                {/* Content Block */}
-                {item.type === "content" && (
-                  <div className="h-full flex flex-col items-center justify-center text-center px-8 md:px-12">
-                    <h3 className="text-2xl md:text-3xl font-semibold text-neutral-900 leading-tight">
-                      {item.title}
-                    </h3>
+            {/* Row 1 — Featured image (5 cols) + Gallery (7 cols) */}
+            <div className="col-span-12 md:col-span-5">
+              <ImageCard item={showcaseData.featured} minHeight="min-h-[280px]" />
+            </div>
 
-                    <p className="mt-6 text-neutral-600 leading-8 max-w-md">
-                      {item.desc}
-                    </p>
+            <div className="col-span-12 md:col-span-7">
+              <GalleryCard item={showcaseData.gallery} />
+            </div>
 
-                    <div className="w-24 h-[2px] bg-violet-500 mt-10" />
-                  </div>
-                )}
+            {/* Row 2 — Content (4) + Stat (4) + Content (4) */}
+            <div className="col-span-12 md:col-span-4">
+              <ContentCard item={showcaseData.insight1} />
+            </div>
 
-                {/* Gallery Grid */}
-                {item.type === "gallery" && (
-                  <div className="grid grid-cols-2 grid-rows-3 h-full gap-[1px] bg-neutral-300">
-                    {item.images.map((img, index) => (
-                      <div key={index} className="overflow-hidden bg-white">
-                        <img
-                          src={img}
-                          alt={`Creative branding gallery image ${index + 1}`}
-                          className="h-full w-full object-cover transition duration-500 hover:scale-105"
-                        />
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            ))}
+            <div className="col-span-12 md:col-span-4">
+              <StatCard item={showcaseData.stat} />
+            </div>
+
+            <div className="col-span-12 md:col-span-4">
+              <ContentCard item={showcaseData.insight2} />
+            </div>
+
+            {/* Row 3 — Wide image (7) + Feature (5) */}
+            <div className="col-span-12 md:col-span-7">
+              <ImageCard item={showcaseData.campaign} minHeight="min-h-[200px]" />
+            </div>
+
+            <div className="col-span-12 md:col-span-5">
+              <FeatureCard item={showcaseData.feature} />
+            </div>
+
           </div>
         </div>
       </section>
 
       {/* Process Section */}
-      <section className="py-24 bg-neutral-950 text-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center max-w-3xl mx-auto mb-16">
-            <span className="text-white/50 font-semibold text-sm uppercase tracking-wider">
-              Our Process
-            </span>
-            <h2 className="mt-4 text-2xl sm:text-5xl font-bold tracking-tight">
-              How we bring your brand to life
-            </h2>
-            <p className="mt-4 text-base text-center text-white/60">
-              Our proven four-step process ensures that every project delivers
-              exceptional results. From initial discovery to final launch, we
-              maintain transparent communication and collaborative workflows
-              that keep you involved at every stage.
-            </p>
-          </div>
+      <section className="relative overflow-hidden bg-neutral-950 py-24 text-white">
+        <div className="absolute inset-0 overflow-hidden">
+          <div className="absolute left-1/2 top-0 h-[420px] w-[420px] -translate-x-1/2 rounded-full bg-violet-600/10 blur-3xl" />
+          <div className="absolute bottom-0 right-0 h-[320px] w-[320px] rounded-full bg-fuchsia-500/5 blur-3xl" />
+        </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {[
-              {
-                step: "01",
-                title: "Discover",
-                desc: "Deep dive into your brand, market, and audience to uncover key insights.",
-              },
-              {
-                step: "02",
-                title: "Strategize",
-                desc: "Craft a positioning strategy that sets your brand apart from the competition.",
-              },
-              {
-                step: "03",
-                title: "Design",
-                desc: "Bring the strategy to life with stunning visual design and identity systems.",
-              },
-              {
-                step: "04",
-                title: "Launch",
-                desc: "Roll out your brand with confidence, supported by guidelines and assets.",
-              },
-            ].map((item) => (
-              <div key={item.step} className="text-center">
-                <div className="text-5xl font-bold text-white/10 mb-4">
-                  {item.step}
-                </div>
-                <h3 className="text-xl font-bold mb-2">{item.title}</h3>
-                <p className="text-white/50 leading-relaxed">{item.desc}</p>
-              </div>
-            ))}
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <FadeIn className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between mb-16">
+            <div className="max-w-3xl">
+              <span className="text-white/50 font-semibold text-sm uppercase tracking-[0.3em]">
+                Our Process
+              </span>
+              <h2 className="mt-4 text-3xl sm:text-5xl font-bold tracking-tight">
+                How we bring your brand to life
+              </h2>
+            </div>
+            <p className="max-w-2xl text-base text-white/60 lg:text-left">
+              Our proven four-step process keeps every project aligned,
+              collaborative, and focused on results from discovery to launch.
+            </p>
+          </FadeIn>
+
+          <div className="relative">
+            <div className="absolute left-0 right-0 top-10 hidden h-px bg-gradient-to-r from-transparent via-white/10 to-transparent lg:block" />
+            <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
+              {[
+                {
+                  step: "01",
+                  title: "Discover",
+                  desc: "We study your market, audience, and goals to uncover the right direction.",
+                },
+                {
+                  step: "02",
+                  title: "Strategize",
+                  desc: "We shape a clear story, positioning, and roadmap that fits your brand.",
+                },
+                {
+                  step: "03",
+                  title: "Design",
+                  desc: "We craft bold visuals, systems, and experiences that bring the brand to life.",
+                },
+                {
+                  step: "04",
+                  title: "Launch",
+                  desc: "We deliver, refine, and support the rollout so your brand grows with confidence.",
+                },
+              ].map((item, idx) => (
+                <motion.div
+                  key={item.step}
+                  className="group relative z-10 h-full rounded-3xl border border-white/10 bg-white/[0.03] p-8 backdrop-blur-sm transition-all duration-500 hover:border-violet-400/30 hover:bg-white/[0.05]"
+                  initial={{ opacity: 0, y: 40 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: "-60px" }}
+                  transition={{
+                    duration: 0.6,
+                    delay: idx * 0.2,
+                    ease: [0.22, 1, 0.36, 1],
+                  }}
+                >
+                  <div className="flex items-center justify-between">
+                    <motion.div
+                      className="relative flex h-16 w-16 items-center justify-center rounded-2xl border border-white/10 bg-gradient-to-br from-violet-500/15 to-fuchsia-500/10"
+                      whileHover={{ scale: 1.06 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      <span className="text-base font-semibold text-white">
+                        {item.step}
+                      </span>
+                      <span className="absolute inset-0 rounded-2xl border border-violet-400/10" />
+                    </motion.div>
+                    <span className="text-xs uppercase tracking-[0.35em] text-white/25">
+                      Step {idx + 1}
+                    </span>
+                  </div>
+
+                  <div className="mt-8">
+                    <h3 className="text-2xl font-semibold text-white">
+                      {item.title}
+                    </h3>
+                    <p className="mt-3 text-sm leading-6 text-white/50">
+                      {item.desc}
+                    </p>
+                  </div>
+
+                  <div className="mt-8 flex items-center justify-between">
+                    <div className="h-px flex-1 bg-gradient-to-r from-white/0 via-white/10 to-white/0" />
+                    <span className="ml-3 text-xs uppercase tracking-[0.3em] text-white/20">
+                      0{idx + 1}
+                    </span>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
           </div>
         </div>
       </section>

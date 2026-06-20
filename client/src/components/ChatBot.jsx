@@ -224,27 +224,27 @@ export default function ChatBot() {
             : "opacity-0 translate-y-4 pointer-events-none"
         }`}
       >
-        <div className="flex flex-col bg-neutral-950 border border-white/10 rounded-2xl shadow-2xl shadow-black/50 overflow-hidden h-[70vh] sm:h-[520px]">
-          <div className="flex items-center justify-between px-5 py-4 border-b border-white/10 bg-black">
+        <div className="flex flex-col bg-white border border-black/10 rounded-2xl shadow-2xl shadow-black/10 overflow-hidden h-[70vh] sm:h-[520px]">
+          <div className="flex items-center justify-between px-5 py-4 border-b border-black/10 bg-white">
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 bg-white/10 rounded-full flex items-center justify-center">
+              <div className="w-9 h-9 bg-black rounded-full flex items-center justify-center">
                 <Bot className="w-5 h-5 text-white" />
               </div>
               <div>
-                <p className="text-sm font-semibold text-white leading-tight">Adway Assistant</p>
-                <p className="text-[11px] text-white/40">Guided lead generation</p>
+                <p className="text-sm font-semibold text-black leading-tight">Adway Assistant</p>
+                <p className="text-[11px] text-black/60 font-medium">Guided lead generation</p>
               </div>
             </div>
             <button
               onClick={() => setIsOpen(false)}
-              className="w-8 h-8 rounded-lg flex items-center justify-center text-white/50 hover:text-white hover:bg-white/10 transition-all"
+              className="w-8 h-8 rounded-lg flex items-center justify-center text-black/50 hover:text-black hover:bg-black/5 transition-all"
               aria-label="Close chat"
             >
               <X className="w-4 h-4" />
             </button>
           </div>
 
-          <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4 scrollbar-thin">
+          <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4 scrollbar-thin bg-white">
             {messages.map((msg, index) => (
               <div
                 key={index}
@@ -252,21 +252,21 @@ export default function ChatBot() {
               >
                 <div
                   className={`shrink-0 w-7 h-7 rounded-full flex items-center justify-center mt-0.5 ${
-                    msg.role === "bot" ? "bg-white/10" : "bg-white/20"
+                    msg.role === "bot" ? "bg-black" : "bg-black/90"
                   }`}
                 >
                   {msg.role === "bot" ? (
-                    <Bot className="w-3.5 h-3.5 text-white/70" />
+                    <Bot className="w-3.5 h-3.5 text-white font-medium" />
                   ) : (
-                    <User className="w-3.5 h-3.5 text-white/80" />
+                    <User className="w-3.5 h-3.5 text-white font-medium" />
                   )}
                 </div>
 
                 <div
                   className={`max-w-[80%] px-4 py-2.5 rounded-2xl text-sm leading-relaxed ${
                     msg.role === "bot"
-                      ? "bg-white/5 text-white/80 rounded-tl-sm"
-                      : "bg-white text-black rounded-tr-sm"
+                      ? "bg-black/5 text-black rounded-tl-sm"
+                      : "bg-black text-white rounded-tr-sm"
                   }`}
                 >
                   {msg.text}
@@ -276,14 +276,14 @@ export default function ChatBot() {
 
             {isTyping && (
               <div className="flex gap-2.5">
-                <div className="shrink-0 w-7 h-7 rounded-full bg-white/10 flex items-center justify-center mt-0.5">
-                  <Bot className="w-3.5 h-3.5 text-white/70" />
+                <div className="shrink-0 w-7 h-7 rounded-full bg-black flex items-center justify-center mt-0.5">
+                  <Bot className="w-3.5 h-3.5 text-white" />
                 </div>
-                <div className="bg-white/5 px-4 py-3 rounded-2xl rounded-tl-sm">
+                <div className="bg-black/5 px-4 py-3 rounded-2xl rounded-tl-sm">
                   <div className="flex gap-1.5">
-                    <span className="w-2 h-2 bg-white/30 rounded-full animate-bounce [animation-delay:0ms]" />
-                    <span className="w-2 h-2 bg-white/30 rounded-full animate-bounce [animation-delay:150ms]" />
-                    <span className="w-2 h-2 bg-white/30 rounded-full animate-bounce [animation-delay:300ms]" />
+                    <span className="w-2 h-2 bg-black/50 rounded-full animate-bounce [animation-delay:0ms]" />
+                    <span className="w-2 h-2 bg-black/50 rounded-full animate-bounce [animation-delay:150ms]" />
+                    <span className="w-2 h-2 bg-black/50 rounded-full animate-bounce [animation-delay:300ms]" />
                   </div>
                 </div>
               </div>
@@ -292,7 +292,7 @@ export default function ChatBot() {
             <div ref={messagesEndRef} />
           </div>
 
-          <div className="px-4 py-3 border-t border-white/10 bg-black">
+          <div className="px-4 py-3 border-t border-black/10 bg-white">
             {showContactForm ? (
               <form onSubmit={handleContactSubmit} className="space-y-3">
                 <div className="grid gap-3">
@@ -301,7 +301,7 @@ export default function ChatBot() {
                     value={contact.name}
                     onChange={(e) => handleContactChange("name", e.target.value)}
                     placeholder="Name"
-                    className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/40 focus:outline-none"
+                    className="w-full px-4 py-3 rounded-xl bg-white border border-black/10 text-black placeholder:text-black/40 focus:outline-none"
                     required
                   />
                   <input
@@ -309,14 +309,14 @@ export default function ChatBot() {
                     value={contact.business}
                     onChange={(e) => handleContactChange("business", e.target.value)}
                     placeholder="Business Name"
-                    className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/40 focus:outline-none"
+                    className="w-full px-4 py-3 rounded-xl bg-white border border-black/10 text-black placeholder:text-black/40 focus:outline-none"
                   />
                   <input
                     type="email"
                     value={contact.email}
                     onChange={(e) => handleContactChange("email", e.target.value)}
                     placeholder="Email"
-                    className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/40 focus:outline-none"
+                    className="w-full px-4 py-3 rounded-xl bg-white border border-black/10 text-black placeholder:text-black/40 focus:outline-none"
                     required
                   />
                   <input
@@ -324,7 +324,7 @@ export default function ChatBot() {
                     value={contact.phone}
                     onChange={(e) => handleContactChange("phone", e.target.value)}
                     placeholder="Phone Number"
-                    className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/40 focus:outline-none"
+                    className="w-full px-4 py-3 rounded-xl bg-white border border-black/10 text-black placeholder:text-black/40 focus:outline-none"
                     required
                   />
                   <textarea
@@ -332,12 +332,12 @@ export default function ChatBot() {
                     onChange={(e) => handleContactChange("requirements", e.target.value)}
                     placeholder="Project requirements"
                     rows={3}
-                    className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/40 focus:outline-none resize-none"
+                    className="w-full px-4 py-3 rounded-xl bg-white border border-black/10 text-black placeholder:text-black/40 focus:outline-none resize-none"
                   />
                 </div>
                 <button
                   type="submit"
-                  className="w-full rounded-xl bg-violet-600 px-4 py-3 text-sm font-semibold text-white hover:bg-violet-500 transition"
+                  className="w-full rounded-xl bg-black px-4 py-3 text-sm font-semibold text-white hover:bg-black/90 transition"
                 >
                   Submit Contact Details
                 </button>
@@ -351,7 +351,7 @@ export default function ChatBot() {
                     <button
                       key={option}
                       onClick={() => handleOptionSelect(option)}
-                      className="px-3 py-2 border border-white/20 text-white rounded-full text-xs hover:text-black hover:bg-white transition"
+                      className="px-3 py-2 border border-black/10 text-black font-medium rounded-full text-xs hover:text-white hover:bg-black transition"
                     >
                       {option}
                     </button>
