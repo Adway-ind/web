@@ -936,7 +936,7 @@ app.post(
 app.delete("/api/admin/portfolio/:id", authMiddleware, async (req, res) => {
   try {
     const { id } = req.params;
-    
+
     // First check if project exists
     const [rows] = await db.query("SELECT id, image FROM projects WHERE id = ?", [id]);
     if (rows.length === 0) {
@@ -945,7 +945,7 @@ app.delete("/api/admin/portfolio/:id", authMiddleware, async (req, res) => {
 
     // Delete the project from database
     const [result] = await db.query("DELETE FROM projects WHERE id = ?", [id]);
-    
+
     if (result.affectedRows === 0) {
       return res.status(404).json({ error: "Failed to delete project" });
     }
@@ -1482,10 +1482,10 @@ app.get("/api/projects/:slug", async (req, res) => {
       "SELECT slug, title FROM projects ORDER BY id DESC"
     );
     const currentIndex = allProjects.findIndex((item) => item.slug === slug || item.id == slug);
-    
+
     let prevProject = null;
     let nextProject = null;
-    
+
     if (currentIndex > 0) {
       prevProject = allProjects[currentIndex - 1];
     }
@@ -1787,14 +1787,7 @@ app.post("/api/admin/send-email", authMiddleware, async (req, res) => {
       to,
       subject,
       html: `
-        <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 580px; margin: 0 auto; padding: 40px 32px; background: #ffffff; border: 1px solid #e5e7eb; border-radius: 12px;">
-          <div style="margin-bottom: 32px;">
-            <img src="${process.env.CLIENT_URL}/logo.png" alt="Adway" style="height: 32px;" onerror="this.style.display='none'" />
-          </div>
-          <div style="font-size: 15px; line-height: 1.7; color: #374151; white-space: pre-wrap;">${message.replace(/\n/g, "<br/>")}</div>
-          <hr style="border: 0; border-top: 1px solid #e5e7eb; margin: 32px 0 20px;" />
-          <p style="font-size: 12px; color: #9ca3af; margin: 0;">Sent via Adway Admin · <a href="${process.env.CLIENT_URL}" style="color: #9ca3af;">${process.env.CLIENT_URL}</a></p>
-        </div>
+        <!-- Header --> <div style="padding:30px;text-align:center;border-bottom:1px solid #e5e7eb;"> <img src="${process.env.CLIENT_URL}/logo.png" alt="Adway Creations" style="height:40px;" /> </div> <!-- Content --> <div style="padding:40px 32px;"> <div style="font-size:15px;line-height:1.8;color:#374151;"> ${message.replace(/\n/g, "<br/>")} </div> </div> <!-- Footer --> <div style="padding:24px 32px;background:#fafafa;border-top:1px solid #e5e7eb;"> <p style="margin:0;font-size:14px;color:#4b5563;"> Regards,<br /> <strong>Adway Creations Team</strong> </p> <p style="margin:16px 0 0;font-size:12px;color:#9ca3af;"> © ${new Date().getFullYear()} Adway Creations. All rights reserved. </p> </div> </div> </div>
       `,
     });
 
