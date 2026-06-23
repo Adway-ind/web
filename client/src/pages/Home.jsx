@@ -1016,7 +1016,7 @@ export default function Home() {
       <CurvedTextDivider />
 
       {/* ── Featured Portfolio (API-driven) ── */}
-      <section className="pt-24 pb-8 bg-white">
+      <section className="pt-24 pb-8 bg-black">
         <FeaturedPortfolio />
       </section>
 
