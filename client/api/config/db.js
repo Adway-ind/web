@@ -12,7 +12,7 @@ const pool = new Pool({
 });
 
 module.exports = {
-  query: async (sql, params = []) => {
+  query: async function (sql, params = []) {
     try {
       // 1. Convert MySQL ? to Postgres $1, $2, etc.
       let i = 1;
@@ -50,5 +50,8 @@ module.exports = {
       console.error("DB Query Error:", err.message, "SQL:", sql, "PARAMS:", params);
       throw err;
     }
+  },
+  execute: async function (sql, params = []) {
+    return this.query(sql, params);
   }
 };
