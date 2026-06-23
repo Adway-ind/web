@@ -48,6 +48,7 @@ app.use(
 app.use(helmet({ crossOriginResourcePolicy: false }));
 const allowedOrigins = [
   "http://localhost:5173",
+  "https://web-bay-kappa-78.vercel.app",
   process.env.CLIENT_URL,
 ].filter(Boolean);
 app.use(
