@@ -41,7 +41,6 @@ if (!fs.existsSync(BLOG_DIR)) {
 }
 
 const db = require("./config/db");
-const { sequelize, Application, CareerJob, ChatEnquiry, Client, Blog } = require("./models");
 
 const app = express();
 console.log("📁 Server directory:", __dirname);
@@ -121,37 +120,6 @@ function addChatbotEnquiry(enquiry) {
   enquiries.unshift(enquiry);
   if (enquiries.length > 200) enquiries.length = 200;
   saveChatbotEnquiries(enquiries);
-}
-
-async function importChatbotEnquiriesFromJson() {
-  const enquiries = readChatbotEnquiries();
-  if (!Array.isArray(enquiries) || enquiries.length === 0) return;
-
-  for (const enquiry of enquiries) {
-    try {
-      if (!enquiry.id) continue;
-      const existing = await ChatEnquiry.findByPk(enquiry.id);
-      if (existing) continue;
-
-      await ChatEnquiry.create({
-        id: enquiry.id,
-        service: enquiry.service || "",
-        project_type: enquiry.projectType || "",
-        budget: enquiry.budget || "",
-        timeline: enquiry.timeline || "",
-        contact_name: enquiry.contact?.name || "",
-        contact_business: enquiry.contact?.business || "",
-        contact_email: enquiry.contact?.email || "",
-        contact_phone: enquiry.contact?.phone || "",
-        contact_requirements: enquiry.contact?.requirements || "",
-        read: enquiry.read || false,
-        created_at: enquiry.createdAt ? new Date(enquiry.createdAt) : undefined,
-        updated_at: enquiry.updatedAt ? new Date(enquiry.updatedAt) : undefined,
-      });
-    } catch (err) {
-      console.error("Failed to import chatbot enquiry:", err);
-    }
-  }
 }
 
 function loadChatbotPrompt() {
@@ -382,7 +350,8 @@ async function createApplicationsExcelBuffer(apps) {
 }
 
 async function getAllApplications() {
-  return Application.findAll({ order: [[sequelize.col("created_at"), "DESC"]] });
+  const [rows] = await db.query("SELECT * FROM applications ORDER BY created_at DESC");
+  return rows;
 }
 
 async function getGoogleAuth() {
@@ -622,37 +591,21 @@ app.post("/api/auth/logout", authMiddleware, (req, res) => {
 app.get("/api/admin/stats", authMiddleware, async (req, res) => {
   try {
     const messages = readJSON("messages.json", []);
-    const chatEnquiriesCount = await ChatEnquiry.count();
-    const chatEnquiriesNewCount = await ChatEnquiry.count({
-      where: {
-        created_at: {
-          [require("sequelize").Op.gte]: new Date(Date.now() - 7 * 86400000),
-        },
-      },
-    });
-    const [portfolioRows] = await db.query("SELECT COUNT(*) as count FROM projects");
-    const portfolioCount = portfolioRows[0].count;
-    const applicationsCount = await Application.count();
-    const newApplicationsCount = await Application.count({
-      where: {
-        created_at: {
-          [require("sequelize").Op.gte]: new Date(Date.now() - 7 * 86400000),
-        },
-      },
-    });
+    const sevenDaysAgo = new Date(Date.now() - 7 * 86400000);
 
-    // ✅ ADDED: contact enquiries count
-    const [contactRows] = await db.query(
-      "SELECT COUNT(*) AS count FROM contact_enquiries"
-    );
-    const contactEnquiriesCount = Number(contactRows[0].count);
+    const [[{ count: chatEnquiriesCount }]] = await db.query("SELECT COUNT(*) as count FROM chat_enquiries");
+    const [[{ count: chatEnquiriesNewCount }]] = await db.query("SELECT COUNT(*) as count FROM chat_enquiries WHERE created_at >= ?", [sevenDaysAgo]);
+    const [[{ count: portfolioCount }]] = await db.query("SELECT COUNT(*) as count FROM projects");
+    const [[{ count: applicationsCount }]] = await db.query("SELECT COUNT(*) as count FROM applications");
+    const [[{ count: newApplicationsCount }]] = await db.query("SELECT COUNT(*) as count FROM applications WHERE created_at >= ?", [sevenDaysAgo]);
+    const [[{ count: contactEnquiriesCount }]] = await db.query("SELECT COUNT(*) AS count FROM contact_enquiries");
 
     res.json({
       applications: applicationsCount,
       messages: messages.length,
       chatEnquiries: chatEnquiriesCount,
       portfolio: portfolioCount,
-      contactEnquiries: contactEnquiriesCount, // ✅ now included
+      contactEnquiries: Number(contactEnquiriesCount),
       newApplications: newApplicationsCount,
       newMessages: messages.filter(
         (m) => Date.now() - new Date(m.createdAt).getTime() < 7 * 86400000,
@@ -667,8 +620,8 @@ app.get("/api/admin/stats", authMiddleware, async (req, res) => {
 // Applications CRUD
 app.get("/api/admin/applications", authMiddleware, async (req, res) => {
   try {
-    const apps = await Application.findAll({ order: [[sequelize.col("created_at"), "DESC"]] });
-    res.json(apps);
+    const [rows] = await db.query("SELECT * FROM applications ORDER BY created_at DESC");
+    res.json(rows);
   } catch (err) {
     res.status(500).json({ error: "Failed to fetch applications", details: err.message });
   }
@@ -680,12 +633,12 @@ app.patch("/api/admin/applications/:id/status", authMiddleware, async (req, res)
     return res.status(400).json({ error: "Invalid status" });
 
   try {
-    const application = await Application.findByPk(req.params.id);
-    if (!application) return res.status(404).json({ error: "Not found" });
+    const [rows] = await db.query("SELECT * FROM applications WHERE id = ?", [req.params.id]);
+    if (rows.length === 0) return res.status(404).json({ error: "Not found" });
 
-    application.status = status;
-    await application.save();
-    res.json(application);
+    await db.query("UPDATE applications SET status = ?, updated_at = NOW() WHERE id = ?", [status, req.params.id]);
+    const [updated] = await db.query("SELECT * FROM applications WHERE id = ?", [req.params.id]);
+    res.json(updated[0]);
   } catch (err) {
     res.status(500).json({ error: "Failed to update application status", details: err.message });
   }
@@ -693,8 +646,8 @@ app.patch("/api/admin/applications/:id/status", authMiddleware, async (req, res)
 
 app.delete("/api/admin/applications/:id", authMiddleware, async (req, res) => {
   try {
-    const deleted = await Application.destroy({ where: { id: req.params.id } });
-    if (!deleted) return res.status(404).json({ error: "Not found" });
+    const [result] = await db.query("DELETE FROM applications WHERE id = ?", [req.params.id]);
+    if (result.affectedRows === 0) return res.status(404).json({ error: "Not found" });
     res.json({ success: true });
   } catch (err) {
     res.status(500).json({ error: "Failed to delete application", details: err.message });
@@ -728,23 +681,23 @@ app.delete("/api/admin/messages/:id", authMiddleware, (req, res) => {
 
 app.get("/api/admin/chat-enquiries", authMiddleware, async (req, res) => {
   try {
-    const enquiries = await ChatEnquiry.findAll({ order: [["created_at", "DESC"]] });
-    const mapped = enquiries.map((enquiry) => ({
-      id: enquiry.id,
-      service: enquiry.service,
-      projectType: enquiry.project_type,
-      budget: enquiry.budget,
-      timeline: enquiry.timeline,
+    const [rows] = await db.query("SELECT * FROM chat_enquiries ORDER BY created_at DESC");
+    const mapped = rows.map((e) => ({
+      id: e.id,
+      service: e.service,
+      projectType: e.project_type,
+      budget: e.budget,
+      timeline: e.timeline,
       contact: {
-        name: enquiry.contact_name,
-        business: enquiry.contact_business,
-        email: enquiry.contact_email,
-        phone: enquiry.contact_phone,
-        requirements: enquiry.contact_requirements,
+        name: e.contact_name,
+        business: e.contact_business,
+        email: e.contact_email,
+        phone: e.contact_phone,
+        requirements: e.contact_requirements,
       },
-      read: enquiry.read,
-      createdAt: enquiry.created_at,
-      updatedAt: enquiry.updated_at,
+      read: !!e.read,
+      createdAt: e.created_at,
+      updatedAt: e.updated_at,
     }));
     res.json(mapped);
   } catch (err) {
@@ -754,11 +707,13 @@ app.get("/api/admin/chat-enquiries", authMiddleware, async (req, res) => {
 
 app.patch("/api/admin/chat-enquiries/:id/read", authMiddleware, async (req, res) => {
   try {
-    const enquiry = await ChatEnquiry.findByPk(req.params.id);
-    if (!enquiry) return res.status(404).json({ error: "Not found" });
+    const [rows] = await db.query("SELECT * FROM chat_enquiries WHERE id = ?", [req.params.id]);
+    if (rows.length === 0) return res.status(404).json({ error: "Not found" });
 
-    enquiry.read = !enquiry.read;
-    await enquiry.save();
+    const enquiry = rows[0];
+    const newRead = !enquiry.read;
+    await db.query("UPDATE chat_enquiries SET `read` = ? WHERE id = ?", [newRead, req.params.id]);
+
     res.json({
       id: enquiry.id,
       service: enquiry.service,
@@ -772,7 +727,7 @@ app.patch("/api/admin/chat-enquiries/:id/read", authMiddleware, async (req, res)
         phone: enquiry.contact_phone,
         requirements: enquiry.contact_requirements,
       },
-      read: enquiry.read,
+      read: newRead,
       createdAt: enquiry.created_at,
       updatedAt: enquiry.updated_at,
     });
@@ -783,8 +738,8 @@ app.patch("/api/admin/chat-enquiries/:id/read", authMiddleware, async (req, res)
 
 app.delete("/api/admin/chat-enquiries/:id", authMiddleware, async (req, res) => {
   try {
-    const deleted = await ChatEnquiry.destroy({ where: { id: req.params.id } });
-    if (!deleted) return res.status(404).json({ error: "Not found" });
+    const [result] = await db.query("DELETE FROM chat_enquiries WHERE id = ?", [req.params.id]);
+    if (result.affectedRows === 0) return res.status(404).json({ error: "Not found" });
     res.json({ success: true });
   } catch (err) {
     res.status(500).json({ error: "Failed to delete enquiry", details: err.message });
@@ -1148,24 +1103,18 @@ app.post("/api/admin/careers", authMiddleware, async (req, res) => {
       return res.status(400).json({ error: "Category, title, location, and type are required." });
     }
 
-    const existing = await CareerJob.findOne({
-      where: {
-        category,
-        title,
-      },
-    });
-
-    if (existing) {
+    const [existing] = await db.query(
+      "SELECT id FROM career_jobs WHERE category = ? AND title = ?",
+      [category, title]
+    );
+    if (existing.length > 0) {
       return res.status(409).json({ error: "This role already exists in that category." });
     }
 
-    await CareerJob.create({
-      category,
-      title,
-      location,
-      type,
-      description: description || "",
-    });
+    await db.query(
+      "INSERT INTO career_jobs (category, title, location, type, description, created_at, updated_at) VALUES (?, ?, ?, ?, ?, NOW(), NOW())",
+      [category, title, location, type, description || ""]
+    );
 
     const categories = await getCareerJobsFromDb();
     res.status(201).json({ success: true, categories });
@@ -1182,8 +1131,8 @@ app.delete("/api/admin/careers", authMiddleware, async (req, res) => {
       return res.status(400).json({ error: "Job id is required to delete a role." });
     }
 
-    const deletedCount = await CareerJob.destroy({ where: { id } });
-    if (!deletedCount) {
+    const [result] = await db.query("DELETE FROM career_jobs WHERE id = ?", [id]);
+    if (result.affectedRows === 0) {
       return res.status(404).json({ error: "Role not found." });
     }
 
@@ -1308,25 +1257,15 @@ const careerPerks = [
 ];
 
 async function getCareerJobsFromDb() {
-  const jobs = await CareerJob.findAll({
-    raw: true,
-    order: [
-      ["category", "ASC"],
-      ["created_at", "ASC"],
-    ],
-  });
+  const [jobs] = await db.query("SELECT * FROM career_jobs ORDER BY category ASC, created_at ASC");
 
   const categories = [];
   jobs.forEach((job) => {
     let category = categories.find((item) => item.title === job.category);
     if (!category) {
-      category = {
-        title: job.category,
-        roles: [],
-      };
+      category = { title: job.category, roles: [] };
       categories.push(category);
     }
-
     category.roles.push({
       id: job.id,
       title: job.title,
@@ -1343,8 +1282,8 @@ async function getCareerJobsFromDb() {
 }
 
 async function seedCareerJobsIfEmpty() {
-  const remaining = await CareerJob.count();
-  if (remaining > 0) return;
+  const [[{ count }]] = await db.query("SELECT COUNT(*) as count FROM career_jobs");
+  if (count > 0) return;
 
   const entries = careerJobs.flatMap((category) =>
     category.roles.map((role) => ({
@@ -1356,8 +1295,11 @@ async function seedCareerJobsIfEmpty() {
     })),
   );
 
-  if (entries.length) {
-    await CareerJob.bulkCreate(entries);
+  for (const entry of entries) {
+    await db.query(
+      "INSERT INTO career_jobs (category, title, location, type, description, created_at, updated_at) VALUES (?, ?, ?, ?, ?, NOW(), NOW())",
+      [entry.category, entry.title, entry.location, entry.type, entry.description]
+    );
   }
 }
 
@@ -1393,36 +1335,31 @@ app.post("/api/chat-enquiries", async (req, res) => {
   }
 
   try {
-    const enquiry = await ChatEnquiry.create({
-      service,
-      project_type: projectType,
-      budget,
-      timeline,
-      contact_name: contact.name,
-      contact_business: contact.business || "",
-      contact_email: contact.email,
-      contact_phone: contact.phone,
-      contact_requirements: contact.requirements || "",
-    });
+    const id = crypto.randomUUID();
+    await db.query(
+      `INSERT INTO chat_enquiries (id, service, project_type, budget, timeline, contact_name, contact_business, contact_email, contact_phone, contact_requirements, \`read\`, created_at, updated_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, NOW(), NOW())`,
+      [id, service, projectType, budget, timeline, contact.name, contact.business || "", contact.email, contact.phone, contact.requirements || ""]
+    );
 
     res.status(201).json({
       success: true,
       enquiry: {
-        id: enquiry.id,
-        service: enquiry.service,
-        projectType: enquiry.project_type,
-        budget: enquiry.budget,
-        timeline: enquiry.timeline,
+        id,
+        service,
+        projectType,
+        budget,
+        timeline,
         contact: {
-          name: enquiry.contact_name,
-          business: enquiry.contact_business,
-          email: enquiry.contact_email,
-          phone: enquiry.contact_phone,
-          requirements: enquiry.contact_requirements,
+          name: contact.name,
+          business: contact.business || "",
+          email: contact.email,
+          phone: contact.phone,
+          requirements: contact.requirements || "",
         },
-        read: enquiry.read,
-        createdAt: enquiry.created_at,
-        updatedAt: enquiry.updated_at,
+        read: false,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
       },
     });
   } catch (err) {
@@ -1546,18 +1483,13 @@ app.post("/api/applications", apiLimiter, resumeUpload.single("resume"), async (
   }
 
   try {
-    // 2. Commit application to the local Sequelize Database
-    const application = await Application.create({
-      name,
-      email,
-      position,
-      phone: phone || "",
-      portfolio: portfolio || "",
-      linkedin: linkedin || "",
-      coverNote: coverNote || "",
-      resume: resumePath,
-      status: "new",
-    });
+    // 2. Insert application into MySQL
+    const appId = crypto.randomUUID();
+    await db.query(
+      `INSERT INTO applications (id, name, email, position, phone, portfolio, linkedin, coverNote, resume, status, created_at, updated_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'new', NOW(), NOW())`,
+      [appId, name, email, position, phone || "", portfolio || "", linkedin || "", coverNote || "", resumePath]
+    );
 
     // 3. Trigger cloud workbook sync logic asynchronously in background (if configured)
     syncApplicationRecords().catch((syncErr) => {
@@ -1623,7 +1555,7 @@ app.post("/api/applications", apiLimiter, resumeUpload.single("resume"), async (
 
     // 6. Respond immediately to the frontend application layout frame
     console.log("📣 Application response mail result:", mailResult);
-    res.status(201).json({ success: true, id: application.id, mail: mailResult });
+    res.status(201).json({ success: true, id: appId, mail: mailResult });
   } catch (err) {
     console.error("Application routing system encountered an issue:", err);
     res.status(500).json({ error: "Failed to save application", details: err.message });
@@ -1658,30 +1590,110 @@ app.listen(PORT, async () => {
   console.log(`🔑 JWT Secret: ${JWT_SECRET.substring(0, 12)}...`);
   console.log(`\n⚠️  Change ADMIN_EMAIL, ADMIN_PASS, JWT_SECRET in .env for production!\n`);
 
-  // Run DB check safely now that server is listening
   try {
-    if (db && typeof db.query === 'function') {
-      await db.query("SELECT 1");
-    } else if (db && db.pool && typeof db.pool.query === 'function') {
-      await db.pool.query("SELECT 1");
-    } else {
-      throw new Error("The 'db' export is not a valid modern Promise pool setup.");
-    }
+    // Verify MySQL connection
+    await db.query("SELECT 1");
+    console.log("✅ MySQL Connected successfully");
 
-    await sequelize.authenticate();
-    await Application.sync();
-    await CareerJob.sync();
-    await ChatEnquiry.sync();
-    await Client.sync();
-    await Blog.sync();
-    await importChatbotEnquiriesFromJson();
+    // Ensure all tables exist
+    await db.query(`CREATE TABLE IF NOT EXISTS applications (
+      id VARCHAR(36) PRIMARY KEY,
+      name VARCHAR(200) NOT NULL,
+      email VARCHAR(255) NOT NULL,
+      position VARCHAR(150) NOT NULL,
+      phone VARCHAR(50) DEFAULT '',
+      portfolio VARCHAR(255) DEFAULT '',
+      linkedin VARCHAR(255) DEFAULT '',
+      coverNote TEXT,
+      resume VARCHAR(255) DEFAULT '',
+      status VARCHAR(50) NOT NULL DEFAULT 'new',
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    )`);
+
+    await db.query(`CREATE TABLE IF NOT EXISTS career_jobs (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      category VARCHAR(100) NOT NULL,
+      title VARCHAR(200) NOT NULL,
+      location VARCHAR(100) NOT NULL,
+      type VARCHAR(50) NOT NULL,
+      description TEXT DEFAULT NULL,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+      UNIQUE KEY idx_category_title (category, title)
+    )`);
+
+    await db.query(`CREATE TABLE IF NOT EXISTS chat_enquiries (
+      id VARCHAR(36) PRIMARY KEY,
+      service VARCHAR(150) NOT NULL,
+      project_type VARCHAR(150) NOT NULL,
+      budget VARCHAR(100) NOT NULL,
+      timeline VARCHAR(100) NOT NULL,
+      contact_name VARCHAR(200) NOT NULL,
+      contact_business VARCHAR(255) DEFAULT '',
+      contact_email VARCHAR(255) NOT NULL,
+      contact_phone VARCHAR(50) NOT NULL,
+      contact_requirements TEXT DEFAULT NULL,
+      \`read\` TINYINT(1) NOT NULL DEFAULT 0,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    )`);
+
+    await db.query(`CREATE TABLE IF NOT EXISTS clients (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      name VARCHAR(100) NOT NULL,
+      logo VARCHAR(500) DEFAULT NULL,
+      position INT NOT NULL DEFAULT 0,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    )`);
+
+    await db.query(`CREATE TABLE IF NOT EXISTS blogs (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      title VARCHAR(300) NOT NULL,
+      slug VARCHAR(300) NOT NULL UNIQUE,
+      excerpt VARCHAR(500) DEFAULT '',
+      content LONGTEXT NOT NULL,
+      coverImage VARCHAR(500) DEFAULT '',
+      author VARCHAR(100) NOT NULL DEFAULT 'Adway Team',
+      category VARCHAR(100) DEFAULT '',
+      tags VARCHAR(500) DEFAULT '',
+      readingTime INT DEFAULT 1,
+      published TINYINT(1) NOT NULL DEFAULT 0,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+      INDEX idx_published (published),
+      INDEX idx_category (category)
+    )`);
+
+    await db.query(`CREATE TABLE IF NOT EXISTS contact_enquiries (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      name VARCHAR(200) NOT NULL,
+      email VARCHAR(255) NOT NULL,
+      company VARCHAR(255) DEFAULT NULL,
+      service VARCHAR(255) DEFAULT NULL,
+      budget VARCHAR(255) DEFAULT NULL,
+      message TEXT NOT NULL,
+      createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )`);
+
+    await db.query(`CREATE TABLE IF NOT EXISTS users (
+      id VARCHAR(36) PRIMARY KEY,
+      email VARCHAR(255) NOT NULL UNIQUE,
+      password VARCHAR(255) NOT NULL,
+      role VARCHAR(50) NOT NULL DEFAULT 'user',
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    )`);
+
+    console.log("✅ All tables ensured");
+
+    // Seed career jobs if empty
     await seedCareerJobsIfEmpty();
 
-    console.log("✅ MySQL Connected successfully");
-    console.log("✅ Sequelize authenticated and tables synced");
+    console.log("✅ MySQL Initialized successfully");
   } catch (err) {
-    console.error("❌ Database Connection Warning:", err.message || err);
-    console.log("👉 Please confirm your ./config/db file exports a clean mysql2/promise pool pool instance and your Sequelize config matches your DB.");
+    console.error("❌ Database Connection Error:", err.message || err);
   }
 });
 
@@ -1745,14 +1757,16 @@ app.get("/api/admin/stats/history", authMiddleware, async (req, res) => {
 
       labels.push(from.toLocaleDateString("en-US", { weekday: "short" }));
 
-      const appCount = await Application.count({
-        where: { created_at: { [require("sequelize").Op.between]: [from, to] } },
-      });
+      const [[{ count: appCount }]] = await db.query(
+        "SELECT COUNT(*) as count FROM applications WHERE created_at BETWEEN ? AND ?",
+        [from, to]
+      );
       applications.push(appCount);
 
-      const chatCount = await ChatEnquiry.count({
-        where: { created_at: { [require("sequelize").Op.between]: [from, to] } },
-      });
+      const [[{ count: chatCount }]] = await db.query(
+        "SELECT COUNT(*) as count FROM chat_enquiries WHERE created_at BETWEEN ? AND ?",
+        [from, to]
+      );
       chat.push(chatCount);
 
       const msgCount = allMessages.filter((m) => {
@@ -1761,11 +1775,11 @@ app.get("/api/admin/stats/history", authMiddleware, async (req, res) => {
       }).length;
       messages.push(msgCount);
 
-      const [contactRows] = await db.query(
-        `SELECT COUNT(*) AS count FROM contact_enquiries WHERE createdAt BETWEEN ? AND ?`,
+      const [[{ count: contactCount }]] = await db.query(
+        "SELECT COUNT(*) AS count FROM contact_enquiries WHERE createdAt BETWEEN ? AND ?",
         [from, to]
       );
-      contact.push(Number(contactRows[0].count));
+      contact.push(Number(contactCount));
     }
 
     res.json({ labels, applications, messages, chat, contact });
@@ -1805,15 +1819,15 @@ app.post("/api/admin/send-email", authMiddleware, async (req, res) => {
 app.get("/api/blogs", async (req, res) => {
   try {
     const { category } = req.query;
-    const where = { published: 1 };
-    if (category && category !== "All") where.category = category;
-
-    const blogs = await Blog.findAll({
-      where,
-      order: [[sequelize.col("created_at"), "DESC"]],
-      attributes: { exclude: ["content"] },
-    });
-    res.json(blogs);
+    let sql = "SELECT id, title, slug, excerpt, coverImage, cover_image, author, category, tags, readingTime, reading_time, published, created_at, updated_at FROM blogs WHERE published = 1";
+    const params = [];
+    if (category && category !== "All") {
+      sql += " AND category = ?";
+      params.push(category);
+    }
+    sql += " ORDER BY created_at DESC";
+    const [rows] = await db.query(sql, params);
+    res.json(rows);
   } catch (err) {
     console.error("Blog list error:", err);
     res.status(500).json({ error: "Failed to fetch blogs", details: err.message });
@@ -1836,15 +1850,15 @@ app.get("/api/blogs/categories", async (req, res) => {
 // Public: single blog by slug
 app.get("/api/blogs/:slug", async (req, res) => {
   try {
-    const blog = await Blog.findOne({ where: { slug: req.params.slug, published: 1 } });
-    if (!blog) return res.status(404).json({ error: "Blog post not found" });
+    const [rows] = await db.query("SELECT * FROM blogs WHERE slug = ? AND published = 1", [req.params.slug]);
+    if (rows.length === 0) return res.status(404).json({ error: "Blog post not found" });
+
+    const blog = rows[0];
 
     // Navigation
-    const allBlogs = await Blog.findAll({
-      where: { published: 1 },
-      order: [[sequelize.col("created_at"), "DESC"]],
-      attributes: ["slug", "title"],
-    });
+    const [allBlogs] = await db.query(
+      "SELECT slug, title FROM blogs WHERE published = 1 ORDER BY created_at DESC"
+    );
     const idx = allBlogs.findIndex((b) => b.slug === req.params.slug);
     const prevBlog = idx > 0 ? allBlogs[idx - 1] : null;
     const nextBlog = idx < allBlogs.length - 1 ? allBlogs[idx + 1] : null;
@@ -1859,8 +1873,8 @@ app.get("/api/blogs/:slug", async (req, res) => {
 // Admin: list all blogs (including drafts)
 app.get("/api/admin/blogs", authMiddleware, async (req, res) => {
   try {
-    const blogs = await Blog.findAll({ order: [[sequelize.col("created_at"), "DESC"]] });
-    res.json(blogs);
+    const [rows] = await db.query("SELECT * FROM blogs ORDER BY created_at DESC");
+    res.json(rows);
   } catch (err) {
     res.status(500).json({ error: "Failed to fetch blogs", details: err.message });
   }
@@ -1893,20 +1907,14 @@ app.post("/api/admin/blogs", authMiddleware, upload.single("coverImage"), async 
     const wordCount = content.split(/\s+/).length;
     const readingTime = Math.max(1, Math.ceil(wordCount / 200));
 
-    const blog = await Blog.create({
-      title,
-      slug,
-      excerpt: excerpt || content.substring(0, 200),
-      content,
-      coverImage: coverImagePath,
-      author: author || "Adway Team",
-      category: category || "",
-      tags: tags || "",
-      readingTime,
-      published: published ? 1 : 0,
-    });
+    const [result] = await db.query(
+      `INSERT INTO blogs (title, slug, excerpt, content, coverImage, author, category, tags, readingTime, published, created_at, updated_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())`,
+      [title, slug, excerpt || content.substring(0, 200), content, coverImagePath, author || "Adway Team", category || "", tags || "", readingTime, published ? 1 : 0]
+    );
 
-    res.status(201).json(blog);
+    const [newBlog] = await db.query("SELECT * FROM blogs WHERE id = ?", [result.insertId]);
+    res.status(201).json(newBlog[0]);
   } catch (err) {
     console.error("Blog create error:", err);
     res.status(500).json({ error: "Failed to create blog", details: err.message });
@@ -1916,33 +1924,40 @@ app.post("/api/admin/blogs", authMiddleware, upload.single("coverImage"), async 
 // Admin: update blog
 app.patch("/api/admin/blogs/:id", authMiddleware, upload.single("coverImage"), async (req, res) => {
   try {
-    const blog = await Blog.findByPk(req.params.id);
-    if (!blog) return res.status(404).json({ error: "Blog not found" });
+    const [rows] = await db.query("SELECT * FROM blogs WHERE id = ?", [req.params.id]);
+    if (rows.length === 0) return res.status(404).json({ error: "Blog not found" });
 
+    const blog = rows[0];
     const { title, excerpt, content, author, category, tags, published } = req.body;
 
+    let coverImagePath = blog.coverImage;
     if (req.file) {
       const fileName = `${Date.now()}-blog.webp`;
       await sharp(req.file.buffer)
         .resize({ width: 1200, fit: "inside", withoutEnlargement: true })
         .webp({ quality: 78 })
         .toFile(path.join(BLOG_DIR, fileName));
-      blog.coverImage = `/uploads/blogs/${fileName}`;
+      coverImagePath = `/uploads/blogs/${fileName}`;
     }
 
-    if (title !== undefined) blog.title = title;
-    if (excerpt !== undefined) blog.excerpt = excerpt;
-    if (content !== undefined) {
-      blog.content = content;
-      blog.readingTime = Math.max(1, Math.ceil(content.split(/\s+/).length / 200));
-    }
-    if (author !== undefined) blog.author = author;
-    if (category !== undefined) blog.category = category;
-    if (tags !== undefined) blog.tags = tags;
-    if (published !== undefined) blog.published = published ? 1 : 0;
+    const finalTitle = title !== undefined ? title : blog.title;
+    const finalExcerpt = excerpt !== undefined ? excerpt : blog.excerpt;
+    const finalContent = content !== undefined ? content : blog.content;
+    const finalAuthor = author !== undefined ? author : blog.author;
+    const finalCategory = category !== undefined ? category : blog.category;
+    const finalTags = tags !== undefined ? tags : blog.tags;
+    const finalPublished = published !== undefined ? (published ? 1 : 0) : blog.published;
+    const finalReadingTime = content !== undefined
+      ? Math.max(1, Math.ceil(finalContent.split(/\s+/).length / 200))
+      : blog.readingTime;
 
-    await blog.save();
-    res.json(blog);
+    await db.query(
+      `UPDATE blogs SET title=?, excerpt=?, content=?, coverImage=?, author=?, category=?, tags=?, readingTime=?, published=?, updated_at=NOW() WHERE id=?`,
+      [finalTitle, finalExcerpt, finalContent, coverImagePath, finalAuthor, finalCategory, finalTags, finalReadingTime, finalPublished, req.params.id]
+    );
+
+    const [updated] = await db.query("SELECT * FROM blogs WHERE id = ?", [req.params.id]);
+    res.json(updated[0]);
   } catch (err) {
     console.error("Blog update error:", err);
     res.status(500).json({ error: "Failed to update blog", details: err.message });
@@ -1952,8 +1967,8 @@ app.patch("/api/admin/blogs/:id", authMiddleware, upload.single("coverImage"), a
 // Admin: delete blog
 app.delete("/api/admin/blogs/:id", authMiddleware, async (req, res) => {
   try {
-    const deleted = await Blog.destroy({ where: { id: req.params.id } });
-    if (!deleted) return res.status(404).json({ error: "Blog not found" });
+    const [result] = await db.query("DELETE FROM blogs WHERE id = ?", [req.params.id]);
+    if (result.affectedRows === 0) return res.status(404).json({ error: "Blog not found" });
     res.json({ success: true });
   } catch (err) {
     console.error("Blog delete error:", err);
@@ -1968,8 +1983,8 @@ module.exports = app;
 // Public: fetch all clients ordered by position
 app.get("/api/clients", async (req, res) => {
   try {
-    const clients = await Client.findAll({ order: [["position", "ASC"], ["created_at", "ASC"]] });
-    res.json(clients);
+    const [rows] = await db.query("SELECT * FROM clients ORDER BY position ASC, created_at ASC");
+    res.json(rows);
   } catch (err) {
     console.error("Failed to fetch clients:", err);
     res.status(500).json({ error: "Failed to fetch clients", details: err.message });
@@ -1979,8 +1994,8 @@ app.get("/api/clients", async (req, res) => {
 // Admin: fetch all clients (auth required)
 app.get("/api/admin/clients", authMiddleware, async (req, res) => {
   try {
-    const clients = await Client.findAll({ order: [["position", "ASC"], ["created_at", "ASC"]] });
-    res.json(clients);
+    const [rows] = await db.query("SELECT * FROM clients ORDER BY position ASC, created_at ASC");
+    res.json(rows);
   } catch (err) {
     console.error("Failed to fetch admin clients:", err);
     res.status(500).json({ error: "Failed to fetch clients", details: err.message });
@@ -2003,14 +2018,16 @@ app.post("/api/admin/clients", authMiddleware, upload.single("logo"), async (req
       logoPath = `/uploads/logos/${fileName}`;
     }
 
-    const maxPos = await Client.max("position") || 0;
-    const client = await Client.create({
-      name,
-      logo: logoPath,
-      position: position !== undefined && position !== "" ? Number(position) : maxPos + 1,
-    });
+    const [[{ max: maxPos }]] = await db.query("SELECT MAX(position) as max FROM clients");
+    const finalPosition = position !== undefined && position !== "" ? Number(position) : (maxPos || 0) + 1;
 
-    res.status(201).json(client);
+    const [result] = await db.query(
+      "INSERT INTO clients (name, logo, position, created_at, updated_at) VALUES (?, ?, ?, NOW(), NOW())",
+      [name, logoPath, finalPosition]
+    );
+
+    const [newClient] = await db.query("SELECT * FROM clients WHERE id = ?", [result.insertId]);
+    res.status(201).json(newClient[0]);
   } catch (err) {
     console.error("Create client error:", err);
     res.status(500).json({ error: "Failed to create client", details: err.message });
@@ -2020,10 +2037,12 @@ app.post("/api/admin/clients", authMiddleware, upload.single("logo"), async (req
 // Admin: update client
 app.patch("/api/admin/clients/:id", authMiddleware, upload.single("logo"), async (req, res) => {
   try {
-    const client = await Client.findByPk(req.params.id);
-    if (!client) return res.status(404).json({ error: "Client not found" });
+    const [rows] = await db.query("SELECT * FROM clients WHERE id = ?", [req.params.id]);
+    if (rows.length === 0) return res.status(404).json({ error: "Client not found" });
 
+    const client = rows[0];
     const { name, position } = req.body;
+    let logoPath = client.logo;
 
     if (req.file) {
       const fileName = `${Date.now()}-${Math.random().toString(36).substring(2, 8)}.webp`;
@@ -2031,14 +2050,19 @@ app.patch("/api/admin/clients/:id", authMiddleware, upload.single("logo"), async
         .resize({ width: 400, fit: "inside", withoutEnlargement: true })
         .webp({ quality: 85 })
         .toFile(path.join(LOGO_DIR, fileName));
-      client.logo = `/uploads/logos/${fileName}`;
+      logoPath = `/uploads/logos/${fileName}`;
     }
 
-    if (name !== undefined) client.name = name;
-    if (position !== undefined && position !== "") client.position = Number(position);
+    const finalName = name !== undefined ? name : client.name;
+    const finalPosition = position !== undefined && position !== "" ? Number(position) : client.position;
 
-    await client.save();
-    res.json(client);
+    await db.query(
+      "UPDATE clients SET name = ?, logo = ?, position = ?, updated_at = NOW() WHERE id = ?",
+      [finalName, logoPath, finalPosition, req.params.id]
+    );
+
+    const [updated] = await db.query("SELECT * FROM clients WHERE id = ?", [req.params.id]);
+    res.json(updated[0]);
   } catch (err) {
     console.error("Update client error:", err);
     res.status(500).json({ error: "Failed to update client", details: err.message });
@@ -2048,8 +2072,8 @@ app.patch("/api/admin/clients/:id", authMiddleware, upload.single("logo"), async
 // Admin: delete client
 app.delete("/api/admin/clients/:id", authMiddleware, async (req, res) => {
   try {
-    const deleted = await Client.destroy({ where: { id: req.params.id } });
-    if (!deleted) return res.status(404).json({ error: "Client not found" });
+    const [result] = await db.query("DELETE FROM clients WHERE id = ?", [req.params.id]);
+    if (result.affectedRows === 0) return res.status(404).json({ error: "Client not found" });
     res.json({ success: true });
   } catch (err) {
     console.error("Delete client error:", err);
