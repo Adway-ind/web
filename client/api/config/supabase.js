@@ -11,7 +11,7 @@ if (!supabaseUrl || !supabaseKey) {
 
 // We use the service role key if available for admin operations that bypass RLS
 const supabase = createClient(
-  supabaseUrl || '', 
+  supabaseUrl || '',
   supabaseServiceRole || supabaseKey || '',
   {
     auth: {
