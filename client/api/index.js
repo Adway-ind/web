@@ -20,20 +20,15 @@ const LOGO_DIR = path.join(UPLOAD_DIR, "logos");
 const BLOG_DIR = path.join(UPLOAD_DIR, "blogs");
 const nodemailer = require("nodemailer")
 
-);
-}
 
-);
-}
 
-);
-}
 
-);
-}
 
-);
-}
+
+
+
+
+
 
 const db = require("./config/db");
 
@@ -631,11 +626,7 @@ app.patch("/api/admin/messages/:id/read", authMiddleware, async (req, res) => {
   } catch(e) { res.status(500).json({error: e.message}); }
 });
 
-  msgs[idx].read = !msgs[idx].read;
-  msgs[idx].updatedAt = new Date().toISOString();
-  writeJSON("messages.json", msgs);
-  res.json(msgs[idx]);
-});
+
 
 app.delete("/api/admin/messages/:id", authMiddleware, async (req, res) => {
   try {
@@ -643,7 +634,7 @@ app.delete("/api/admin/messages/:id", authMiddleware, async (req, res) => {
     res.json({success: true});
   } catch(e) { res.status(500).json({error: e.message}); }
 });
-});
+
 
 app.get("/api/admin/chat-enquiries", authMiddleware, async (req, res) => {
   try {
@@ -1536,20 +1527,7 @@ app.post("/api/messages", apiLimiter, async (req, res) => {
   } catch(e) { res.status(500).json({error: e.message}); }
 });
 
-  const msgs = readJSON("messages.json", []);
-  const msg = {
-    id: crypto.randomUUID(),
-    name,
-    email,
-    subject: subject || "",
-    message,
-    read: false,
-    createdAt: new Date().toISOString(),
-  };
-  msgs.push(msg);
-  writeJSON("messages.json", msgs);
-  res.status(201).json({ success: true, id: msg.id });
-});
+
 
 module.exports = app;
 

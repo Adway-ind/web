@@ -9,12 +9,8 @@ code = code.replace('const upload = multer({', 'const upload = multer({ storage:
 code = code.replace('const resumeUpload = multer({', 'const resumeUpload = multer({ storage: multer.memoryStorage(), ')
 code = re.sub(r'const storage = multer\.diskStorage\(\{.*?\}\);\s*const upload = multer\(\{.*?\}\);', 'const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 50 * 1024 * 1024 } });', code, flags=re.DOTALL)
 
-# 2. Replace fs.mkdirSync for uploads
-code = re.sub(r'if \(\!fs\.existsSync\(COVER_DIR\)\) \{.*?\}', '', code, flags=re.DOTALL)
-code = re.sub(r'if \(\!fs\.existsSync\(GALLERY_DIR\)\) \{.*?\}', '', code, flags=re.DOTALL)
-code = re.sub(r'if \(\!fs\.existsSync\(RESUME_DIR\)\) \{.*?\}', '', code, flags=re.DOTALL)
-code = re.sub(r'if \(\!fs\.existsSync\(LOGO_DIR\)\) \{.*?\}', '', code, flags=re.DOTALL)
-code = re.sub(r'if \(\!fs\.existsSync\(BLOG_DIR\)\) \{.*?\}', '', code, flags=re.DOTALL)
+# 2. Safely replace fs.mkdirSync for uploads
+code = re.sub(r'if \(\!fs\.existsSync\([^)]+\)\) \{\s*fs\.mkdirSync\([^)]+\);\s*\}', '', code)
 code = re.sub(r'const DATA_DIR.*?\nif \(\!fs\.existsSync\(DATA_DIR\)\).*?\n', '', code, flags=re.DOTALL)
 
 # 3. Replace JSON functions with DB calls
