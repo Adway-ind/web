@@ -1893,25 +1893,24 @@ app.post("/api/admin/send-email", authMiddleware, async (req, res) => {
 app.get("/api/blogs", async (req, res) => {
   try {
     const { category } = req.query;
-
-    // 1. Loose validation inside the query: covers string '1', integer 1, or true boolean values 🛡️
+    
+    // 1. Fixed: Removed duplicate columns (cover_image, reading_time) to prevent database crashes
+    // 2. Fixed: Loosened validation to check for integers, strings, or booleans for 'published'
     let sql = `
-      SELECT 
-        id, title, slug, excerpt, coverImage, cover_image, 
-        author, category, tags, readingTime, reading_time, 
-        published, created_at, updated_at 
+      SELECT id, title, slug, excerpt, coverImage, author, 
+             category, tags, readingTime, published, created_at 
       FROM blogs 
       WHERE (published = 1 OR published = '1' OR published = true)
     `;
-
+    
     const params = [];
     if (category && category !== "All") {
       sql += " AND category = ?";
       params.push(category);
     }
-
+    
     sql += " ORDER BY created_at DESC";
-
+    
     const [rows] = await db.query(sql, params);
     res.json(rows);
   } catch (err) {
