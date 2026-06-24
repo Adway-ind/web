@@ -14,8 +14,7 @@ import {
 } from "lucide-react";
 import * as XLSX from "xlsx";
 import { useAuth } from "../../context/AuthContext";
-
-const API = "";
+import { getApiUrl } from "../../config/api";
 
 export default function ContactEnquiries() {
     const { authFetch } = useAuth();
@@ -35,7 +34,7 @@ export default function ContactEnquiries() {
         try {
             setLoading(true);
 
-            const response = await fetch(`/api/contact-enquiries`, {
+            const response = await fetch(getApiUrl("/api/contact-enquiries"), {
                 method: "GET",
                 cache: "no-store",
                 headers: {

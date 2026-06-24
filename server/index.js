@@ -1791,13 +1791,19 @@ app.post("/api/contact-enquiries", async (req, res) => {
 
 app.get("/api/contact-enquiries", async (req, res) => {
   try {
-    // Option A: Use 'created_at' if your system sets timestamps automatically
-    const [rows] = await db.query(`SELECT * FROM contact_enquiries ORDER BY created_at DESC`);
-    
-    // Option B: Safe alternative if you just want to read the empty table rows by ID
-    // const [rows] = await db.query(`SELECT * FROM contact_enquiries ORDER BY id DESC`);
+    let rows = [];
 
-    res.json(rows); // Will cleanly return [] instead of crashing
+    try {
+      [rows] = await db.query(`SELECT * FROM contact_enquiries ORDER BY createdAt DESC, id DESC`);
+    } catch (columnError) {
+      if (String(columnError.message).includes("createdAt")) {
+        [rows] = await db.query(`SELECT * FROM contact_enquiries ORDER BY created_at DESC, id DESC`);
+      } else {
+        throw columnError;
+      }
+    }
+
+    res.json(rows);
   } catch (error) {
     console.error("FETCH ENQUIRIES ERROR:", error);
     res.status(500).json({ success: false, message: error.message });
