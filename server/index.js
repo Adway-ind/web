@@ -58,7 +58,11 @@ app.use(
 app.use(helmet({ crossOriginResourcePolicy: false }));
 const allowedOrigins = [
   "http://localhost:5173",
+  "http://127.0.0.1:5173",
   process.env.CLIENT_URL,
+  process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : null,
+  "https://adway-web.vercel.app",
+  "https://adway.agency",
 ].filter(Boolean);
 app.use(
   cors({
@@ -68,6 +72,8 @@ app.use(
       callback(new Error(`CORS policy does not allow access from origin ${origin}`));
     },
     credentials: true,
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
 app.use(express.json({ limit: "2mb" }));
