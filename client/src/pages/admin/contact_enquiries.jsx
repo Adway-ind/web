@@ -34,8 +34,19 @@ export default function ContactEnquiries() {
     const fetchEnquiries = async () => {
         try {
             setLoading(true);
-            const response = await fetch(`/api/contact-enquiries`);
+
+            const response = await fetch(`/api/contact-enquiries`, {
+                method: "GET",
+                cache: "no-store",
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            });
+
             const data = await response.json();
+
+            console.log("CONTACT API DATA:", data);
+
             setEnquiries(Array.isArray(data) ? data : []);
         } catch (error) {
             console.error(error);
