@@ -45,7 +45,7 @@ if (!fs.existsSync(BLOG_DIR)) {
 
 const db = require("./config/db");
 
-const app = express();
+
 console.log("📁 Server directory:", __dirname);
 
 app.use(
