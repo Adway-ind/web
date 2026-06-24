@@ -459,30 +459,50 @@ async function syncApplicationRecords() {
 }
 
 /* ═══ ADMIN USER SETUP ═══ */
-const ADMIN_EMAIL = process.env.ADMIN_EMAIL || "admin@adway.com";
+const ADMIN_EMAIL = (process.env.ADMIN_EMAIL || "admin@adway.com").trim().toLowerCase();
 const ADMIN_PASS = process.env.ADMIN_PASS || "Adway@2026!";
 const JWT_SECRET = process.env.JWT_SECRET || crypto.randomBytes(64).toString("hex");
 const JWT_EXPIRES = "2h";
 
-// Ensure admin user exists
-function getAdminUser() {
-  const users = readJSON("users.json", []);
-  let admin = users.find((u) => u.role === "admin");
-  if (!admin) {
-    const hashed = bcrypt.hashSync(ADMIN_PASS, 12);
-    admin = {
-      id: crypto.randomUUID(),
-      email: ADMIN_EMAIL,
-      password: hashed,
-      role: "admin",
-      createdAt: new Date().toISOString(),
-    };
-    users.push(admin);
-    writeJSON("users.json", users);
+async function ensureAdminUserInDatabase() {
+  const normalizedEmail = ADMIN_EMAIL.trim().toLowerCase();
+  const hashedPassword = bcrypt.hashSync(ADMIN_PASS, 12);
+
+  const [existingRows] = await db.execute("SELECT * FROM users WHERE email = ? LIMIT 1", [normalizedEmail]);
+  if (existingRows.length > 0) {
+    const existingUser = existingRows[0];
+    const updates = [];
+    const values = [];
+
+    if (existingUser.role !== "admin") {
+      updates.push("role = ?");
+      values.push("admin");
+    }
+
+    if (existingUser.password !== hashedPassword) {
+      updates.push("password = ?");
+      values.push(hashedPassword);
+    }
+
+    if (updates.length > 0) {
+      values.push(existingUser.id);
+      await db.execute(`UPDATE users SET ${updates.join(", ")} WHERE id = ?`, values);
+    }
+
+    return { email: normalizedEmail, password: ADMIN_PASS };
   }
-  return admin;
+
+  const [adminRows] = await db.execute("SELECT * FROM users WHERE role = 'admin' LIMIT 1");
+  if (adminRows.length > 0) {
+    const existingAdmin = adminRows[0];
+    await db.execute("UPDATE users SET email = ?, password = ? WHERE id = ?", [normalizedEmail, hashedPassword, existingAdmin.id]);
+    return { email: normalizedEmail, password: ADMIN_PASS };
+  }
+
+  const userId = crypto.randomUUID();
+  await db.execute("INSERT INTO users (id, email, password, role) VALUES (?, ?, ?, ?)", [userId, normalizedEmail, hashedPassword, "admin"]);
+  return { email: normalizedEmail, password: ADMIN_PASS };
 }
-getAdminUser();
 
 /* ═══ AUTH HELPERS ═══ */
 function signToken(payload) {
@@ -1303,6 +1323,48 @@ async function seedCareerJobsIfEmpty() {
   }
 }
 
+async function seedProjectsIfEmpty() {
+  const [[{ count }]] = await db.query("SELECT COUNT(*) as count FROM projects");
+  if (count > 0) return;
+
+  const backupProjects = readJSON("portfolio.json", []);
+  for (const project of backupProjects) {
+    const id = project.id || crypto.randomUUID();
+    await db.query(
+      `INSERT INTO projects (id, title, slug, category, image, tags, year, client, description, challenge, result, images, created_at, updated_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())`,
+      [
+        id,
+        project.title || "Untitled",
+        project.slug || project.title?.toLowerCase().replace(/\s+/g, "-") || id,
+        project.category || "",
+        project.image || "",
+        Array.isArray(project.tags) ? project.tags.join(",") : "",
+        project.year || "",
+        project.client || "",
+        project.desc || project.description || "",
+        project.challenge || "",
+        project.result || "",
+        Array.isArray(project.images) ? JSON.stringify(project.images) : "[]",
+      ]
+    );
+  }
+}
+
+async function seedClientsIfEmpty() {
+  const [[{ count }]] = await db.query("SELECT COUNT(*) as count FROM clients");
+  if (count > 0) return;
+
+  const backupClients = readJSON("clients.json", []);
+  for (const client of backupClients) {
+    const id = client.id || crypto.randomUUID();
+    await db.query(
+      "INSERT INTO clients (id, name, logo, position, created_at, updated_at) VALUES (?, ?, ?, ?, NOW(), NOW())",
+      [id, client.name || "Client", client.logo || "", client.position || 0]
+    );
+  }
+}
+
 app.get("/api/careers", async (req, res) => {
   try {
     res.json({ categories: await getCareerJobsFromDb(), stats: careerStats, perks: careerPerks });
@@ -1686,10 +1748,15 @@ app.listen(PORT, async () => {
       updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
     )`);
 
+    const adminUser = await ensureAdminUserInDatabase();
+    console.log(`✅ Admin user ready: ${adminUser.email}`);
+
     console.log("✅ All tables ensured");
 
-    // Seed career jobs if empty
+    // Seed starter data if the new Railway database is empty
     await seedCareerJobsIfEmpty();
+    await seedProjectsIfEmpty();
+    await seedClientsIfEmpty();
 
     console.log("✅ MySQL Initialized successfully");
   } catch (err) {
