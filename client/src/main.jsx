@@ -5,14 +5,17 @@ import "./index.css";
 import App from "./App.jsx";
 import { TransitionProvider } from "../src/custom/TransitionContext";
 import ScrollToTop from "../src/custom/ScrollToTop";
-import { pageview } from "../scripts/analytics";
 
 // Analytics tracker component for SPA pageview tracking
 function AnalyticsTracker() {
   const location = useLocation();
 
   useEffect(() => {
-    pageview(location.pathname + location.search);
+    if (typeof window !== "undefined" && window.gtag) {
+      window.gtag("config", import.meta.env.VITE_GA_ID || "", {
+        page_path: location.pathname + location.search,
+      });
+    }
   }, [location]);
 
   return null;

@@ -48,9 +48,7 @@ export default function Contact() {
     e.preventDefault();
 
     try {
-      const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/contact-enquiries`,
-        {
+      const response = await fetch(`/api/contact-enquiries`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

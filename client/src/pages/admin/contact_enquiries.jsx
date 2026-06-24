@@ -15,7 +15,7 @@ import {
 import * as XLSX from "xlsx";
 import { useAuth } from "../../context/AuthContext";
 
-const API = import.meta.env.VITE_API_URL || "http://localhost:5000";
+const API = "";
 
 export default function ContactEnquiries() {
     const { authFetch } = useAuth();
@@ -34,7 +34,7 @@ export default function ContactEnquiries() {
     const fetchEnquiries = async () => {
         try {
             setLoading(true);
-            const response = await fetch(`${API}/api/contact-enquiries`);
+            const response = await fetch(`/api/contact-enquiries`);
             const data = await response.json();
             setEnquiries(Array.isArray(data) ? data : []);
         } catch (error) {

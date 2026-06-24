@@ -73,7 +73,7 @@ export default function AdminBlog() {
     });
     setEditingId(blog.id);
     setCoverFile(null);
-    setCoverPreview(blog.coverImage ? `${import.meta.env.VITE_API_URL || "http://localhost:5000"}${blog.coverImage}` : "");
+    setCoverPreview(blog.coverImage ? `${API}${blog.coverImage}` : "");
   };
 
   const handleSubmit = async (e) => {
@@ -327,7 +327,7 @@ export default function AdminBlog() {
                 <div className="w-16 h-10 rounded-lg overflow-hidden bg-white/[0.04] shrink-0">
                   {blog.coverImage ? (
                     <img
-                      src={`${import.meta.env.VITE_API_URL || "http://localhost:5000"}${blog.coverImage}`}
+                      src={`${API}${blog.coverImage}`}
                       alt={blog.title}
                       className="w-full h-full object-cover"
                     />
