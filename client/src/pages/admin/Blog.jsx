@@ -1,6 +1,11 @@
 import { useEffect, useState, useRef } from "react";
 import { Plus, Trash2, Edit3, X, Eye, EyeOff, Image as ImageIcon } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
+// 1. Import your dynamic API configuration here 👇
+import { API } from "../../config/api"; 
+
+// 2. OR add a safe global fallback string if config isn't rendering during build
+const BACKEND_URL = typeof API !== "undefined" ? API : "https://web-production-12c9d.up.railway.app";
 
 const initialForm = {
   title: "",
@@ -73,7 +78,8 @@ export default function AdminBlog() {
     });
     setEditingId(blog.id);
     setCoverFile(null);
-    setCoverPreview(blog.coverImage ? `${API}${blog.coverImage}` : "");
+    // Fixed reference to target BACKEND_URL safely 🛡️
+    setCoverPreview(blog.coverImage ? `${BACKEND_URL}${blog.coverImage}` : "");
   };
 
   const handleSubmit = async (e) => {
@@ -135,7 +141,10 @@ export default function AdminBlog() {
   const handleTogglePublish = async (blog) => {
     try {
       const formData = new FormData();
-      formData.append("published", blog.published ? "0" : "1");
+      // Explicitly check boolean fallback wrapper to bypass 1/0 integer interpretation bugs ⚙️
+      const isCurrentlyPublished = !!blog.published;
+      formData.append("published", isCurrentlyPublished ? "0" : "1");
+      
       await authFetch(`/api/admin/blogs/${blog.id}`, {
         method: "PATCH",
         body: formData,
@@ -327,7 +336,8 @@ export default function AdminBlog() {
                 <div className="w-16 h-10 rounded-lg overflow-hidden bg-white/[0.04] shrink-0">
                   {blog.coverImage ? (
                     <img
-                      src={`${API}${blog.coverImage}`}
+                      // Fixed reference to target BACKEND_URL safely 🛡️
+                      src={`${BACKEND_URL}${blog.coverImage}`}
                       alt={blog.title}
                       className="w-full h-full object-cover"
                     />
