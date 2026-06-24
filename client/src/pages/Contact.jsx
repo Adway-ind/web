@@ -29,6 +29,8 @@ const contactInfo = [
   },
 ];
 
+const API_URL = import.meta.env.VITE_API_URL
+
 export default function Contact() {
   const [formData, setFormData] = useState({
     name: "",
@@ -48,13 +50,15 @@ export default function Contact() {
     e.preventDefault();
 
     try {
-      const response = await fetch(`/api/contact-enquiries`, {
+      const response = await fetch(
+        `${API_URL}/api/contact-enquiries`,
+        {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
           body: JSON.stringify(formData),
-        },
+        }
       );
 
       const data = await response.json();
@@ -108,7 +112,7 @@ export default function Contact() {
             }}
           >
             Let's start
-            <br />{" "} 
+            <br />{" "}
             <em className="text-blue-500" style={{ fontStyle: "italic" }}>
               something great
             </em>
