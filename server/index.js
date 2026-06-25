@@ -24,7 +24,7 @@ const GALLERY_DIR = "/data/uploads/gallery";
 const RESUME_DIR = path.join(UPLOAD_DIR, "resumes");
 const LOGO_DIR = path.join(UPLOAD_DIR, "logos");
 const BLOG_DIR = path.join(UPLOAD_DIR, "blogs");
-const nodemailer = require("nodemailer")
+// const nodemailer = require("nodemailer")
 
 if (!fs.existsSync(COVER_DIR)) {
   fs.mkdirSync(COVER_DIR, { recursive: true });
@@ -1533,18 +1533,18 @@ app.get("/api/projects/:slug", async (req, res) => {
   }
 });
 
-const transporter = nodemailer.createTransport({
-  host: "smtp.gmail.com",
-  port: 587,
-  secure: false,
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
-  },
-  tls: {
-    rejectUnauthorized: false,
-  },
-});
+// const transporter = nodemailer.createTransport({
+//   host: "smtp.gmail.com",
+//   port: 587,
+//   secure: false,
+//   auth: {
+//     user: process.env.EMAIL_USER,
+//     pass: process.env.EMAIL_PASS,
+//   },
+//   tls: {
+//     rejectUnauthorized: false,
+//   },
+// });
 
 if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
   console.warn("⚠️  EMAIL_USER or EMAIL_PASS is not configured. Candidate confirmation emails will not be sent.");
@@ -1555,13 +1555,13 @@ console.log("📎 Mail config:", {
   EMAIL_PASS: !!process.env.EMAIL_PASS,
 });
 
-transporter.verify((error, success) => {
-  if (error) {
-    console.error("SMTP Error:", error);
-  } else {
-    console.log("✅ SMTP Server Ready", success ? "(verified)" : "");
-  }
-});
+// transporter.verify((error, success) => {
+//   if (error) {
+//     console.error("SMTP Error:", error);
+//   } else {
+//     console.log("✅ SMTP Server Ready", success ? "(verified)" : "");
+//   }
+// });
 
 app.post("/api/applications", apiLimiter, resumeUpload.single("resume"), async (req, res) => {
   console.log("🔥 Application endpoint hit");
@@ -1955,23 +1955,63 @@ app.get("/api/admin/stats/history", authMiddleware, async (req, res) => {
 app.post("/api/admin/send-email", authMiddleware, async (req, res) => {
   try {
     const { to, subject, message } = req.body;
+
     if (!to || !subject || !message) {
-      return res.status(400).json({ error: "To, subject, and message are required." });
+      return res.status(400).json({
+        error: "To, subject, and message are required.",
+      });
     }
 
-    await transporter.sendMail({
-      from: `"Adway Admin" <${process.env.EMAIL_USER}>`,
+    const data = await resend.emails.send({
+      from: "Adway Admin <onboarding@resend.dev>",
       to,
       subject,
       html: `
-        <!-- Header --> <div style="padding:30px;text-align:center;border-bottom:1px solid #e5e7eb;"> <img src="${process.env.CLIENT_URL}/logo.png" alt="Adway Creations" style="height:40px;" /> </div> <!-- Content --> <div style="padding:40px 32px;"> <div style="font-size:15px;line-height:1.8;color:#374151;"> ${message.replace(/\n/g, "<br/>")} </div> </div> <!-- Footer --> <div style="padding:24px 32px;background:#fafafa;border-top:1px solid #e5e7eb;"> <p style="margin:0;font-size:14px;color:#4b5563;"> Regards,<br /> <strong>Adway Creations Team</strong> </p> <p style="margin:16px 0 0;font-size:12px;color:#9ca3af;"> © ${new Date().getFullYear()} Adway Creations. All rights reserved. </p> </div> </div> </div>
+        <div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;max-width:650px;margin:0 auto;background:#fff;border:1px solid #e5e7eb;border-radius:12px;overflow:hidden;">
+
+          <!-- Header -->
+          <div style="padding:30px;text-align:center;border-bottom:1px solid #e5e7eb;">
+            <img src="${process.env.CLIENT_URL}/logo.png"
+                 alt="Adway Creations"
+                 style="height:40px;" />
+          </div>
+
+          <!-- Content -->
+          <div style="padding:40px 32px;">
+            <div style="font-size:15px;line-height:1.8;color:#374151;">
+              ${message.replace(/\n/g, "<br/>")}
+            </div>
+          </div>
+
+          <!-- Footer -->
+          <div style="padding:24px 32px;background:#fafafa;border-top:1px solid #e5e7eb;">
+            <p style="margin:0;font-size:14px;color:#4b5563;">
+              Regards,<br />
+              <strong>Adway Creations Team</strong>
+            </p>
+
+            <p style="margin:16px 0 0;font-size:12px;color:#9ca3af;">
+              © ${new Date().getFullYear()} Adway Creations. All rights reserved.
+            </p>
+          </div>
+
+        </div>
       `,
     });
 
-    res.json({ success: true });
+    console.log("Admin email sent:", data);
+
+    res.json({
+      success: true,
+      email: data,
+    });
+
   } catch (err) {
     console.error("Send email error:", err);
-    res.status(500).json({ error: err.message });
+
+    res.status(500).json({
+      error: err.message,
+    });
   }
 });
 
