@@ -15,9 +15,7 @@ const sharp = require("sharp");
 const ExcelJS = require("exceljs");
 const { google } = require("googleapis");
 const path = require("path");
-// const UPLOAD_DIR = path.join(__dirname, "uploads");
-// const COVER_DIR = path.join(UPLOAD_DIR, "covers");
-// const GALLERY_DIR = path.join(UPLOAD_DIR, "gallery");
+
 const UPLOAD_DIR = "/data/uploads";
 const COVER_DIR = "/data/uploads/covers";
 const GALLERY_DIR = "/data/uploads/gallery";
@@ -67,8 +65,9 @@ const db = require("./config/db");
 //   })
 // );
 
-const UPLOAD_DIR = "/data/uploads";
+// const UPLOAD_DIR = "/data/uploads";
 
+// Variable is already declared at the top, we just reference it here
 console.log("📁 Upload directory:", UPLOAD_DIR);
 
 app.use(
@@ -1930,7 +1929,7 @@ app.post("/api/admin/send-email", authMiddleware, async (req, res) => {
 app.get("/api/blogs", async (req, res) => {
   try {
     const { category } = req.query;
-    
+
     // 1. Fixed: Removed duplicate columns (cover_image, reading_time) to prevent database crashes
     // 2. Fixed: Loosened validation to check for integers, strings, or booleans for 'published'
     let sql = `
@@ -1939,15 +1938,15 @@ app.get("/api/blogs", async (req, res) => {
       FROM blogs 
       WHERE (published = 1 OR published = '1' OR published = true)
     `;
-    
+
     const params = [];
     if (category && category !== "All") {
       sql += " AND category = ?";
       params.push(category);
     }
-    
+
     sql += " ORDER BY created_at DESC";
-    
+
     const [rows] = await db.query(sql, params);
     res.json(rows);
   } catch (err) {
