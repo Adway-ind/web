@@ -447,7 +447,7 @@ export default function Apply() {
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="group inline-flex items-center gap-2.5 px-7 py-3.5 bg-accent hover:bg-accent/90 text-white text-sm font-medium rounded-lg transition-all duration-200 active:scale-[0.98] shrink-0 disabled:cursor-not-allowed disabled:opacity-60"
+                  className="group inline-flex items-center gap-2.5 px-7 py-3.5 bg-accent hover:bg-accent/90 text-black text-sm font-medium rounded-lg transition-all duration-200 active:scale-[0.98] shrink-0 disabled:cursor-not-allowed disabled:opacity-60"
                 >
                   {submitting ? "Submitting…" : "Submit application"}
                   <svg
