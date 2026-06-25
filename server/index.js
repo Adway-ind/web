@@ -1,4 +1,6 @@
 require("dotenv").config();
+const { Resend } = require("resend");
+const resend = new Resend(process.env.RESEND_API_KEY);
 const express = require("express");
 const cors = require("cors");
 const app = express();
@@ -1592,32 +1594,34 @@ app.post("/api/applications", apiLimiter, resumeUpload.single("resume"), async (
 
     // 4. Draft the premium dark/minimal themed automated candidate email
     const confirmationEmail = {
-      from: `"Adway Careers" <${process.env.EMAIL_USER}>`,
-      to: email, // Candidate's email address
+      from: "Adway Careers <onboarding@resend.dev>",
+      to: email,
       subject: `Application Received — ${position}`,
       html: `
-        <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 550px; margin: 0 auto; padding: 40px 32px; color: #111111; background-color: #ffffff; border: 1px solid #e5e7eb; border-radius: 12px;">
-          <h2 style="font-size: 20px; font-weight: 600; color: #111111; margin-bottom: 16px; letter-spacing: -0.02em;">Hi ${name},</h2>
-          
-          <p style="font-size: 15px; line-height: 1.6; color: #4b5563; margin-bottom: 24px;">
-            Thank you for applying to join our team at Adway. We have safely received your submission data and files for the <strong>${position}</strong> opening.
-          </p>
-          
-          <div style="background-color: #f9fafb; padding: 16px 20px; border-left: 3px solid #111111; margin-bottom: 24px; border-radius: 4px;">
-            <p style="margin: 0; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: #9ca3af; font-weight: 600;">Submission Parameters</p>
-            <p style="margin: 6px 0 0 0; font-size: 14px; color: #1f2937;"><strong>Target Position:</strong> ${position}</p>
-          </div>
+    <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 550px; margin: 0 auto; padding: 40px 32px; color: #111111; background-color: #ffffff; border: 1px solid #e5e7eb; border-radius: 12px;">
+      <h2 style="font-size: 20px; font-weight: 600; color: #111111; margin-bottom: 16px;">
+        Hi ${name},
+      </h2>
 
-          <p style="font-size: 15px; line-height: 1.6; color: #4b5563; margin-bottom: 32px;">
-            Our talent acquisition team evaluates applicant portfolios individually. If your expertise aligns with our current creative goals, we will follow up with you within 5–7 business days to arrange an interview.
-          </p>
+      <p style="font-size: 15px; line-height: 1.6; color: #4b5563;">
+        Thank you for applying to join our team at Adway. We have safely received your submission for the <strong>${position}</strong> opening.
+      </p>
 
-          <hr style="border: 0; border-top: 1px solid #e5e7eb; margin-bottom: 20px;" />
-          <p style="font-size: 11px; text-align: center; color: #9ca3af; margin: 0;">
-            This automated verification was dispatched by Adway Systems.
-          </p>
-        </div>
-      `,
+      <div style="background-color: #f9fafb; padding: 16px 20px; border-left: 3px solid #111111; margin: 24px 0;">
+        <strong>Target Position:</strong> ${position}
+      </div>
+
+      <p style="font-size: 15px; line-height: 1.6; color: #4b5563;">
+        Our talent acquisition team evaluates applications individually. If your profile matches our requirements, we will contact you within 5–7 business days.
+      </p>
+
+      <hr style="border:0; border-top:1px solid #e5e7eb; margin:20px 0;" />
+
+      <p style="font-size:11px; text-align:center; color:#9ca3af;">
+        This automated verification was dispatched by Adway Systems.
+      </p>
+    </div>
+  `,
     };
 
     console.log("🔔 Email attempt details:", {
@@ -1631,30 +1635,39 @@ app.post("/api/applications", apiLimiter, resumeUpload.single("resume"), async (
     let mailResult = null;
     if (process.env.EMAIL_USER && process.env.EMAIL_PASS) {
       try {
-        console.log("📤 Sending confirmation email...");
-        const info = await transporter.sendMail(confirmationEmail);
-        mailResult = { success: true, messageId: info.messageId };
-        console.log(`✅ Confirmation email sent: ${info.messageId}`);
-      } catch (mailError) {
-        mailResult = { success: false, error: mailError.message };
-        console.error("❌ Nodemailer routing failure:", mailError);
-      }
-    } else {
-      mailResult = {
-        success: false,
-        error: "EMAIL_USER or EMAIL_PASS is not configured",
-      };
-      console.warn("⚠️ Skipping candidate confirmation email because EMAIL_USER or EMAIL_PASS is not configured.");
-    }
+        console.log("📤 Sending confirmation email via Resend...");
 
-    // 6. Respond immediately to the frontend application layout frame
-    console.log("📣 Application response mail result:", mailResult);
-    res.status(201).json({ success: true, id: appId, mail: mailResult });
-  } catch (err) {
-    console.error("Application routing system encountered an issue:", err);
-    res.status(500).json({ error: "Failed to save application", details: err.message });
-  }
-});
+        const data = await resend.emails.send({
+          from: confirmationEmail.from,
+          to: confirmationEmail.to,
+          subject: confirmationEmail.subject,
+          html: confirmationEmail.html,
+        });
+
+        mailResult = {
+          success: true,
+          id: data.data?.id,
+        };
+
+        console.log("✅ Confirmation email sent:", data);
+
+      } catch (mailError) {
+        mailResult = {
+          success: false,
+          error: mailError.message,
+        };
+
+        console.error("❌ Resend failure:", mailError);
+      }
+
+      // 6. Respond immediately to the frontend application layout frame
+      console.log("📣 Application response mail result:", mailResult);
+      res.status(201).json({ success: true, id: appId, mail: mailResult });
+    } catch (err) {
+      console.error("Application routing system encountered an issue:", err);
+      res.status(500).json({ error: "Failed to save application", details: err.message });
+    }
+  });
 
 app.post("/api/messages", apiLimiter, (req, res) => {
   const { name, email, subject, message } = req.body;
