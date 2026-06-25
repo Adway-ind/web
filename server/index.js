@@ -1566,108 +1566,148 @@ transporter.verify((error, success) => {
 app.post("/api/applications", apiLimiter, resumeUpload.single("resume"), async (req, res) => {
   console.log("🔥 Application endpoint hit");
   console.log("Body:", req.body);
+
   const { name, email, position, phone, portfolio, linkedin, coverNote } = req.body;
-  if (!name || !email || !position)
-    return res.status(400).json({ error: "Name, email, and position are required" });
+
+  if (!name || !email || !position) {
+    return res.status(400).json({
+      error: "Name, email, and position are required"
+    });
+  }
 
   let resumePath = "";
+
   if (req.file) {
-    const safeName = `${Date.now()}-${req.file.originalname.replace(/[^a-zA-Z0-9.\-_]/g, "-")}`;
+    const safeName = `${Date.now()}-${req.file.originalname.replace(
+      /[^a-zA-Z0-9.\-_]/g,
+      "-"
+    )}`;
+
     const filePath = path.join(RESUME_DIR, safeName);
+
     fs.writeFileSync(filePath, req.file.buffer);
+
     resumePath = `/uploads/resumes/${safeName}`;
   }
 
   try {
-    // 2. Insert application into MySQL
+    // Save application to MySQL
     const appId = crypto.randomUUID();
+
     await db.query(
-      `INSERT INTO applications (id, name, email, position, phone, portfolio, linkedin, coverNote, resume, status, created_at, updated_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'new', NOW(), NOW())`,
-      [appId, name, email, position, phone || "", portfolio || "", linkedin || "", coverNote || "", resumePath]
+      `INSERT INTO applications
+      (id, name, email, position, phone, portfolio, linkedin, coverNote, resume, status, created_at, updated_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'new', NOW(), NOW())`,
+      [
+        appId,
+        name,
+        email,
+        position,
+        phone || "",
+        portfolio || "",
+        linkedin || "",
+        coverNote || "",
+        resumePath
+      ]
     );
 
-    // 3. Trigger cloud workbook sync logic asynchronously in background (if configured)
+    // Background sync
     syncApplicationRecords().catch((syncErr) => {
-      console.error("Background spreadsheet synchronization failed:", syncErr.message);
+      console.error(
+        "Background spreadsheet synchronization failed:",
+        syncErr.message
+      );
     });
 
-    // 4. Draft the premium dark/minimal themed automated candidate email
+    // Email template
     const confirmationEmail = {
       from: "Adway Careers <onboarding@resend.dev>",
       to: email,
       subject: `Application Received — ${position}`,
       html: `
-    <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 550px; margin: 0 auto; padding: 40px 32px; color: #111111; background-color: #ffffff; border: 1px solid #e5e7eb; border-radius: 12px;">
-      <h2 style="font-size: 20px; font-weight: 600; color: #111111; margin-bottom: 16px;">
-        Hi ${name},
-      </h2>
+        <div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;max-width:550px;margin:0 auto;padding:40px 32px;color:#111;background:#fff;border:1px solid #e5e7eb;border-radius:12px;">
 
-      <p style="font-size: 15px; line-height: 1.6; color: #4b5563;">
-        Thank you for applying to join our team at Adway. We have safely received your submission for the <strong>${position}</strong> opening.
-      </p>
+          <h2 style="font-size:20px;font-weight:600;margin-bottom:16px;">
+            Hi ${name},
+          </h2>
 
-      <div style="background-color: #f9fafb; padding: 16px 20px; border-left: 3px solid #111111; margin: 24px 0;">
-        <strong>Target Position:</strong> ${position}
-      </div>
+          <p style="font-size:15px;line-height:1.6;color:#4b5563;">
+            Thank you for applying to join our team at Adway. We have safely received your submission for the <strong>${position}</strong> opening.
+          </p>
 
-      <p style="font-size: 15px; line-height: 1.6; color: #4b5563;">
-        Our talent acquisition team evaluates applications individually. If your profile matches our requirements, we will contact you within 5–7 business days.
-      </p>
+          <div style="background:#f9fafb;padding:16px 20px;border-left:3px solid #111;margin:24px 0;">
+            <strong>Target Position:</strong> ${position}
+          </div>
 
-      <hr style="border:0; border-top:1px solid #e5e7eb; margin:20px 0;" />
+          <p style="font-size:15px;line-height:1.6;color:#4b5563;">
+            Our talent acquisition team evaluates applications individually.
+            If your profile matches our requirements, we will contact you within 5–7 business days.
+          </p>
 
-      <p style="font-size:11px; text-align:center; color:#9ca3af;">
-        This automated verification was dispatched by Adway Systems.
-      </p>
-    </div>
-  `,
+          <hr style="border:0;border-top:1px solid #e5e7eb;margin:20px 0;" />
+
+          <p style="font-size:11px;text-align:center;color:#9ca3af;">
+            This automated verification was dispatched by Adway Systems.
+          </p>
+
+        </div>
+      `
     };
 
     console.log("🔔 Email attempt details:", {
       to: email,
-      subject: confirmationEmail.subject,
-      smtpUserConfigured: !!process.env.EMAIL_USER,
-      smtpPassConfigured: !!process.env.EMAIL_PASS,
+      subject: confirmationEmail.subject
     });
 
-    // 5. Send the confirmation email and include the result in the response for debugging
+    // Send email using Resend
     let mailResult = null;
-    if (process.env.EMAIL_USER && process.env.EMAIL_PASS) {
-      try {
-        console.log("📤 Sending confirmation email via Resend...");
 
-        const data = await resend.emails.send({
-          from: confirmationEmail.from,
-          to: confirmationEmail.to,
-          subject: confirmationEmail.subject,
-          html: confirmationEmail.html,
-        });
+    try {
+      console.log("📤 Sending confirmation email via Resend...");
 
-        mailResult = {
-          success: true,
-          id: data.data?.id,
-        };
+      const data = await resend.emails.send({
+        from: confirmationEmail.from,
+        to: confirmationEmail.to,
+        subject: confirmationEmail.subject,
+        html: confirmationEmail.html
+      });
 
-        console.log("✅ Confirmation email sent:", data);
+      mailResult = {
+        success: true,
+        id: data.data?.id || data.id
+      };
 
-      } catch (mailError) {
-        mailResult = {
-          success: false,
-          error: mailError.message,
-        };
+      console.log("✅ Confirmation email sent:", data);
 
-        console.error("❌ Resend failure:", mailError);
-      }
+    } catch (mailError) {
+      mailResult = {
+        success: false,
+        error: mailError.message
+      };
 
-      // 6. Respond immediately to the frontend application layout frame
-      console.log("📣 Application response mail result:", mailResult);
-      res.status(201).json({ success: true, id: appId, mail: mailResult });
-    } catch (err) {
-      console.error("Application routing system encountered an issue:", err);
-      res.status(500).json({ error: "Failed to save application", details: err.message });
+      console.error("❌ Resend failure:", mailError);
     }
-  });
+
+    console.log("📣 Application response mail result:", mailResult);
+
+    return res.status(201).json({
+      success: true,
+      id: appId,
+      mail: mailResult
+    });
+
+  } catch (err) {
+    console.error(
+      "Application routing system encountered an issue:",
+      err
+    );
+
+    return res.status(500).json({
+      error: "Failed to save application",
+      details: err.message
+    });
+  }
+});
 
 app.post("/api/messages", apiLimiter, (req, res) => {
   const { name, email, subject, message } = req.body;
