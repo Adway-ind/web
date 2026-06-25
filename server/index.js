@@ -2,6 +2,7 @@ require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const app = express();
+const fs = require("fs");
 
 app.set("trust proxy", 1);
 const helmet = require("helmet");
@@ -15,9 +16,12 @@ const sharp = require("sharp");
 const ExcelJS = require("exceljs");
 const { google } = require("googleapis");
 const path = require("path");
-const UPLOAD_DIR = path.join(__dirname, "uploads");
-const COVER_DIR = path.join(UPLOAD_DIR, "covers");
-const GALLERY_DIR = path.join(UPLOAD_DIR, "gallery");
+// const UPLOAD_DIR = path.join(__dirname, "uploads");
+// const COVER_DIR = path.join(UPLOAD_DIR, "covers");
+// const GALLERY_DIR = path.join(UPLOAD_DIR, "gallery");
+const UPLOAD_DIR = "/data/uploads";
+const COVER_DIR = "/data/uploads/covers";
+const GALLERY_DIR = "/data/uploads/gallery";
 const RESUME_DIR = path.join(UPLOAD_DIR, "resumes");
 const LOGO_DIR = path.join(UPLOAD_DIR, "logos");
 const BLOG_DIR = path.join(UPLOAD_DIR, "blogs");
@@ -45,12 +49,33 @@ if (!fs.existsSync(BLOG_DIR)) {
 
 const db = require("./config/db");
 
+const fs = require("fs");
 
-console.log("📁 Server directory:", __dirname);
+[UPLOAD_DIR, COVER_DIR, GALLERY_DIR].forEach((dir) => {
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir, { recursive: true });
+  }
+});
+
+
+// console.log("📁 Server directory:", __dirname);
+
+// app.use(
+//   "/uploads",
+//   express.static(path.join(__dirname, "uploads"), {
+//     setHeaders: (res) => {
+//       res.setHeader("Cross-Origin-Resource-Policy", "cross-origin");
+//     },
+//   })
+// );
+
+const UPLOAD_DIR = "/data/uploads";
+
+console.log("📁 Upload directory:", UPLOAD_DIR);
 
 app.use(
   "/uploads",
-  express.static(path.join(__dirname, "uploads"), {
+  express.static(UPLOAD_DIR, {
     setHeaders: (res) => {
       res.setHeader("Cross-Origin-Resource-Policy", "cross-origin");
     },
