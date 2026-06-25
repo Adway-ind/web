@@ -48,7 +48,6 @@ if (!fs.existsSync(BLOG_DIR)) {
 
 const db = require("./config/db");
 
-const fs = require("fs");
 
 [UPLOAD_DIR, COVER_DIR, GALLERY_DIR].forEach((dir) => {
   if (!fs.existsSync(dir)) {
