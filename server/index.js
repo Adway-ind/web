@@ -343,6 +343,8 @@ function buildApplicationTableRows(apps) {
     "Phone",
     "Portfolio",
     "LinkedIn",
+    "Experience",
+    "Earliest Start Date",
     "Cover Note",
     "Resume",
     "Status",
@@ -358,6 +360,8 @@ function buildApplicationTableRows(apps) {
     app.phone || "",
     app.portfolio || "",
     app.linkedin || "",
+    app.experience || "",
+    app.startDate || app.start_date || "",
     app.coverNote || "",
     app.resume || "",
     app.status || "",
@@ -1567,7 +1571,7 @@ app.post("/api/applications", apiLimiter, resumeUpload.single("resume"), async (
   console.log("🔥 Application endpoint hit");
   console.log("Body:", req.body);
 
-  const { name, email, position, phone, portfolio, linkedin, coverNote } = req.body;
+  const { name, email, position, phone, portfolio, linkedin, experience, startDate, coverNote } = req.body;
 
   if (!name || !email || !position) {
     return res.status(400).json({
@@ -1596,8 +1600,8 @@ app.post("/api/applications", apiLimiter, resumeUpload.single("resume"), async (
 
     await db.query(
       `INSERT INTO applications
-      (id, name, email, position, phone, portfolio, linkedin, coverNote, resume, status, created_at, updated_at)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'new', NOW(), NOW())`,
+      (id, name, email, position, phone, portfolio, linkedin, experience_years, earliest_start_date, coverNote, resume, status, created_at, updated_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'new', NOW(), NOW())`,
       [
         appId,
         name,
@@ -1606,7 +1610,11 @@ app.post("/api/applications", apiLimiter, resumeUpload.single("resume"), async (
         phone || "",
         portfolio || "",
         linkedin || "",
+        experience || "",
+        startDate || null,
         coverNote || "",
+        experience || "",
+        startDate || null,
         resumePath
       ]
     );
@@ -1751,12 +1759,27 @@ app.listen(PORT, async () => {
       phone VARCHAR(50) DEFAULT '',
       portfolio VARCHAR(255) DEFAULT '',
       linkedin VARCHAR(255) DEFAULT '',
+      experience VARCHAR(50) DEFAULT '',
+      startDate DATE DEFAULT NULL,
       coverNote TEXT,
       resume VARCHAR(255) DEFAULT '',
       status VARCHAR(50) NOT NULL DEFAULT 'new',
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
       updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
     )`);
+
+    const ensureColumn = async (table, column, definition) => {
+      const [columns] = await db.query(
+        "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = ? AND COLUMN_NAME = ?",
+        [table, column]
+      );
+      if (columns.length === 0) {
+        await db.query(`ALTER TABLE \`${table}\` ADD COLUMN \`${column}\` ${definition}`);
+      }
+    };
+
+    await ensureColumn("applications", "experience", "VARCHAR(50) DEFAULT ''");
+    await ensureColumn("applications", "startDate", "DATE DEFAULT NULL");
 
     await db.query(`CREATE TABLE IF NOT EXISTS career_jobs (
       id INT AUTO_INCREMENT PRIMARY KEY,

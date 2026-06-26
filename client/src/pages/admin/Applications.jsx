@@ -1,5 +1,6 @@
-import { useState, useEffect } from "react";
+import { useCallback, useState, useEffect } from "react";
 import { useAuth } from "../../context/AuthContext";
+import { buildApiUrl } from "../../config/api";
 import {
   Briefcase,
   Search,
@@ -7,9 +8,12 @@ import {
   Trash2,
   Eye,
   EyeOff,
-  ExternalLink,
   ChevronDown,
-  Download, // Imported the Download icon for the button
+  Download,
+  CalendarDays,
+  Clock,
+  Globe2,
+  Link,
 } from "lucide-react";
 import * as XLSX from "xlsx"; // Imported the installed Excel tool
 
@@ -23,6 +27,21 @@ const STATUS_COLORS = {
 
 const STATUS_OPTIONS = ["new", "reviewed", "shortlisted", "rejected", "hired"];
 
+const getResumeUrl = (resume) => {
+  if (!resume) return "";
+  if (/^https?:\/\//i.test(resume)) return resume;
+  return buildApiUrl(resume);
+};
+
+const getApplicationDate = (app) => app.createdAt || app.created_at || "";
+
+const formatDate = (value, fallback = "Not provided") => {
+  if (!value) return fallback;
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return fallback;
+  return date.toLocaleDateString();
+};
+
 export default function Applications() {
   const { authFetch } = useAuth();
   const [applications, setApplications] = useState([]);
@@ -31,14 +50,14 @@ export default function Applications() {
   const [filterStatus, setFilterStatus] = useState("all");
   const [expanded, setExpanded] = useState(null);
 
-  const fetchApps = () => {
+  const fetchApps = useCallback(() => {
     authFetch("/api/admin/applications")
       .then(setApplications)
-      .catch(() => { })
+      .catch((err) => console.error("Failed to load applications:", err))
       .finally(() => setLoading(false));
-  };
+  }, [authFetch]);
 
-  useEffect(() => { fetchApps(); }, []);
+  useEffect(() => { fetchApps(); }, [fetchApps]);
 
   const updateStatus = async (id, status) => {
     try {
@@ -47,7 +66,9 @@ export default function Applications() {
         body: JSON.stringify({ status }),
       });
       setApplications((prev) => prev.map((a) => (a.id === id ? updated : a)));
-    } catch { }
+    } catch (err) {
+      console.error("Failed to update application status:", err);
+    }
   };
 
   const deleteApp = async (id) => {
@@ -55,7 +76,9 @@ export default function Applications() {
     try {
       await authFetch(`/api/admin/applications/${id}`, { method: "DELETE" });
       setApplications((prev) => prev.filter((a) => a.id !== id));
-    } catch { }
+    } catch (err) {
+      console.error("Failed to delete application:", err);
+    }
   };
 
   const filtered = applications.filter((a) => {
@@ -78,8 +101,10 @@ export default function Applications() {
       "Email Address": app.email,
       "Phone Number": app.phone || "N/A",
       "Position Applied": app.position,
+      "Years of Experience": app.experience || "N/A",
+      "Earliest Start Date": formatDate(app.startDate || app.start_date, "N/A"),
       "Current Status": app.status.toUpperCase(),
-      "Submission Date": new Date(app.createdAt).toLocaleDateString(),
+      "Submission Date": formatDate(getApplicationDate(app), "N/A"),
       "Portfolio Link": app.portfolio || "N/A",
       "LinkedIn Profile": app.linkedin || "N/A",
       "Cover Note Summary": app.coverNote || "No cover note provided",
@@ -188,6 +213,19 @@ export default function Applications() {
                   </div>
 
                   <div className="flex items-center gap-2 shrink-0">
+                    {app.resume && (
+                      <a
+                        href={getResumeUrl(app.resume)}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        download
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/15 transition-all text-[11px] font-semibold uppercase tracking-wider"
+                        title="Download uploaded resume"
+                      >
+                        <Download className="w-3.5 h-3.5" />
+                        Resume
+                      </a>
+                    )}
                     <select
                       value={app.status}
                       onChange={(e) => updateStatus(app.id, e.target.value)}
@@ -224,8 +262,14 @@ export default function Applications() {
                     <Briefcase className="w-3 h-3" />
                     {app.position}
                   </span>
+                  {app.experience && (
+                    <span className="flex items-center gap-1">
+                      <Clock className="w-3 h-3" />
+                      {app.experience}
+                    </span>
+                  )}
                   {app.phone && <span>{app.phone}</span>}
-                  <span>{new Date(app.createdAt).toLocaleDateString()}</span>
+                  <span>{formatDate(getApplicationDate(app))}</span>
                 </div>
               </div>
 
@@ -233,9 +277,25 @@ export default function Applications() {
               {expanded === app.id && (
                 <div className="px-5 pb-5 pt-0 border-t border-white/[0.04] mt-0">
                   <div className="pt-4 space-y-3">
+                    {(app.experience || app.startDate || app.start_date) && (
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+                        {app.experience && (
+                          <div className="flex items-center gap-2 text-white/60">
+                            <Clock className="w-3.5 h-3.5 text-white/30" />
+                            <span>{app.experience}</span>
+                          </div>
+                        )}
+                        {(app.startDate || app.start_date) && (
+                          <div className="flex items-center gap-2 text-white/60">
+                            <CalendarDays className="w-3.5 h-3.5 text-white/30" />
+                            <span>{formatDate(app.startDate || app.start_date)}</span>
+                          </div>
+                        )}
+                      </div>
+                    )}
                     {app.portfolio && (
                       <div className="flex items-center gap-2 text-sm">
-                        <ExternalLink className="w-3.5 h-3.5 text-white/30" />
+                        <Globe2 className="w-3.5 h-3.5 text-white/30" />
                         <a
                           href={app.portfolio}
                           target="_blank"
@@ -248,7 +308,7 @@ export default function Applications() {
                     )}
                     {app.linkedin && (
                       <div className="flex items-center gap-2 text-sm">
-                        <ExternalLink className="w-3.5 h-3.5 text-white/30" />
+                        <Link className="w-3.5 h-3.5 text-white/30" />
                         <a
                           href={app.linkedin}
                           target="_blank"
@@ -270,9 +330,18 @@ export default function Applications() {
                       </div>
                     )}
                     {app.resume && (
-                      <p className="text-sm text-white/40">
-                        Resume: {app.resume}
-                      </p>
+                      <div className="flex items-center gap-2 text-sm">
+                        <Download className="w-3.5 h-3.5 text-white/30" />
+                        <a
+                          href={getResumeUrl(app.resume)}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          download
+                          className="text-emerald-400 hover:underline truncate"
+                        >
+                          Download uploaded resume
+                        </a>
+                      </div>
                     )}
                   </div>
                 </div>

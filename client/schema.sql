@@ -28,6 +28,8 @@ CREATE TABLE applications (
   phone VARCHAR(50),
   portfolio VARCHAR(255),
   linkedin VARCHAR(255),
+  experience VARCHAR(50) DEFAULT '',
+  startDate DATE DEFAULT NULL,
   coverNote TEXT,
   resume VARCHAR(255),
   status VARCHAR(50) DEFAULT 'new',

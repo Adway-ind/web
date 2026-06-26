@@ -33,6 +33,8 @@ CREATE TABLE IF NOT EXISTS applications (
   phone TEXT DEFAULT '',
   portfolio TEXT DEFAULT '',
   linkedin TEXT DEFAULT '',
+  experience TEXT DEFAULT '',
+  "startDate" DATE DEFAULT NULL,
   "coverNote" TEXT DEFAULT '',
   resume TEXT DEFAULT '',
   status TEXT NOT NULL DEFAULT 'new',
