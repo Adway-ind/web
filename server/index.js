@@ -1600,8 +1600,23 @@ app.post("/api/applications", apiLimiter, resumeUpload.single("resume"), async (
 
     await db.query(
       `INSERT INTO applications
-      (id, name, email, position, phone, portfolio, linkedin, experience_years, earliest_start_date, coverNote, resume, status, created_at, updated_at)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'new', NOW(), NOW())`,
+    (
+      id, 
+      name, 
+      email, 
+      position, 
+      phone, 
+      portfolio, 
+      linkedin, 
+      experience_years, 
+      earliest_start_date, 
+      coverNote, 
+      resume, 
+      status, 
+      created_at, 
+      updated_at
+    )
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'new', NOW(), NOW())`,
       [
         appId,
         name,
@@ -1610,12 +1625,10 @@ app.post("/api/applications", apiLimiter, resumeUpload.single("resume"), async (
         phone || "",
         portfolio || "",
         linkedin || "",
-        experience || "",
-        startDate || null,
-        coverNote || "",
-        experience || "",
-        startDate || null,
-        resumePath
+        experience || "",     // 1-to-1 match with experience_years
+        startDate || null,    // 1-to-1 match with earliest_start_date
+        coverNote || "",      // 1-to-1 match with coverNote
+        resumePath            // 1-to-1 match with resume
       ]
     );
 
