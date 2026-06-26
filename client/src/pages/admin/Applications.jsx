@@ -35,6 +35,10 @@ const getResumeUrl = (resume) => {
 
 const getApplicationDate = (app) => app.createdAt || app.created_at || "";
 
+const getExperience = (app) => app.experience || app.experience_years || "";
+
+const getStartDate = (app) => app.startDate || app.start_date || app.earliest_start_date || "";
+
 const formatDate = (value, fallback = "Not provided") => {
   if (!value) return fallback;
   const date = new Date(value);
@@ -99,8 +103,8 @@ export default function Applications() {
       "Email Address": app.email,
       "Phone Number": app.phone || "N/A",
       "Position Applied": app.position,
-      "Years of Experience": app.experience || app.experience_years || "N/A", // Fixed lookup
-      "Earliest Start Date": formatDate(app.startDate || app.earliest_start_date || app.start_date, "N/A"), // Fixed lookup
+      "Years of Experience": getExperience(app) || "N/A",
+      "Earliest Start Date": formatDate(getStartDate(app), "N/A"),
       "Current Status": app.status.toUpperCase(),
       "Submission Date": formatDate(getApplicationDate(app), "N/A"),
       "Portfolio Link": app.portfolio || "N/A",
@@ -258,10 +262,16 @@ export default function Applications() {
                     <Briefcase className="w-3 h-3" />
                     {app.position}
                   </span>
-                  {(app.experience || app.experience_years) && ( // Fixed lookup
+                  {getExperience(app) && (
                     <span className="flex items-center gap-1">
                       <Clock className="w-3 h-3" />
-                      {app.experience || app.experience_years}
+                      {getExperience(app)}
+                    </span>
+                  )}
+                  {getStartDate(app) && (
+                    <span className="flex items-center gap-1">
+                      <CalendarDays className="w-3 h-3" />
+                      {formatDate(getStartDate(app))}
                     </span>
                   )}
                   {app.phone && <span>{app.phone}</span>}
@@ -273,18 +283,24 @@ export default function Applications() {
               {expanded === app.id && (
                 <div className="px-5 pb-5 pt-0 border-t border-white/[0.04] mt-0">
                   <div className="pt-4 space-y-3">
-                    {(app.experience || app.experience_years || app.startDate || app.earliest_start_date || app.start_date) && (
+                    {(getExperience(app) || getStartDate(app)) && (
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
-                        {(app.experience || app.experience_years) && ( // Fixed lookup
+                        {getExperience(app) && (
                           <div className="flex items-center gap-2 text-white/60">
                             <Clock className="w-3.5 h-3.5 text-white/30" />
-                            <span>{app.experience || app.experience_years}</span>
+                            <div>
+                              <p className="text-[10px] uppercase tracking-[0.18em] text-white/25">Years of experience</p>
+                              <p>{getExperience(app)}</p>
+                            </div>
                           </div>
                         )}
-                        {(app.startDate || app.earliest_start_date || app.start_date) && ( // Fixed lookup
+                        {getStartDate(app) && (
                           <div className="flex items-center gap-2 text-white/60">
                             <CalendarDays className="w-3.5 h-3.5 text-white/30" />
-                            <span>{formatDate(app.startDate || app.earliest_start_date || app.start_date)}</span>
+                            <div>
+                              <p className="text-[10px] uppercase tracking-[0.18em] text-white/25">Earliest start date</p>
+                              <p>{formatDate(getStartDate(app))}</p>
+                            </div>
                           </div>
                         )}
                       </div>

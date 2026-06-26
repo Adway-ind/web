@@ -389,7 +389,17 @@ async function createApplicationsExcelBuffer(apps) {
 
 async function getAllApplications() {
   const [rows] = await db.query("SELECT * FROM applications ORDER BY created_at DESC");
-  return rows;
+  return rows.map(normalizeApplication);
+}
+
+function normalizeApplication(app) {
+  return {
+    ...app,
+    experience: app.experience ?? app.experience_years ?? "",
+    experience_years: app.experience_years ?? app.experience ?? "",
+    startDate: app.startDate ?? app.start_date ?? app.earliest_start_date ?? null,
+    earliest_start_date: app.earliest_start_date ?? app.startDate ?? app.start_date ?? null,
+  };
 }
 
 async function getGoogleAuth() {
@@ -679,7 +689,7 @@ app.get("/api/admin/stats", authMiddleware, async (req, res) => {
 app.get(["/api/admin/applications", "/api/admin/career-applications"], authMiddleware, async (req, res) => {
   try {
     const [rows] = await db.query("SELECT * FROM applications ORDER BY created_at DESC");
-    res.json(rows);
+    res.json(rows.map(normalizeApplication));
   } catch (err) {
     res.status(500).json({ error: "Failed to fetch applications", details: err.message });
   }
@@ -1793,6 +1803,8 @@ app.listen(PORT, async () => {
 
     await ensureColumn("applications", "experience", "VARCHAR(50) DEFAULT ''");
     await ensureColumn("applications", "startDate", "DATE DEFAULT NULL");
+    await ensureColumn("applications", "experience_years", "VARCHAR(50) DEFAULT ''");
+    await ensureColumn("applications", "earliest_start_date", "DATE DEFAULT NULL");
 
     await db.query(`CREATE TABLE IF NOT EXISTS career_jobs (
       id INT AUTO_INCREMENT PRIMARY KEY,
