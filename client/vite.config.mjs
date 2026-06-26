@@ -29,17 +29,8 @@ export default defineConfig({
     react(),
     tailwindcss(),
     {
-      name: "copy-robots-and-sitemap",
+      name: "generate-sitemap",
       async closeBundle() {
-        // Copy robots.txt to dist
-        const robotsSource = path.resolve(__dirname, "public/robots.txt");
-        const robotsDest = path.resolve(__dirname, "dist/robots.txt");
-        if (fs.existsSync(robotsSource)) {
-          fs.copyFileSync(robotsSource, robotsDest);
-          console.log("✅ robots.txt copied to dist");
-        }
-
-        // Generate sitemap directly
         const SITE_URL = "https://adway.agency";
         const routes = [
           { path: "/", priority: "1.0", changefreq: "daily" },
@@ -67,8 +58,12 @@ ${routes
 </urlset>`;
 
         const outputPath = path.resolve(__dirname, "dist/sitemap.xml");
-        fs.writeFileSync(outputPath, sitemap);
-        console.log("✅ sitemap.xml generated");
+        try {
+          fs.writeFileSync(outputPath, sitemap);
+          console.log("sitemap.xml generated");
+        } catch (error) {
+          console.warn(`sitemap.xml could not be generated: ${error.message}`);
+        }
       },
     },
   ],
