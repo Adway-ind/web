@@ -672,7 +672,7 @@ app.get("/api/admin/stats", authMiddleware, async (req, res) => {
 });
 
 // Applications CRUD
-app.get("/api/admin/applications", authMiddleware, async (req, res) => {
+app.get(["/api/admin/applications", "/api/admin/career-applications"], authMiddleware, async (req, res) => {
   try {
     const [rows] = await db.query("SELECT * FROM applications ORDER BY created_at DESC");
     res.json(rows);
@@ -681,7 +681,7 @@ app.get("/api/admin/applications", authMiddleware, async (req, res) => {
   }
 });
 
-app.patch("/api/admin/applications/:id/status", authMiddleware, async (req, res) => {
+app.patch(["/api/admin/applications/:id/status", "/api/admin/career-applications/:id/status"], authMiddleware, async (req, res) => {
   const { status } = req.body;
   if (!["new", "reviewed", "shortlisted", "rejected", "hired"].includes(status))
     return res.status(400).json({ error: "Invalid status" });
@@ -698,7 +698,7 @@ app.patch("/api/admin/applications/:id/status", authMiddleware, async (req, res)
   }
 });
 
-app.delete("/api/admin/applications/:id", authMiddleware, async (req, res) => {
+app.delete(["/api/admin/applications/:id", "/api/admin/career-applications/:id"], authMiddleware, async (req, res) => {
   try {
     const [result] = await db.query("DELETE FROM applications WHERE id = ?", [req.params.id]);
     if (result.affectedRows === 0) return res.status(404).json({ error: "Not found" });
