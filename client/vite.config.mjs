@@ -7,6 +7,7 @@ import { fileURLToPath } from "url";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+let sitemapOutDir = "dist";
 
 export default defineConfig({
   server: {
@@ -30,6 +31,9 @@ export default defineConfig({
     tailwindcss(),
     {
       name: "generate-sitemap",
+      configResolved(config) {
+        sitemapOutDir = config.build.outDir;
+      },
       async closeBundle() {
         const SITE_URL = "https://adway.agency";
         const routes = [
@@ -57,8 +61,9 @@ ${routes
   .join("\n")}
 </urlset>`;
 
-        const outputPath = path.resolve(__dirname, "dist/sitemap.xml");
+        const outputPath = path.resolve(__dirname, sitemapOutDir, "sitemap.xml");
         try {
+          fs.mkdirSync(path.dirname(outputPath), { recursive: true });
           fs.writeFileSync(outputPath, sitemap);
           console.log("sitemap.xml generated");
         } catch (error) {
