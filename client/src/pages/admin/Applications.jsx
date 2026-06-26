@@ -15,7 +15,7 @@ import {
   Globe2,
   Link,
 } from "lucide-react";
-import * as XLSX from "xlsx"; // Imported the installed Excel tool
+import * as XLSX from "xlsx";
 
 const STATUS_COLORS = {
   new: "bg-blue-500/15 text-blue-400",
@@ -90,19 +90,17 @@ export default function Applications() {
     return matchSearch && matchStatus;
   });
 
-  // Excel Export Handler Function
   const handleExportExcel = () => {
     if (filtered.length === 0) return;
 
-    // Flatten and structure data fields for the Excel sheet layout
     const excelData = filtered.map((app) => ({
       "Application ID": app.id,
       "Applicant Name": app.name,
       "Email Address": app.email,
       "Phone Number": app.phone || "N/A",
       "Position Applied": app.position,
-      "Years of Experience": app.experience || "N/A",
-      "Earliest Start Date": formatDate(app.startDate || app.start_date, "N/A"),
+      "Years of Experience": app.experience || app.experience_years || "N/A", // Fixed lookup
+      "Earliest Start Date": formatDate(app.startDate || app.earliest_start_date || app.start_date, "N/A"), // Fixed lookup
       "Current Status": app.status.toUpperCase(),
       "Submission Date": formatDate(getApplicationDate(app), "N/A"),
       "Portfolio Link": app.portfolio || "N/A",
@@ -110,12 +108,10 @@ export default function Applications() {
       "Cover Note Summary": app.coverNote || "No cover note provided",
     }));
 
-    // Generate workbook elements and download file
     const worksheet = XLSX.utils.json_to_sheet(excelData);
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Applications List");
 
-    // Set auto-adjusting column sizes for enhanced layout scannability
     const maxProps = Object.keys(excelData[0]);
     worksheet["!cols"] = maxProps.map((key) => ({
       wch: Math.max(...excelData.map((row) => row[key]?.toString().length || 0), key.length) + 3,
@@ -142,7 +138,6 @@ export default function Applications() {
           </p>
         </div>
 
-        {/* Dynamic Export Button - Disables when filter array is empty */}
         <button
           onClick={handleExportExcel}
           disabled={filtered.length === 0}
@@ -229,8 +224,9 @@ export default function Applications() {
                     <select
                       value={app.status}
                       onChange={(e) => updateStatus(app.id, e.target.value)}
-                      className={`px-3 py-1.5 rounded-lg text-[11px] font-semibold uppercase tracking-wider border-0 outline-none cursor-pointer ${STATUS_COLORS[app.status] || "bg-white/10 text-white/60"
-                        }`}
+                      className={`px-3 py-1.5 rounded-lg text-[11px] font-semibold uppercase tracking-wider border-0 outline-none cursor-pointer ${
+                        STATUS_COLORS[app.status] || "bg-white/10 text-white/60"
+                      }`}
                     >
                       {STATUS_OPTIONS.map((s) => (
                         <option key={s} value={s} className="bg-neutral-900">
@@ -262,10 +258,10 @@ export default function Applications() {
                     <Briefcase className="w-3 h-3" />
                     {app.position}
                   </span>
-                  {app.experience && (
+                  {(app.experience || app.experience_years) && ( // Fixed lookup
                     <span className="flex items-center gap-1">
                       <Clock className="w-3 h-3" />
-                      {app.experience}
+                      {app.experience || app.experience_years}
                     </span>
                   )}
                   {app.phone && <span>{app.phone}</span>}
@@ -277,18 +273,18 @@ export default function Applications() {
               {expanded === app.id && (
                 <div className="px-5 pb-5 pt-0 border-t border-white/[0.04] mt-0">
                   <div className="pt-4 space-y-3">
-                    {(app.experience || app.startDate || app.start_date) && (
+                    {(app.experience || app.experience_years || app.startDate || app.earliest_start_date || app.start_date) && (
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
-                        {app.experience && (
+                        {(app.experience || app.experience_years) && ( // Fixed lookup
                           <div className="flex items-center gap-2 text-white/60">
                             <Clock className="w-3.5 h-3.5 text-white/30" />
-                            <span>{app.experience}</span>
+                            <span>{app.experience || app.experience_years}</span>
                           </div>
                         )}
-                        {(app.startDate || app.start_date) && (
+                        {(app.startDate || app.earliest_start_date || app.start_date) && ( // Fixed lookup
                           <div className="flex items-center gap-2 text-white/60">
                             <CalendarDays className="w-3.5 h-3.5 text-white/30" />
-                            <span>{formatDate(app.startDate || app.start_date)}</span>
+                            <span>{formatDate(app.startDate || app.earliest_start_date || app.start_date)}</span>
                           </div>
                         )}
                       </div>
