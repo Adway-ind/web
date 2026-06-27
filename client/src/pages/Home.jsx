@@ -647,7 +647,8 @@ function FeaturedPortfolio() {
                   key={item.id}
                   delay={0.15 + index * 0.08}
                   direction="up"
-className="group relative overflow-hidden rounded-2xl aspect-[16/9] cursor-pointer bg-white shadow-sm hover:shadow-xl transition-all duration-500">
+                  className="group relative overflow-hidden rounded-2xl aspect-[4/3] cursor-pointer bg-white shadow-sm hover:shadow-xl transition-all duration-500"
+                >
                   <Link
                     to={`/portfolio/${item.slug || item.id}`}
                     className="block w-full h-full"
