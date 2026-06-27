@@ -624,10 +624,10 @@ function FeaturedPortfolio() {
               <p className="text-white/85 font-medium">
                 No featured projects yet
               </p>
-              {/* <p className="text-white/65 text-sm mt-1">
+              <p className="text-white/65 text-sm mt-1">
                 Mark projects as featured in the admin panel to display them
                 here.
-              </p> */}
+              </p>
             </div>
             <Link
               to="/portfolio"
@@ -647,7 +647,7 @@ function FeaturedPortfolio() {
                   key={item.id}
                   delay={0.15 + index * 0.08}
                   direction="up"
-                  className="group relative overflow-hidden rounded-2xl aspect-[4/9] cursor-pointer bg-white shadow-sm hover:shadow-xl transition-all duration-500">
+className="group relative overflow-hidden rounded-2xl aspect-[16/9] cursor-pointer bg-white shadow-sm hover:shadow-xl transition-all duration-500">
                   <Link
                     to={`/portfolio/${item.slug || item.id}`}
                     className="block w-full h-full"
