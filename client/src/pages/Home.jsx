@@ -333,7 +333,7 @@ function HeroSlider() {
       />
 
       {/* ── Top nav bar area ── */}
-      <div className="absolute top-0 left-0 right-0 z-30 flex items-center justify-between px-6 sm:px-10 lg:px-16 py-6">
+      {/* <div className="absolute top-0 left-0 right-0 z-30 flex items-center justify-between px-6 sm:px-10 lg:px-16 py-6">
         <div className="flex items-center gap-3">
           <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
           <span className="text-white/60 text-xs sm:text-sm font-medium tracking-wider uppercase">
@@ -345,7 +345,7 @@ function HeroSlider() {
           <span>/</span>
           <span>{String(total).padStart(2, "0")}</span>
         </div>
-      </div>
+      </div> */}
 
       {/* ── Main Content ── */}
       <div className="relative z-20 h-full w-full flex flex-col justify-end px-6 sm:px-10 lg:px-16 pb-28 sm:pb-32">
@@ -403,14 +403,14 @@ function HeroSlider() {
                 >
                   <Link
                     to="/contact"
-                    className="group px-7 py-3.5 bg-white text-black rounded-full font-semibold text-sm hover:bg-white/90 transition-all duration-300 shadow-[0_0_40px_rgba(255,255,255,0.08)] hover:shadow-[0_0_60px_rgba(255,255,255,0.15)] hover:-translate-y-0.5 flex items-center gap-2.5"
+                    className="group px-7 py-3.5 bg-white text-black rounded-2xl font-semibold text-sm hover:bg-white/90 transition-all duration-300 shadow-[0_0_40px_rgba(255,255,255,0.08)] hover:shadow-[0_0_60px_rgba(255,255,255,0.15)] hover:-translate-y-0.5 flex items-center gap-2.5 "
                   >
                     Start Your Project
                     <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                   </Link>
                   <Link
                     to="/portfolio"
-                    className="group px-7 py-3.5 rounded-full border border-white/15 bg-white/[0.04] backdrop-blur-sm text-white font-semibold text-sm hover:bg-white/[0.1] hover:border-white/25 transition-all duration-300 flex items-center gap-2.5"
+                    className="group px-7 py-3.5 rounded-2xl border border-white/15 bg-white/[0.04] backdrop-blur-sm text-white font-semibold text-sm hover:bg-white/[0.1] hover:border-white/25 transition-all duration-300 flex items-center gap-2.5 hidden sm:flex"
                   >
                     View Our Work
                     <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-300" />
@@ -624,10 +624,10 @@ function FeaturedPortfolio() {
               <p className="text-white/85 font-medium">
                 No featured projects yet
               </p>
-              <p className="text-white/65 text-sm mt-1">
+              {/* <p className="text-white/65 text-sm mt-1">
                 Mark projects as featured in the admin panel to display them
                 here.
-              </p>
+              </p> */}
             </div>
             <Link
               to="/portfolio"
@@ -647,52 +647,64 @@ function FeaturedPortfolio() {
                   key={item.id}
                   delay={0.15 + index * 0.08}
                   direction="up"
-                  className="group relative overflow-hidden rounded-2xl aspect-[4/3] cursor-pointer bg-white shadow-sm hover:shadow-xl transition-all duration-500"
+                  className="group overflow-hidden rounded-2xl bg-white shadow-sm hover:shadow-xl transition-all duration-500"
                 >
                   <Link
                     to={`/portfolio/${item.slug || item.id}`}
-                    className="block w-full h-full"
+                    className="block"
                   >
-                    {item.image ? (
-                      <img
-                        src={resolveImageUrl(item.image)}
-                        alt={item.title}
-                        className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                      />
-                    ) : (
-                      <div className="absolute inset-0 w-full h-full bg-gray-100 flex items-center justify-center">
-                        <ImageIcon className="w-10 h-10 text-gray-300" />
-                      </div>
-                    )}
+                    {/* Image */}
+                    <div className="relative overflow-hidden bg-gray-100">
+                      {item.image ? (
+                        <img
+                          src={resolveImageUrl(item.image)}
+                          alt={item.title}
+                          className="block w-full h-auto transition-transform duration-700 group-hover:scale-105"
+                        />
+                      ) : (
+                        <div className="h-[300px] w-full flex items-center justify-center">
+                          <ImageIcon className="w-12 h-12 text-gray-300" />
+                        </div>
+                      )}
 
-                    {/* White Card Overlay at the bottom */}
-                    <div className="absolute bottom-0 left-0 right-0 bg-white p-8 translate-y-4 group-hover:translate-y-0 transition-all duration-500">
-                      {/* Featured badge - now on white card */}
-                      <div className="mb-4">
-                        <span className="px-2.5 py-1 rounded-full bg-violet-500/10 border border-violet-200 text-[11px] font-semibold text-violet-700 tracking-wide">
+                      {/* Gradient Overlay */}
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
+
+                      {/* Badge */}
+                      <div className="absolute top-6 left-6">
+                        <span className="px-3 py-1 rounded-full bg-white/90 text-xs font-semibold text-violet-700">
                           Featured
                         </span>
                       </div>
+                    </div>
 
+                    {/* Content */}
+                    <div className="p-6">
                       <span className="text-violet-600 text-sm font-medium">
                         {item.category}
                       </span>
-                      <h3 className="text-2xl sm:text-3xl font-bold text-gray-900 mt-1">
+
+                      <h3 className="text-2xl font-bold text-gray-900 mt-2">
                         {item.title}
                       </h3>
+
                       {item.client && (
-                        <p className="text-gray-600 text-sm mt-1">
+                        <p className="text-gray-600 mt-2">
                           {item.client}
                         </p>
                       )}
 
-                      <div className="mt-6 flex items-center gap-2 text-violet-600 text-sm font-semibold opacity-0 group-hover:opacity-100 transition-all">
-                        View Project <ArrowRight className="w-4 h-4" />
+                      {item.description && (
+                        <p className="text-gray-500 mt-4 line-clamp-3">
+                          {item.description}
+                        </p>
+                      )}
+
+                      <div className="mt-6 flex items-center gap-2 text-violet-600 font-semibold">
+                        View Project
+                        <ArrowRight className="w-4 h-4" />
                       </div>
                     </div>
-
-                    {/* Subtle gradient at the top of the white card for smooth blend */}
-                    <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-white via-white to-transparent pointer-events-none" />
                   </Link>
                 </FadeIn>
               ))}
@@ -910,9 +922,9 @@ export default function Home() {
 
       {/* Services Overview */}
       <section className="relative py-20 bg-black overflow-hidden">
-        <div className="absolute top-1/4 left-[-10%] w-[500px] h-[500px] rounded-full bg-purple-600/20 blur-[120px] pointer-events-none mix-blend-screen animate-pulse duration-[6000ms]" />
+        {/* <div className="absolute top-1/4 left-[-10%] w-[500px] h-[500px] rounded-full bg-purple-600/20 blur-[120px] pointer-events-none mix-blend-screen animate-pulse duration-[6000ms]" />
         <div className="absolute bottom-1/4 right-[-10%] w-[600px] h-[600px] rounded-full bg-blue-600/15 blur-[140px] pointer-events-none mix-blend-screen animate-pulse duration-[8000ms]" />
-        <div className="absolute top-1/2 left-1/3 w-[400px] h-[400px] rounded-full bg-fuchsia-500/10 blur-[100px] pointer-events-none mix-blend-screen" />
+        <div className="absolute top-1/2 left-1/3 w-[400px] h-[400px] rounded-full bg-fuchsia-500/10 blur-[100px] pointer-events-none mix-blend-screen" /> */}
 
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <FadeIn className="text-center max-w-5xl mx-auto mb-16">
