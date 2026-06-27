@@ -647,62 +647,67 @@ function FeaturedPortfolio() {
                   key={item.id}
                   delay={0.15 + index * 0.08}
                   direction="up"
-                  className="group overflow-hidden rounded-2xl bg-white shadow-sm hover:shadow-xl transition-all duration-500"
-                >
+                  className="group relative overflow-hidden rounded-2xl aspect-[4/9] cursor-pointer bg-white shadow-sm hover:shadow-xl transition-all duration-500">
                   <Link
                     to={`/portfolio/${item.slug || item.id}`}
-                    className="block"
+                    className="block w-full h-full"
                   >
                     {/* Image */}
-                    <div className="relative overflow-hidden bg-gray-100">
-                      {item.image ? (
-                        <img
-                          src={resolveImageUrl(item.image)}
-                          alt={item.title}
-                          className="block w-full h-auto transition-transform duration-700 group-hover:scale-105"
-                        />
-                      ) : (
-                        <div className="h-[300px] w-full flex items-center justify-center">
-                          <ImageIcon className="w-12 h-12 text-gray-300" />
-                        </div>
-                      )}
-
-                      {/* Gradient Overlay */}
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
-
-                      {/* Badge */}
-                      <div className="absolute top-6 left-6">
-                        <span className="px-3 py-1 rounded-full bg-white/90 text-xs font-semibold text-violet-700">
-                          Featured
-                        </span>
+                    {item.image ? (
+                      <img
+                        src={resolveImageUrl(item.image)}
+                        alt={item.title}
+                        className="absolute inset-0 w-full h-full object-contain bg-gray-100 transition-transform duration-700 group-hover:scale-105"
+                      />
+                    ) : (
+                      <div className="absolute inset-0 bg-gray-100 flex items-center justify-center">
+                        <ImageIcon className="w-12 h-12 text-gray-300" />
                       </div>
+                    )}
+
+                    {/* Overlay */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent transition-all duration-500" />
+
+                    {/* Featured Badge */}
+                    <div className="absolute top-6 left-6 z-20">
+                      <span className="px-3 py-1 rounded-full bg-white/90 backdrop-blur-md text-xs font-semibold text-violet-700">
+                        Featured
+                      </span>
                     </div>
 
-                    {/* Content */}
-                    <div className="p-6">
-                      <span className="text-violet-600 text-sm font-medium">
-                        {item.category}
-                      </span>
+                    {/* Main Content */}
+                    <div className="absolute bottom-0 left-0 right-0 z-20 p-8">
 
-                      <h3 className="text-2xl font-bold text-gray-900 mt-2">
-                        {item.title}
-                      </h3>
+                      {/* Always Visible */}
+                      <div className="transition-all duration-500 group-hover:-translate-y-24">
+                        <span className="text-violet-300 text-sm font-medium">
+                          {item.category}
+                        </span>
 
-                      {item.client && (
-                        <p className="text-gray-600 mt-2">
-                          {item.client}
-                        </p>
-                      )}
+                        <h3 className="text-3xl font-bold text-white mt-2">
+                          {item.title}
+                        </h3>
+                      </div>
 
-                      {item.description && (
-                        <p className="text-gray-500 mt-4 line-clamp-3">
-                          {item.description}
-                        </p>
-                      )}
+                      {/* Hidden Content */}
+                      <div className="absolute left-0 right-0 bottom-0 bg-white rounded-t-3xl p-8 translate-y-full group-hover:translate-y-0 transition-all duration-500">
 
-                      <div className="mt-6 flex items-center gap-2 text-violet-600 font-semibold">
-                        View Project
-                        <ArrowRight className="w-4 h-4" />
+                        {item.client && (
+                          <p className="text-gray-600 text-sm">
+                            Client: {item.client}
+                          </p>
+                        )}
+
+                        {item.description && (
+                          <p className="text-gray-500 text-sm mt-4 line-clamp-3">
+                            {item.description}
+                          </p>
+                        )}
+
+                        <div className="mt-6 flex items-center gap-2 text-violet-600 font-semibold">
+                          View Project
+                          <ArrowRight className="w-4 h-4" />
+                        </div>
                       </div>
                     </div>
                   </Link>
