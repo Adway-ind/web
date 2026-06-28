@@ -4,12 +4,39 @@ import { ArrowUpRight, SlidersHorizontal } from "lucide-react";
 import Video from "../assets/video/portfolio-one.mp4";
 import { API } from "../config/api";
 import SEO from "../components/SEO";
+import { motion } from "framer-motion";
 import Client from "../components/ClientsSection";
+
 
 const resolveImageUrl = (url) => {
   if (!url) return "";
   if (/^(?:https?:|blob:|data:)/.test(url)) return url;
   return `${API}${url}`;
+};
+const containerVariants = {
+  hidden: {},
+  visible: {
+    transition: {
+      staggerChildren: 0.12,
+    },
+  },
+};
+
+const cardVariants = {
+  hidden: {
+    opacity: 0,
+    y: 60,
+    scale: 0.96,
+  },
+  visible: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: {
+      duration: 0.8,
+      ease: [0.22, 1, 0.36, 1],
+    },
+  },
 };
 
 export default function Portfolio() {
@@ -84,7 +111,7 @@ export default function Portfolio() {
           </p>
 
           {/* Stats + scroll hint */}
-          
+
         </div>
       </section>
 
@@ -100,11 +127,10 @@ export default function Portfolio() {
                   <button
                     key={cat}
                     onClick={() => setActiveCategory(cat)}
-                    className={`px-4 py-2 text-[12px] tracking-[0.04em] font-medium border-r border-black/15 last:border-r-0 transition-all duration-150 ${
-                      activeCategory === cat
-                        ? "bg-black text-white hover:bg-black hover:text-white"
-                        : "bg-transparent text-black hover:bg-white hover:text-black"
-                    }`}
+                    className={`px-4 py-2 text-[12px] tracking-[0.04em] font-medium border-r border-black/15 last:border-r-0 transition-all duration-150 ${activeCategory === cat
+                      ? "bg-black text-white hover:bg-black hover:text-white"
+                      : "bg-transparent text-black hover:bg-white hover:text-black"
+                      }`}
                   >
                     {cat}
                   </button>
@@ -128,63 +154,106 @@ export default function Portfolio() {
           </div>
         ) : (
           <div className="max-w-7xl mx-auto px-6 lg:px-12 pb-12">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 bg-white/5">
+            <motion.div
+              variants={containerVariants}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, amount: 0.1 }}
+              className="grid grid-cols-1 md:grid-cols-3 gap-3 bg-white/5"
+            >
               {projects.map((project) => {
                 const projectTags = Array.isArray(project.tags)
                   ? project.tags
                   : typeof project.tags === "string"
-                  ? project.tags.split(",").map((t) => t.trim()).filter(Boolean)
-                  : [];
+                    ? project.tags
+                      .split(",")
+                      .map((t) => t.trim())
+                      .filter(Boolean)
+                    : [];
 
                 return (
-                  <Link
+                  <motion.div
                     key={project.slug || project.id}
-                    to={`/portfolio/${project.slug}`}
-                    className="group relative bg-[#0a0a0a] hover:bg-[#141414] transition-colors duration-200 overflow-hidden flex flex-col"
+                    variants={cardVariants}
+                    whileHover={{ y: -8 }}
+                    className="h-full"
                   >
-                    {/* Arrow icon — top-right corner with highlight border on hover */}
-                    <div className="absolute top-4 right-4 z-20 w-10 h-10 rounded-full border-2 border-white/20 bg-black/60 backdrop-blur-sm flex items-center justify-center text-white/60 transition-all duration-300 group-hover:border-white group-hover:bg-white group-hover:text-black group-hover:scale-110">
-                      <ArrowUpRight className="w-4 h-4 transition-transform duration-300 group-hover:-rotate-45" />
-                    </div>
+                    <Link
+                      to={`/portfolio/${project.slug}`}
+                      className="group relative bg-[#0a0a0a] hover:bg-[#141414]
+            transition-all duration-500 overflow-hidden flex flex-col h-full"
+                    >
+                      {/* Arrow */}
+                      <div
+                        className="absolute top-4 right-4 z-20
+              w-10 h-10 rounded-full border-2 border-white/20
+              bg-black/60 backdrop-blur-sm
+              flex items-center justify-center
+              text-white/60 transition-all duration-300
+              group-hover:border-white
+              group-hover:bg-white
+              group-hover:text-black
+              group-hover:scale-110"
+                      >
+                        <ArrowUpRight
+                          className="w-4 h-4 transition-transform duration-300
+                group-hover:-rotate-45"
+                        />
+                      </div>
 
-                    {/* Image — fixed height */}
-                    <div className="relative overflow-hidden flex-shrink-0 h-[300px] md:h-[360px]">
-                      <img
-                        src={resolveImageUrl(project.image)}
-                        alt={project.title}
-                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.04]"
-                      />
-                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300" />
-                    </div>
+                      {/* Image */}
+                      <div className="relative overflow-hidden flex-shrink-0 h-[300px] md:h-[360px]">
+                        <img
+                          src={resolveImageUrl(project.image)}
+                          alt={project.title}
+                          className="w-full h-full object-cover
+                transition-transform duration-700
+                group-hover:scale-[1.05]"
+                        />
 
-                    {/* Content — fixed height bottom area */}
-                    <div className="flex flex-col flex-1 min-h-[90px] px-5 pt-4 pb-4">
-                      <span className="text-[10px] tracking-[0.1em] uppercase text-white/50 mb-1.5">
-                        {project.category}
-                      </span>
-                      <h3 className="font-serif text-[17px] text-white leading-tight line-clamp-2">
-                        {project.title}
-                      </h3>
+                        <div
+                          className="absolute inset-0 bg-black/0
+                group-hover:bg-black/10
+                transition-colors duration-300"
+                        />
+                      </div>
 
-                      {/* <div className="mt-auto pt-3">
+                      {/* Content */}
+                      <div className="flex flex-col flex-1 min-h-[90px] px-5 pt-4 pb-4">
+                        <span
+                          className="text-[10px] tracking-[0.1em]
+                uppercase text-white/50 mb-1.5"
+                        >
+                          {project.category}
+                        </span>
+
+                        <h3 className="font-serif text-[17px] text-white leading-tight line-clamp-2">
+                          {project.title}
+                        </h3>
+
                         {projectTags.length > 0 && (
-                          <div className="flex gap-1.5 flex-wrap">
-                            {projectTags.map((tag) => (
+                          <div className="mt-auto pt-3 flex gap-1.5 flex-wrap">
+                            {projectTags.slice(0, 3).map((tag) => (
                               <span
                                 key={tag}
-                                className="text-[10px] tracking-[0.06em] uppercase text-white/40 px-2 py-1 border border-white/15 rounded-[2px]"
+                                className="text-[10px]
+                      tracking-[0.06em]
+                      uppercase text-white/40
+                      px-2 py-1
+                      border border-white/15
+                      rounded-[2px]"
                               >
                                 {tag}
                               </span>
                             ))}
                           </div>
                         )}
-                      </div> */}
-                    </div>
-                  </Link>
+                      </div>
+                    </Link>
+                  </motion.div>
                 );
               })}
-            </div>
+            </motion.div>
           </div>
         )}
       </section>

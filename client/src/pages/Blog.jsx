@@ -21,7 +21,7 @@ export default function Blog() {
     fetch(`${API}/api/blogs/categories`)
       .then((res) => (res.ok ? res.json() : []))
       .then((data) => setCategories(data))
-      .catch(() => {});
+      .catch(() => { });
   }, []);
 
   useEffect(() => {
@@ -33,7 +33,7 @@ export default function Blog() {
     fetch(url)
       .then((res) => (res.ok ? res.json() : []))
       .then((data) => setBlogs(data))
-      .catch(() => {})
+      .catch(() => { })
       .finally(() => setLoading(false));
   }, [activeCategory]);
 
@@ -84,11 +84,10 @@ export default function Blog() {
               <button
                 key={cat}
                 onClick={() => setActiveCategory(cat)}
-                className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 ${
-                  activeCategory === cat
+                className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 ${activeCategory === cat
                     ? "bg-white text-black"
                     : "bg-white/[0.04] text-white/50 hover:bg-white/[0.08] hover:text-white/70"
-                }`}
+                  }`}
               >
                 {cat}
               </button>
@@ -109,77 +108,117 @@ export default function Blog() {
               <p className="text-white/30 text-lg">No blog posts yet. Check back soon.</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {blogs.map((blog, i) => (
                 <article
                   key={blog.id}
                   onClick={() => handleBlogClick(blog.slug)}
-                  className="group cursor-pointer bg-white/[0.02] border border-white/[0.06] rounded-2xl overflow-hidden hover:border-white/[0.12] hover:bg-white/[0.04] transition-all duration-500"
-                  style={{ animationDelay: `${i * 80}ms` }}
+                  className="group relative overflow-hidden rounded-[28px]
+      border border-white/10 bg-gradient-to-b from-white/[0.08] to-white/[0.03]
+      backdrop-blur-xl cursor-pointer transition-all duration-700
+      hover:-translate-y-3 hover:border-blue-500/40"
+                  style={{ animationDelay: `${i * 100}ms` }}
                 >
-                  {/* Cover Image */}
-                  <div className="relative aspect-[16/10] overflow-hidden bg-white/[0.03]">
+                  {/* Glow */}
+                  <div className="absolute -inset-px rounded-[28px] opacity-0 group-hover:opacity-100 transition-opacity duration-700">
+                    <div className="absolute inset-0 rounded-[28px] bg-gradient-to-r from-blue-500/20 via-cyan-500/10 to-purple-500/20 blur-xl" />
+                  </div>
+
+                  {/* Image */}
+                  <div className="relative h-64 overflow-hidden">
                     {blog.coverImage ? (
                       <img
                         src={resolveImageUrl(blog.coverImage)}
                         alt={blog.title}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                        className="h-full w-full object-cover transition-transform duration-1000 group-hover:scale-110"
                       />
                     ) : (
-                      <div className="w-full h-full flex items-center justify-center">
-                        <div className="w-12 h-12 rounded-full bg-white/[0.05] flex items-center justify-center">
-                          <Tag className="w-5 h-5 text-white/20" />
-                        </div>
+                      <div className="w-full h-full flex items-center justify-center bg-white/[0.03]">
+                        <Tag className="w-10 h-10 text-white/20" />
                       </div>
                     )}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                    <div className="absolute bottom-3 right-3 opacity-0 group-hover:opacity-100 transition-all duration-300 translate-y-2 group-hover:translate-y-0">
-                      <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center">
-                        <ArrowUpRight className="w-4 h-4 text-black" />
-                      </div>
-                    </div>
-                  </div>
 
-                  {/* Content */}
-                  <div className="p-5">
-                    {/* Meta */}
-                    <div className="flex items-center gap-3 text-[11px] text-white/30 uppercase tracking-wider mb-3">
-                      {blog.category && (
-                        <span className="px-2 py-0.5 rounded bg-white/[0.06] text-white/50">
+                    {/* Overlay */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
+
+                    {/* Category */}
+                    {blog.category && (
+                      <div className="absolute top-5 left-5">
+                        <span className="rounded-full border border-white/20 bg-white/10 backdrop-blur-md px-4 py-1 text-xs uppercase tracking-[0.2em] text-white">
                           {blog.category}
                         </span>
-                      )}
-                      <span className="flex items-center gap-1">
-                        <Clock className="w-3 h-3" />
+                      </div>
+                    )}
+
+                    {/* Read Time */}
+                    <div className="absolute bottom-5 left-5 flex items-center gap-2 rounded-full bg-black/40 backdrop-blur-md px-3 py-1">
+                      <Clock className="w-3 h-3 text-white/70" />
+                      <span className="text-xs text-white/70">
                         {blog.readingTime || 1} min read
                       </span>
                     </div>
 
+                    {/* Arrow */}
+                    <div
+                      className="absolute right-5 bottom-5 h-12 w-12 rounded-full
+          bg-white text-black flex items-center justify-center
+          scale-0 group-hover:scale-100 transition-all duration-500"
+                    >
+                      <ArrowUpRight className="w-5 h-5" />
+                    </div>
+                  </div>
+
+                  {/* Content */}
+                  <div className="relative p-7">
                     {/* Title */}
-                    <h3 className="text-white text-lg font-semibold leading-snug mb-2 group-hover:text-blue-400 transition-colors duration-300">
+                    <h3
+                      className="text-2xl font-semibold text-white mb-4
+          leading-tight transition-colors duration-300
+          group-hover:text-blue-400"
+                    >
                       {blog.title}
                     </h3>
 
                     {/* Excerpt */}
-                    <p className="text-white/40 text-sm leading-relaxed line-clamp-2">
+                    <p className="text-white/50 leading-relaxed line-clamp-3 mb-6">
                       {blog.excerpt}
                     </p>
 
-                    {/* Author + Date */}
-                    <div className="flex items-center justify-between mt-4 pt-4 border-t border-white/[0.06]">
-                      <div className="flex items-center gap-2">
-                        <div className="w-6 h-6 rounded-full bg-white/[0.08] flex items-center justify-center">
-                          <User className="w-3 h-3 text-white/40" />
+                    {/* Footer */}
+                    <div className="flex items-center justify-between border-t border-white/10 pt-5">
+                      <div className="flex items-center gap-3">
+                        <div
+                          className="w-10 h-10 rounded-full
+              bg-gradient-to-br from-blue-500/30 to-cyan-500/30
+              border border-white/10 flex items-center justify-center"
+                        >
+                          <User className="w-4 h-4 text-white/80" />
                         </div>
-                        <span className="text-xs text-white/40">{blog.author}</span>
+
+                        <div>
+                          <p className="text-sm text-white">{blog.author}</p>
+                          <p className="text-xs text-white/30">
+                            {new Date(blog.created_at).toLocaleDateString(
+                              "en-US",
+                              {
+                                month: "short",
+                                day: "numeric",
+                                year: "numeric",
+                              }
+                            )}
+                          </p>
+                        </div>
                       </div>
-                      <span className="text-xs text-white/25">
-                        {new Date(blog.created_at).toLocaleDateString("en-US", {
-                          month: "short",
-                          day: "numeric",
-                          year: "numeric",
-                        })}
-                      </span>
+
+                      <div className="overflow-hidden">
+                        <span
+                          className="inline-flex items-center gap-2 text-sm text-white/60
+              group-hover:text-white transition-colors"
+                        >
+                          Read More
+                          <ArrowUpRight className="w-4 h-4 transform transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-1" />
+                        </span>
+                      </div>
                     </div>
                   </div>
                 </article>

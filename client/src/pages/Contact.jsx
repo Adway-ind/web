@@ -6,20 +6,20 @@ const contactInfo = [
   {
     icon: Mail,
     title: "Email Us",
-    detail: "hello@adway.com",
+    detail: "adwaycreations.com",
     sub: "We reply within 24 hours",
   },
   {
     icon: Phone,
     title: "Call Us",
-    detail: "+1 (555) 123-4567",
+    detail: "+91 8606880634",
     sub: "Mon-Fri, 9am-6pm EST",
   },
   {
     icon: MapPin,
     title: "Visit Us",
-    detail: "123 Creative Ave",
-    sub: "Design District, NY 10001",
+    detail: "Kattappana",
+    sub: "Adway Building, 23/7, near Vi Office, Kattappana, Kerala",
   },
   {
     icon: Clock,

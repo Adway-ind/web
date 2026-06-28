@@ -39,7 +39,7 @@ export default function Footer() {
           {/* Brand */}
           <div className="lg:col-span-1">
             <Link to="/" className="flex items-center gap-2">
-                <img src={LogoBlack} alt="Adway Studio" className="h-auto w-50" />
+              <img src={LogoBlack} alt="Adway Studio" className="h-auto w-50" />
             </Link>
             <p className="mt-4 text-black/80 text-[14px] font-normal leading-relaxed text-justify">
               We craft brands that resonate, inspire, and leave lasting
@@ -126,6 +126,41 @@ export default function Footer() {
           </div>
         </div>
       </div>
+      <section className="relative overflow-hidden py-8 bg-black border-y border-white/10">
+        {/* Fade edges */}
+        <div className="absolute left-0 top-0 z-10 h-full w-32 bg-gradient-to-r from-black to-transparent" />
+        <div className="absolute right-0 top-0 z-10 h-full w-32 bg-gradient-to-l from-black to-transparent" />
+
+        <div className="flex w-max animate-smooth-marquee">
+          {[...Array(2)].map((_, i) => (
+            <div key={i} className="flex items-center">
+              {[
+                "Brand Strategy",
+                "Visual Identity",
+                "UI/UX Design",
+                "Web Development",
+                "Creative Campaigns",
+                "Digital Experiences",
+                "Motion Graphics",
+                "Social Media Design",
+                "E-Commerce Solutions",
+                "SEO Optimization",
+              ].map((item, index) => (
+                <div
+                  key={index}
+                  className="flex items-center shrink-0"
+                >
+                  <span className="px-10 text-2xl md:text-4xl font-semibold tracking-[0.15em] uppercase text-white/90">
+                    {item}
+                  </span>
+
+                  <div className="h-2 w-2 rounded-full bg-white/30" />
+                </div>
+              ))}
+            </div>
+          ))}
+        </div>
+      </section>
       <div className="mt-16 mb-4 text-center">
         <h2 className="text-6xl md:text-8xl lg:text-[25rem] font-black tracking-tighter text-black/10 select-none">
           ADWAY

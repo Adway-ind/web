@@ -5,6 +5,7 @@ import {
   Target,
   Zap,
   Layers,
+  SquareCode,
   TrendingUp,
   Sparkles,
   Monitor,
@@ -46,18 +47,18 @@ const services = [
       "https://img.magnific.com/premium-photo/innovative-branding-concept-tech-startup-featuring-sleek-modern-design-elements-including_145776-134886.jpg?uid=R138009327&ga=GA1.1.1010247763.1779271943&semt=ais_hybrid&w=740&q=80",
   },
   {
-    icon: Layers,
-    title: "Digital Design",
-    desc: "We design beautiful, intuitive digital experiences — from websites to apps — that connect with your audience and reinforce your brand at every interaction.",
+    icon: SquareCode,
+    title: "Web Development",
+    desc: "We build fast, scalable, and high-performing websites and web applications that deliver seamless user experiences while driving business growth and digital success.",
     features: [
-      "Web Design",
-      "App UI/UX Design",
-      "Responsive Design",
-      "Design Prototyping",
-      "Interactive Experiences",
+      "Custom Website Development",
+      "E-Commerce Development",
+      "CMS Development",
+      "Frontend & Backend Development",
+      "Performance Optimization",
     ],
     image:
-      "https://img.magnific.com/free-photo/digital-art-style-illustration-graphic-designer_23-2151536954.jpg?uid=R138009327&ga=GA1.1.1010247763.1779271943&semt=ais_hybrid&w=740&q=80",
+      "https://img.magnific.com/free-photo/programming-background-collage_23-2149901789.jpg?uid=R138009327&ga=GA1.1.1010247763.1779271943&semt=ais_hybrid&w=740&q=80",
   },
   {
     icon: Film,
@@ -193,42 +194,36 @@ export default function Services() {
         {services.map((service, i) => (
           <div
             key={service.title}
-            className={`w-full py-24 ${
-              i % 2 === 0 ? "bg-white" : "bg-neutral-950"
-            }`}
+            className={`w-full py-24 ${i % 2 === 0 ? "bg-white" : "bg-neutral-950"
+              }`}
           >
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
               <div
-                className={`grid grid-cols-1 lg:grid-cols-2 gap-16 items-center ${
-                  i % 2 === 1 ? "lg:direction-rtl" : ""
-                }`}
+                className={`grid grid-cols-1 lg:grid-cols-2 gap-16 items-center ${i % 2 === 1 ? "lg:direction-rtl" : ""
+                  }`}
               >
                 {/* Content */}
                 <div className={i % 2 === 1 ? "lg:order-2" : ""}>
                   <div
-                    className={`w-16 h-16 rounded-2xl flex items-center justify-center mb-6 ${
-                      i % 2 === 0 ? "bg-black/10" : "bg-white/10"
-                    }`}
+                    className={`w-16 h-16 rounded-2xl flex items-center justify-center mb-6 ${i % 2 === 0 ? "bg-black/10" : "bg-white/10"
+                      }`}
                   >
                     <service.icon
-                      className={`w-8 h-8 ${
-                        i % 2 === 0 ? "text-black/70" : "text-white/70"
-                      }`}
+                      className={`w-8 h-8 ${i % 2 === 0 ? "text-black/70" : "text-white/70"
+                        }`}
                     />
                   </div>
 
                   <h3
-                    className={`text-3xl sm:text-4xl font-medium tracking-tight ${
-                      i % 2 === 0 ? "text-black" : "text-white"
-                    }`}
+                    className={`text-3xl sm:text-4xl font-medium tracking-tight ${i % 2 === 0 ? "text-black" : "text-white"
+                      }`}
                   >
                     {service.title}
                   </h3>
 
                   <p
-                    className={`mt-4 text-lg leading-relaxed ${
-                      i % 2 === 0 ? "text-black/70" : "text-white/60"
-                    }`}
+                    className={`mt-4 text-lg leading-relaxed ${i % 2 === 0 ? "text-black/70" : "text-white/60"
+                      }`}
                   >
                     {service.desc}
                   </p>
@@ -237,9 +232,8 @@ export default function Services() {
                     {service.features.map((feature) => (
                       <li key={feature} className="flex items-center gap-3">
                         <CheckCircle2
-                          className={`w-5 h-5 shrink-0 ${
-                            i % 2 === 0 ? "text-black/40" : "text-white/40"
-                          }`}
+                          className={`w-5 h-5 shrink-0 ${i % 2 === 0 ? "text-black/40" : "text-white/40"
+                            }`}
                         />
                         <span
                           className={
@@ -291,23 +285,66 @@ export default function Services() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
-            {process.map((p, i) => (
-              <div key={p.step} className="relative text-center group">
-                <div className="w-16 h-16 bg-black/10 rounded-2xl border border-black/10 flex items-center justify-center mx-auto mb-4 group-hover:bg-black transition-colors duration-300">
-                  <span className="text-xl font-bold text-black/70 group-hover:text-white transition-colors">
-                    {p.step}
-                  </span>
+          <div className="space-y-8">
+            {/* First Row - 3 Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {process.slice(0, 3).map((p) => (
+                <div
+                  key={p.step}
+                  className="group relative rounded-3xl bg-black border border-white/10 p-8 text-center overflow-hidden transition-all duration-500 hover:-translate-y-3 hover:border-white/20"
+                >
+                  {/* Glow Effect */}
+                  <div className="absolute -top-20 left-1/2 h-40 w-40 -translate-x-1/2 rounded-full bg-white/10 blur-3xl opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+
+                  {/* Step Number */}
+                  <div className="relative mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-2xl bg-white/10 border border-white/10 backdrop-blur-xl transition-all duration-500 group-hover:scale-110 group-hover:rotate-6">
+                    <span className="text-2xl font-bold text-white">
+                      {p.step}
+                    </span>
+                  </div>
+
+                  {/* Title */}
+                  <h3 className="mb-3 text-xl font-bold text-white">
+                    {p.title}
+                  </h3>
+
+                  {/* Description */}
+                  <p className="text-sm leading-relaxed text-white/60">
+                    {p.desc}
+                  </p>
                 </div>
-                <h3 className="text-lg font-bold text-black mb-2">{p.title}</h3>
-                <p className="text-black/50 text-sm leading-relaxed">
-                  {p.desc}
-                </p>
-                {i < process.length - 1 && (
-                  <div className="hidden md:block absolute top-8 left-[calc(50%+40px)] w-[calc(100%-80px)] h-0.5 bg-black/10" />
-                )}
-              </div>
-            ))}
+              ))}
+            </div>
+
+            {/* Second Row - 2 Centered Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:w-2/3 mx-auto">
+              {process.slice(3).map((p) => (
+                <div
+                  key={p.step}
+                  className="group relative rounded-3xl bg-black border border-white/10 p-8 text-center overflow-hidden transition-all duration-500 hover:-translate-y-3 hover:border-white/20"
+                >
+                  {/* Glow Effect */}
+                  <div className="absolute -top-20 left-1/2 h-40 w-40 -translate-x-1/2 rounded-full bg-white/10 blur-3xl opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+
+                  {/* Step Number */}
+                  <div className="relative mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-2xl bg-white/10 border border-white/10 backdrop-blur-xl transition-all duration-500 group-hover:scale-110 group-hover:rotate-6">
+                    <span className="text-2xl font-bold text-white">
+                      {p.step}
+                    </span>
+                  </div>
+
+                  {/* Title */}
+                  <h3 className="mb-3 text-xl font-bold text-white">
+                    {p.title}
+                  </h3>
+
+                  {/* Description */}
+                  <p className="text-sm leading-relaxed text-white/60">
+                    {p.desc}
+                  </p>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </section>

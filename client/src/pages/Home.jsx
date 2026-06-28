@@ -16,8 +16,13 @@ import {
   Volume2,
   VolumeX,
 } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
-
+import {
+  motion,
+  AnimatePresence,
+  useScroll,
+  useTransform,
+} from "framer-motion";
+import Lenis from "lenis";
 import Client from "../components/ClientsSection";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay } from "swiper/modules";
@@ -133,6 +138,7 @@ const showcaseData = {
   },
 };
 
+
 const services = [
   {
     icon: Target,
@@ -226,6 +232,8 @@ const fadeInUp = {
   },
 };
 
+
+
 function FadeIn({ children, delay = 0, className = "", direction = "up" }) {
   const dirMap = {
     up: { opacity: 0, y: 40 },
@@ -258,6 +266,7 @@ function HeroSlider() {
   const progressRef = useRef(null);
   const SLIDE_DURATION = 7000;
 
+
   const nextIndex = (current + 1) % total;
 
   const goTo = useCallback(
@@ -269,6 +278,7 @@ function HeroSlider() {
   );
 
   const next = useCallback(() => goTo((current + 1) % total), [current, goTo]);
+
 
   /* Auto-play timer */
   useEffect(() => {
@@ -318,6 +328,9 @@ function HeroSlider() {
           />
         </div>
       ))}
+
+
+
 
       {/* ── Dark Overlay ── */}
       <div className="absolute inset-0 z-[2] bg-gradient-to-r from-black/80 via-black/50 to-black/30" />
@@ -377,11 +390,11 @@ function HeroSlider() {
                 <motion.h1
                   variants={textVariants}
                   custom={1}
-                  className="text-5xl sm:text-7xl md:text-8xl lg:text-[9rem] font-bold text-white leading-[0.88] tracking-[-0.04em]"
-                  style={{ fontFamily: "'Space Grotesk', sans-serif" }}
+                  className="text-5xl sm:text-7xl md:text-8xl lg:text-[9rem] font-medium  text-white leading-[0.88] tracking-[-0.04em]"
+                  style={{ fontFamily: "'Poppins', sans-serif" }}
                 >
                   {heroSlides[current].title}
-                  <span className="block mt-2 bg-gradient-to-r from-purple-400 via-violet-400 to-indigo-400 bg-clip-text text-transparent">
+                  <span className="block mt-2 bg-gradient-to-r ">
                     {heroSlides[current].highlight}
                   </span>
                 </motion.h1>
@@ -552,11 +565,25 @@ function FeaturedPortfolio() {
   const [showAll, setShowAll] = useState(false);
 
   useEffect(() => {
-    // Hit the public endpoint that we just fixed on the backend
+    // Initialize Lenis
+    const lenis = new Lenis({
+      duration: 1.5,
+      smoothWheel: true,
+      wheelMultiplier: 1,
+    });
+
+    let rafId;
+
+    function raf(time) {
+      lenis.raf(time);
+      rafId = requestAnimationFrame(raf);
+    }
+
+    rafId = requestAnimationFrame(raf);
+
+    // Fetch featured projects
     authFetch("/api/projects/featured")
       .then((data) => {
-        // The backend query handles the filtering directly via SQL,
-        // so if data exists, it's safe to load straight into state!
         const featured = Array.isArray(data) ? data : [];
         setProjects(featured);
       })
@@ -565,13 +592,20 @@ function FeaturedPortfolio() {
         setProjects([]);
       })
       .finally(() => setLoading(false));
+
+    // Cleanup
+    return () => {
+      cancelAnimationFrame(rafId);
+      lenis.destroy();
+    };
   }, []);
 
   // Show 4 by default; "Show All Featured" reveals the rest
   const visibleProjects = showAll ? projects : projects.slice(0, 6);
 
   return (
-    <section className="relative overflow-hidden py-24 bg-black">
+    <section className="relative overflow-hidden bg-black py-28">
+      {/* Background */}
       <video
         src={BG}
         autoPlay
@@ -581,156 +615,188 @@ function FeaturedPortfolio() {
         preload="metadata"
         className="absolute inset-0 h-full w-full object-cover"
       />
-      <div className="absolute inset-0 bg-black/5" />
-      <div className="absolute inset-0 bg-gradient-to-br from-black/70 via-black/45 to-black/80" />
+
+      <div className="absolute inset-0 bg-black/70" />
+
+      <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:48px_48px]" />
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
         {/* Header */}
-        <FadeIn delay={0.1} className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-16">
-          <div>
-            <span className="text-white/70 font-semibold text-sm uppercase tracking-wider">
-              Our Work
-            </span>
-            <h2 className="mt-4 text-4xl text-center sm:text-left sm:text-5xl font-bold text-white tracking-tight">
-              Featured projects
-            </h2>
-            <p className="text-center sm:text-left mt-4 text-lg text-white/75 max-w-xl">
-              A selection of brands we've helped build, transform, and grow.
-            </p>
-          </div>
+        <FadeIn className="mb-20 text-center max-w-4xl mx-auto">
+          <span className="inline-flex items-center gap-3 text-white/50 text-sm uppercase tracking-[0.3em]">
+            <span className="w-10 h-px bg-white/30" />
+            Featured Work
+            <span className="w-10 h-px bg-white/30" />
+          </span>
+
+          <h2 className="mt-8 text-4xl sm:text-6xl font-bold text-white tracking-tight">
+            Selected projects
+          </h2>
+
+          <p className="mt-6 text-lg text-white/60 leading-8">
+            A curated selection of brands, digital experiences,
+            and campaigns crafted to create lasting impact.
+          </p>
+
           <Link
             to="/portfolio"
-            className="group inline-flex items-center justify-center gap-2 text-white font-semibold hover:gap-3 transition-all shrink-0"
+            className="inline-flex items-center gap-2 mt-8 text-white font-medium group"
           >
             View All Projects
-            <ArrowRight className="w-4 h-4" />
+            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
           </Link>
         </FadeIn>
 
-        {/* Loading state */}
+        {/* Loading */}
         {loading && (
-          <div className="flex items-center justify-center h-64">
-            <div className="w-6 h-6 border-2 border-white/20 border-t-violet-500 rounded-full animate-spin" />
+          <div className="flex justify-center py-24">
+            <div className="w-8 h-8 rounded-full border-2 border-white/20 border-t-white animate-spin" />
           </div>
         )}
 
-        {/* Empty state — no featured projects yet */}
+        {/* Empty */}
         {!loading && projects.length === 0 && (
-          <div className="flex flex-col items-center justify-center h-64 gap-4 text-center">
-            <div className="w-14 h-14 rounded-2xl bg-white/10 border border-white/15 flex items-center justify-center">
-              <ImageIcon className="w-6 h-6 text-white/40" />
-            </div>
-            <div>
-              <p className="text-white/85 font-medium">
-                No featured projects yet
-              </p>
-              <p className="text-white/65 text-sm mt-1">
-                Mark projects as featured in the admin panel to display them
-                here.
-              </p>
-            </div>
-            <Link
-              to="/portfolio"
-              className="mt-2 inline-flex items-center gap-2 text-sm text-violet-300 hover:text-violet-200 font-medium transition-colors"
-            >
-              Browse all projects <ArrowRight className="w-3.5 h-3.5" />
-            </Link>
+          <div className="text-center py-24">
+            <ImageIcon className="mx-auto w-12 h-12 text-white/30" />
+            <p className="mt-6 text-white/70">
+              No featured projects available.
+            </p>
           </div>
         )}
 
+        {/* Portfolio Grid */}
         {/* Projects Grid */}
         {!loading && visibleProjects.length > 0 && (
           <>
-            <FadeIn delay={0.2} className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <FadeIn
+              delay={0.2}
+              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+            >
               {visibleProjects.map((item, index) => (
                 <FadeIn
                   key={item.id}
                   delay={0.15 + index * 0.08}
                   direction="up"
-                  className="group relative overflow-hidden rounded-2xl aspect-[4/3] cursor-pointer bg-white shadow-sm hover:shadow-xl transition-all duration-500"
+                  className="group"
                 >
                   <Link
                     to={`/portfolio/${item.slug || item.id}`}
-                    className="block w-full h-full"
+                    className="relative block overflow-hidden rounded-[36px]
+            h-[560px] sm:h-[620px]
+            border border-white/10 bg-black"
                   >
                     {/* Image */}
                     {item.image ? (
                       <img
                         src={resolveImageUrl(item.image)}
                         alt={item.title}
-                        className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                        className="absolute inset-0 h-full w-full object-cover
+                transition-transform duration-1000 group-hover:scale-105"
                       />
                     ) : (
-                      <div className="absolute inset-0 bg-gray-100 flex items-center justify-center">
-                        <ImageIcon className="w-12 h-12 text-gray-300" />
+                      <div className="absolute inset-0 flex items-center justify-center bg-white/[0.03]">
+                        <ImageIcon className="w-12 h-12 text-white/30" />
                       </div>
                     )}
 
                     {/* Overlay */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent transition-all duration-500" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black via-black/35 to-transparent" />
 
-                    {/* Featured Badge */}
+                    {/* Top Badge */}
                     <div className="absolute top-6 left-6 z-20">
-                      <span className="px-3 py-1 rounded-full bg-white/90 backdrop-blur-md text-xs font-semibold text-violet-700">
+                      <span
+                        className="inline-flex items-center rounded-full
+                border border-white/10 bg-white/10 backdrop-blur-md
+                px-5 py-2 text-xs uppercase tracking-[0.2em]
+                text-white/90"
+                      >
                         Featured
                       </span>
                     </div>
 
-                    {/* Main Content */}
+                    {/* Arrow Button */}
+                    <div
+                      className="absolute top-6 right-6 z-20
+              h-12 w-12 rounded-full border border-white/10
+              bg-white/10 backdrop-blur-md
+              flex items-center justify-center
+              opacity-0 translate-y-3
+              group-hover:opacity-100
+              group-hover:translate-y-0
+              transition-all duration-500"
+                    >
+                      <ArrowRight className="w-5 h-5 text-white -rotate-45" />
+                    </div>
+
+                    {/* Bottom Content */}
                     <div className="absolute bottom-0 left-0 right-0 z-20 p-8">
 
-                      {/* Always Visible */}
-                      <div className="transition-all duration-500 group-hover:-translate-y-24">
-                        <span className="text-violet-300 text-sm font-medium">
-                          {item.category}
-                        </span>
+                      {/* Category */}
+                      <span
+                        className="text-sm uppercase tracking-[0.25em]
+                text-white/50"
+                      >
+                        {item.category}
+                      </span>
 
-                        <h3 className="text-3xl font-bold text-white mt-2">
-                          {item.title}
-                        </h3>
-                      </div>
+                      {/* Title */}
+                      <h3
+                        className="mt-4 text-4xl sm:text-5xl
+                font-bold text-white leading-none"
+                      >
+                        {item.title}
+                      </h3>
 
-                      {/* Hidden Content */}
-                      <div className="absolute left-0 right-0 bottom-0 bg-white rounded-t-3xl p-8 translate-y-full group-hover:translate-y-0 transition-all duration-500">
+                      {/* Client */}
+                      {item.client && (
+                        <p className="mt-4 text-lg text-white/60">
+                          {item.client}
+                        </p>
+                      )}
 
-                        {item.client && (
-                          <p className="text-gray-600 text-sm">
-                            Client: {item.client}
-                          </p>
-                        )}
-
-                        {item.description && (
-                          <p className="text-gray-500 text-sm mt-4 line-clamp-3">
-                            {item.description}
-                          </p>
-                        )}
-
-                        <div className="mt-6 flex items-center gap-2 text-violet-600 font-semibold">
-                          View Project
-                          <ArrowRight className="w-4 h-4" />
-                        </div>
-                      </div>
+                      {/* Description */}
+                      {item.description && (
+                        <p
+                          className="mt-6 max-w-sm text-sm leading-7 text-white/50
+                  opacity-0 translate-y-6
+                  group-hover:opacity-100
+                  group-hover:translate-y-0
+                  transition-all duration-500"
+                        >
+                          {item.description}
+                        </p>
+                      )}
                     </div>
+
+                    {/* Border Glow */}
+                    <div
+                      className="absolute inset-0 rounded-[36px]
+              border border-transparent
+              group-hover:border-white/20
+              transition-all duration-500"
+                    />
                   </Link>
                 </FadeIn>
               ))}
             </FadeIn>
 
-            {/* Show more / show less toggle */}
+            {/* Show More Button */}
             {projects.length > 6 && (
-              <FadeIn delay={0.35} className="mt-10 text-center">
+              <FadeIn delay={0.35} className="mt-16 text-center">
                 <button
                   onClick={() => setShowAll((v) => !v)}
-                  className="inline-flex items-center gap-2 px-6 py-3 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 hover:text-gray-900 text-sm font-semibold transition-all"
+                  className="group inline-flex items-center gap-3
+          rounded-full border border-white/10
+          bg-white/[0.05] px-8 py-4
+          text-white hover:bg-white/[0.08]
+          transition-all duration-300"
                 >
-                  {showAll ? (
-                    <>Show Less</>
-                  ) : (
-                    <>
-                      Show All {projects.length} Featured Projects{" "}
-                      <ArrowRight className="w-4 h-4" />
-                    </>
-                  )}
+                  {showAll
+                    ? "Show Less"
+                    : `View All ${projects.length} Projects`}
+
+                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                 </button>
               </FadeIn>
             )}
@@ -878,6 +944,18 @@ function FeatureCard({ item }) {
 
 /* ───── Home Page ───── */
 export default function Home() {
+  const sectionRef = useRef(null);
+
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ["start end", "end start"],
+  });
+
+  const scale = useTransform(
+    scrollYProgress,
+    [0, 0.3, 0.7, 1],
+    [0.96, 1, 1.05, 1]
+  );
   const structuredData = {
     "@context": "https://schema.org",
     "@type": "Organization",
@@ -926,88 +1004,213 @@ export default function Home() {
       {/* Hero Slider */}
       <HeroSlider />
 
+      {/* intro about company */}
+
+      <section className="relative overflow-hidden bg-black py-28">
+        {/* Grid Background */}
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:48px_48px]" />
+
+        {/* Glow */}
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-violet-600/10 blur-[140px]" />
+
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+          {/* Header */}
+          <FadeIn className="max-w-5xl mx-auto text-center">
+            <span className="inline-flex items-center gap-3 text-white/50 text-sm uppercase tracking-[0.35em]">
+              <span className="w-10 h-px bg-white/30" />
+              About Adway
+              <span className="w-10 h-px bg-white/30" />
+            </span>
+
+            <h2 className="mt-8 text-4xl sm:text-6xl lg:text-7xl font-bold text-white leading-[0.95] tracking-tight">
+              We create brands
+              <span className="block text-white/45">
+                that people remember.
+              </span>
+            </h2>
+
+            <p className="mt-8 max-w-3xl mx-auto text-lg leading-8 text-white/60">
+              Adway is a premium branding and digital agency helping
+              ambitious businesses build distinctive identities,
+              memorable digital experiences, and measurable growth
+              strategies that drive long-term success.
+            </p>
+
+            {/* Service Tags */}
+            <div className="mt-10 flex flex-wrap justify-center gap-3">
+              {[
+                "Brand Strategy",
+                "Digital Marketing",
+                "Web Development",
+                "Creative Branding",
+                "Consulting",
+              ].map((item) => (
+                <span
+                  key={item}
+                  className="px-5 py-2.5 rounded-full border border-white/10 bg-white/[0.04] text-sm text-white/70"
+                >
+                  {item}
+                </span>
+              ))}
+            </div>
+          </FadeIn>
+
+          <FadeIn>
+            {/* Features */}
+            <div className="mt-20 grid md:grid-cols-3 gap-6">
+              {[
+                {
+                  icon: Target,
+                  title: "Strategic clarity",
+                  desc: "Positioning and messaging that differentiate your brand.",
+                },
+                {
+                  icon: Palette,
+                  title: "Distinctive identity",
+                  desc: "Visual systems designed to scale across every touchpoint.",
+                },
+                {
+                  icon: TrendingUp,
+                  title: "Growth focused",
+                  desc: "Creative solutions aligned with measurable business goals.",
+                },
+              ].map((item) => (
+                <FadeIn key={item.title}>
+                  <div className="group h-full rounded-3xl border border-white/10 bg-white/[0.03] p-8 text-center hover:bg-white/[0.05] transition-all duration-500">
+                    <div className="mx-auto w-14 h-14 rounded-2xl border border-white/10 bg-white/[0.04] flex items-center justify-center mb-6">
+                      <item.icon className="w-6 h-6 text-white" />
+                    </div>
+
+                    <h3 className="text-xl font-semibold text-white">
+                      {item.title}
+                    </h3>
+
+                    <p className="mt-4 text-sm leading-7 text-white/50">
+                      {item.desc}
+                    </p>
+                  </div>
+                </FadeIn>
+              ))}
+            </div>
+
+            {/* Stats */}
+            <div className="mt-20 border-t border-white/10 pt-12">
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-10 text-center">
+
+                {[
+                  ["10+", "Years Experience"],
+                  ["240+", "Projects Delivered"],
+                  ["18", "Industries Served"],
+                  ["98%", "Client Satisfaction"],
+                ].map(([number, text]) => (
+                  <div key={text}>
+                    <h3 className="text-5xl lg:text-6xl font-bold text-white">
+                      {number}
+                    </h3>
+
+                    <p className="mt-3 text-sm text-white/45">
+                      {text}
+                    </p>
+                  </div>
+                ))}
+
+              </div>
+            </div>
+          </FadeIn>
+
+        </div>
+      </section>
+
       {/* Services Overview */}
       <section className="relative py-20 bg-black overflow-hidden">
         {/* <div className="absolute top-1/4 left-[-10%] w-[500px] h-[500px] rounded-full bg-purple-600/20 blur-[120px] pointer-events-none mix-blend-screen animate-pulse duration-[6000ms]" />
         <div className="absolute bottom-1/4 right-[-10%] w-[600px] h-[600px] rounded-full bg-blue-600/15 blur-[140px] pointer-events-none mix-blend-screen animate-pulse duration-[8000ms]" />
         <div className="absolute top-1/2 left-1/3 w-[400px] h-[400px] rounded-full bg-fuchsia-500/10 blur-[100px] pointer-events-none mix-blend-screen" /> */}
 
-        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <FadeIn className="text-center max-w-5xl mx-auto mb-16">
-            <span className="text-white/50 font-semibold text-sm uppercase tracking-wider">
-              What We Do
-            </span>
-            <h2 className="mt-4 text-3xl sm:text-5xl font-bold max-w-5xl mx-auto text-white tracking-tight">
-              Services built for impact
-            </h2>
-            <p className="mt-4 text-base text-white/60 max-w-4xl mx-auto text-justify sm:text-center">
-              We provide complete branding solutions that help businesses build
-              strong, memorable brands. From brand strategy and visual identity
-              design to digital marketing and web development, we create
-              tailored solutions that drive growth, strengthen brand presence,
-              and deliver measurable results.
-            </p>
-          </FadeIn>
+        <motion.section
+          ref={sectionRef}
+          style={{ scale }}
+          className="relative py-20 bg-black overflow-hidden origin-center will-change-transform"
+        >
+          {/* <div className="absolute top-1/4 left-[-10%] w-[500px] h-[500px] rounded-full bg-purple-600/20 blur-[120px] pointer-events-none mix-blend-screen animate-pulse duration-[6000ms]" />
+      <div className="absolute bottom-1/4 right-[-10%] w-[600px] h-[600px] rounded-full bg-blue-600/15 blur-[140px] pointer-events-none mix-blend-screen animate-pulse duration-[8000ms]" />
+      <div className="absolute top-1/2 left-1/3 w-[400px] h-[400px] rounded-full bg-fuchsia-500/10 blur-[100px] pointer-events-none mix-blend-screen" /> */}
 
-          <FadeIn className="relative">
-            <div className="absolute inset-y-0 left-0 w-20 bg-gradient-to-r from-black via-black/80 to-transparent z-20" />
-            <div className="absolute inset-y-0 right-0 w-20 bg-gradient-to-l from-black via-black/80 to-transparent z-20" />
-            <div className="overflow-hidden">
-              <div
-                className="flex w-max gap-6"
-                style={{ animation: "servicesMarquee 32s linear infinite" }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.animationPlayState = "paused";
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.animationPlayState = "running";
-                }}
-              >
-                {marqueeServices.map((service, idx) => (
+          <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <FadeIn className="text-center max-w-5xl mx-auto mb-16">
+              <span className="text-white/50 font-semibold text-sm uppercase tracking-wider">
+                What We Do
+              </span>
+
+              <h2 className="mt-4 text-3xl sm:text-5xl font-bold max-w-5xl mx-auto text-white tracking-tight">
+                Services built for impact
+              </h2>
+
+              <p className="mt-4 text-base text-white/60 max-w-4xl mx-auto text-justify sm:text-center">
+                We provide complete branding solutions that help businesses build
+                strong, memorable brands. From brand strategy and visual identity
+                design to digital marketing and web development, we create tailored
+                solutions that drive growth, strengthen brand presence, and deliver
+                measurable results.
+              </p>
+            </FadeIn>
+
+            <FadeIn className="relative">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {services.map((service, idx) => (
                   <FadeIn
                     key={`${service.title}-${idx}`}
-                    delay={(idx % services.length) * 0.04}
+                    delay={idx * 0.04}
                   >
                     <div
-                      className="group relative h-full min-h-[280px] p-8 rounded-2xl overflow-hidden border border-white/20 bg-gradient-to-br from-white/[0.07] to-white/[0.01] backdrop-blur-xl shadow-2xl shadow-black/40 hover:border-white/30 hover:from-white/[0.12] hover:to-white/[0.03] hover:-translate-y-1 transition-all duration-500 w-[320px] sm:w-[360px] shrink-0"
+                      className="group relative min-h-[280px] p-8 rounded-2xl overflow-hidden border border-white/20 bg-gradient-to-br from-white/[0.07] to-white/[0.01] backdrop-blur-xl shadow-2xl shadow-black/40 hover:border-white/30 hover:from-white/[0.12] hover:to-white/[0.03] hover:-translate-y-1 transition-all duration-500"
                       onMouseMove={(e) => {
                         const rect = e.currentTarget.getBoundingClientRect();
+
                         const x = (
                           ((e.clientX - rect.left) / rect.width) *
                           100
                         ).toFixed(1);
+
                         const y = (
                           ((e.clientY - rect.top) / rect.height) *
                           100
                         ).toFixed(1);
+
                         e.currentTarget.style.setProperty("--gx", `${x}%`);
                         e.currentTarget.style.setProperty("--gy", `${y}%`);
                       }}
                     >
                       {/* Noise texture */}
                       <div
-                        className="absolute inset-0 opacity-[0.03] mix-blend-overlay pointer-events-none select-none"
+                        className="absolute inset-0 opacity-[0.03] mix-blend-overlay pointer-events-none"
                         style={{
                           backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
                         }}
                       />
+
                       {/* Top sheen */}
                       <div className="absolute inset-0 bg-gradient-to-b from-white/[0.05] to-transparent pointer-events-none" />
-                      {/* Glare layer */}
+
+                      {/* Mouse glare effect */}
                       <div
-                        className="absolute inset-0 pointer-events-none rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                        className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
                         style={{
                           background:
                             "radial-gradient(circle at var(--gx, 50%) var(--gy, 50%), rgba(255,255,255,0.13) 0%, rgba(255,255,255,0.04) 40%, transparent 70%)",
                         }}
                       />
+
                       <div className="relative z-10">
                         <div className="w-14 h-14 bg-gradient-to-br from-white/10 to-white/[0.02] border border-white/20 backdrop-blur-md rounded-xl flex items-center justify-center mb-6 group-hover:bg-white group-hover:scale-110 transition-all duration-300">
                           <service.icon className="w-7 h-7 text-white group-hover:text-black transition-colors" />
                         </div>
-                        <h3 className="text-xl font-bold text-white mb-3 tracking-wide">
+
+                        <h3 className="text-xl font-bold text-white mb-3">
                           {service.title}
                         </h3>
+
                         <p className="text-white/70 text-sm leading-relaxed font-light">
                           {service.desc}
                         </p>
@@ -1016,19 +1219,19 @@ export default function Home() {
                   </FadeIn>
                 ))}
               </div>
-            </div>
-          </FadeIn>
+            </FadeIn>
 
-          <FadeIn className="text-center mt-16 pb-8">
-            <Link
-              to="/services"
-              className="group inline-flex items-center gap-2 text-white font-semibold hover:gap-3 transition-all"
-            >
-              Explore All Services
-              <ArrowRight className="w-4 h-4" />
-            </Link>
-          </FadeIn>
-        </div>
+            <FadeIn className="text-center mt-16 pb-8">
+              <Link
+                to="/services"
+                className="group inline-flex items-center gap-2 text-white font-semibold hover:gap-3 transition-all"
+              >
+                Explore All Services
+                <ArrowRight className="w-4 h-4" />
+              </Link>
+            </FadeIn>
+          </div>
+        </motion.section>
       </section>
 
       <CurvedTextDivider />

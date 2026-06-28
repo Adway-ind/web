@@ -31,6 +31,7 @@ import CareerJobs from "./pages/admin/CareerJobs";
 import ContactEnquiries from "./pages/admin/contact_enquiries";
 import AdminBlog from "./pages/admin/Blog";
 import "./App.css";
+import PhoneButton from "./components/PhoneButton";
 
 function App() {
   return (
@@ -67,6 +68,7 @@ function App() {
                   </Routes>
                 </main>
                 <Footer />
+                <PhoneButton />
                 <ChatBot />
               </>
             }
