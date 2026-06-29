@@ -218,11 +218,10 @@ export default function ChatBot() {
   return (
     <>
       <div
-        className={`fixed z-[9999] transition-all duration-300 ease-out bottom-24 right-4 sm:right-6 w-[calc(100vw-2rem)] sm:w-[400px] max-h-[70vh] sm:max-h-[520px] ${
-          isOpen
-            ? "opacity-100 translate-y-0 pointer-events-auto"
-            : "opacity-0 translate-y-4 pointer-events-none"
-        }`}
+        className={`fixed z-[9999] transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] bottom-44 right-4 sm:right-6 w-[calc(100vw-2rem)] sm:w-[400px] max-h-[70vh] sm:max-h-[520px] ${isOpen
+            ? "opacity-100 translate-y-0 scale-100 pointer-events-auto"
+            : "opacity-0 translate-y-8 scale-95 pointer-events-none"
+          }`}
       >
         <div className="flex flex-col bg-white border border-black/10 rounded-2xl shadow-2xl shadow-black/10 overflow-hidden h-[70vh] sm:h-[520px]">
           <div className="flex items-center justify-between px-5 py-4 border-b border-black/10 bg-white">
@@ -251,9 +250,8 @@ export default function ChatBot() {
                 className={`flex gap-2.5 ${msg.role === "user" ? "flex-row-reverse" : "flex-row"}`}
               >
                 <div
-                  className={`shrink-0 w-7 h-7 rounded-full flex items-center justify-center mt-0.5 ${
-                    msg.role === "bot" ? "bg-black" : "bg-black/90"
-                  }`}
+                  className={`shrink-0 w-7 h-7 rounded-full flex items-center justify-center mt-0.5 ${msg.role === "bot" ? "bg-black" : "bg-black/90"
+                    }`}
                 >
                   {msg.role === "bot" ? (
                     <Bot className="w-3.5 h-3.5 text-white font-medium" />
@@ -263,11 +261,10 @@ export default function ChatBot() {
                 </div>
 
                 <div
-                  className={`max-w-[80%] px-4 py-2.5 rounded-2xl text-sm leading-relaxed ${
-                    msg.role === "bot"
+                  className={`max-w-[80%] px-4 py-2.5 rounded-2xl text-sm leading-relaxed ${msg.role === "bot"
                       ? "bg-black/5 text-black rounded-tl-sm"
                       : "bg-black text-white rounded-tr-sm"
-                  }`}
+                    }`}
                 >
                   {msg.text}
                 </div>
@@ -362,7 +359,7 @@ export default function ChatBot() {
         </div>
       </div>
 
-      <div className="fixed z-[9998] bottom-5 right-4 sm:right-6">
+      <div className="fixed z-[9998] bottom-10 right-4 sm:right-10">
         {!isOpen && (
           <span className="absolute -top-1 -right-1 z-10 flex h-5 w-5 items-center justify-center rounded-full bg-rose-500 text-[10px] font-bold text-white ">
             3
@@ -371,11 +368,10 @@ export default function ChatBot() {
         <button
           onClick={() => setIsOpen(!isOpen)}
           aria-label={isOpen ? "Close chat" : "Open chat"}
-          className={`relative flex h-[55px] w-[55px] items-center justify-center rounded-full transition-all duration-300 ease-out overflow-visible ${
-            isOpen
+          className={`relative flex h-[55px] w-[55px] items-center justify-center rounded-full transition-all duration-300 ease-out overflow-visible ${isOpen
               ? "scale-90 border border-white bg-black hover:bg-violet-600"
               : "border border-violet-500/10 bg-violet-600 hover:bg-violet-600/30"
-          }`}
+            }`}
         >
           {!isOpen && (
             <>

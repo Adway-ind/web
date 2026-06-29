@@ -16,6 +16,10 @@
   --font-body: "Inter", system-ui, sans-serif;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 /* *{
   border: 1px solid #e94560;
 } */

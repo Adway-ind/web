@@ -4,7 +4,7 @@ const PhoneButton = () => {
   return (
     <a
       href="tel:+919876543210" // Replace with your phone number
-      className="fixed bottom-34 right-6 z-50 group"
+      className="fixed bottom-34 right-10 z-50 group"
       aria-label="Call Us"
     >
       <div className="relative flex h-14 w-14 items-center justify-center rounded-full bg-green-500 shadow-lg transition-all duration-300 hover:scale-110">

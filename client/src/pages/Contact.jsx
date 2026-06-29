@@ -6,7 +6,7 @@ const contactInfo = [
   {
     icon: Mail,
     title: "Email Us",
-    detail: "adwaycreations.com",
+    detail: "adwaycreations@gmail.com",
     sub: "We reply within 24 hours",
   },
   {
@@ -163,7 +163,7 @@ export default function Contact() {
 
                 <h3 className="font-bold text-black mb-1">{info.title}</h3>
                 <p className="text-black font-medium">{info.detail}</p>
-                <p className="text-black/40 text-sm">{info.sub}</p>
+                <p className="text-black/80 font-heading text-sm">{info.sub}</p>
               </div>
             ))}
           </div>

@@ -1,1 +1,4 @@
 /* App-level styles - minimal since we use Tailwind */
+html {
+  scroll-behavior: smooth;
+}
