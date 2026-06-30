@@ -27,6 +27,7 @@ export default function Navbar() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+
   useEffect(() => {
     setIsOpen(false);
   }, [location]);
@@ -34,14 +35,32 @@ export default function Navbar() {
   // Disable body scroll when sidebar is open
   useEffect(() => {
     if (isOpen) {
+      const scrollY = window.scrollY;
+
+      document.body.style.position = "fixed";
+      document.body.style.top = `-${scrollY}px`;
+      document.body.style.left = "0";
+      document.body.style.right = "0";
+      document.body.style.width = "100%";
       document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "";
+
+      document.documentElement.style.overflow = "hidden";
+
+      return () => {
+        const y = Math.abs(parseInt(document.body.style.top || "0", 10));
+
+        document.body.style.position = "";
+        document.body.style.top = "";
+        document.body.style.left = "";
+        document.body.style.right = "";
+        document.body.style.width = "";
+        document.body.style.overflow = "";
+
+        document.documentElement.style.overflow = "";
+
+        window.scrollTo(0, y);
+      };
     }
-    // Cleanup on unmount
-    return () => {
-      document.body.style.overflow = "";
-    };
   }, [isOpen]);
 
   const handleNav = (e, path) => {
@@ -116,17 +135,15 @@ export default function Navbar() {
 
       {/* Mobile sidebar overlay */}
       <div
-        className={`md:hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-40 transition-opacity duration-300 ${
-          isOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
-        }`}
+        className={`md:hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-40 transition-opacity duration-300 ${isOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
+          }`}
         onClick={() => setIsOpen(false)}
       />
 
       {/* Mobile sidebar */}
       <div
-        className={`md:hidden fixed top-0 right-0 h-full w-80 max-w-[85vw] bg-neutral-950 border-l border-white/10 z-50 transform transition-transform duration-500 ease-out ${
-          isOpen ? "translate-x-0" : "translate-x-full"
-        }`}
+        className={`md:hidden fixed top-0 right-0 h-full w-80 max-w-[85vw] bg-neutral-950 border-l border-white/10 z-9999 transform transition-transform duration-500 ease-out ${isOpen ? "translate-x-0" : "translate-x-full"
+          }`}
       >
         {/* Sidebar header */}
         <div className="flex items-center justify-between px-6 py-5 border-b border-white/10">
@@ -150,11 +167,10 @@ export default function Navbar() {
               key={link.path}
               href={link.path}
               onClick={(e) => handleNav(e, link.path)}
-              className={`group flex items-center justify-between px-4 py-4 rounded-xl text-base font-medium transition-all duration-300 ${
-                location.pathname === link.path
-                  ? "bg-white/10 text-white"
-                  : "text-white/60 hover:bg-white/5 hover:text-white"
-              }`}
+              className={`group flex items-center justify-between px-4 py-4 rounded-xl text-base font-medium transition-all duration-300 ${location.pathname === link.path
+                ? "bg-white/10 text-white"
+                : "text-white/60 hover:bg-white/5 hover:text-white"
+                }`}
               style={{
                 animationDelay: `${index * 50}ms`,
                 animation: isOpen ? "slideInRight 0.4s ease-out forwards" : "none",

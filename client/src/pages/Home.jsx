@@ -361,7 +361,7 @@ function HeroSlider() {
       </div> */}
 
       {/* ── Main Content ── */}
-      <div className="relative z-20 h-full w-full flex flex-col justify-end px-6 sm:px-10 lg:px-16 pb-28 sm:pb-32">
+      <div className="relative z-20 h-full w-full flex flex-col justify-center px-6 sm:px-10 lg:px-16 pb-2 sm:pb-32">
         <div className="max-w-7xl mx-auto w-full flex flex-col lg:flex-row items-end justify-between gap-10 lg:gap-16">
           {/* ── Left: Animated Text Content ── */}
           <div className="flex-1 max-w-2xl">
@@ -560,12 +560,43 @@ function HeroSlider() {
 /* ───── Featured Portfolio Section ───── */
 function FeaturedPortfolio() {
   const { authFetch } = useAuth();
+
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showAll, setShowAll] = useState(false);
 
+  // Required for useScroll
+  const sectionRef = useRef(null);
+
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ["start start", "end end"],
+  });
+
+  // Projects to display
+  const visibleProjects = showAll ? projects : projects.slice(0, 6);
+
+  // Horizontal movement
+  const x = useTransform(
+    scrollYProgress,
+    [0, 1],
+    ["0%", "-35%"]
+  );
+
+  const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 1024);
+
   useEffect(() => {
-    // Initialize Lenis
+    const handleResize = () => {
+      setIsDesktop(window.innerWidth >= 1024);
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  useEffect(() => {
+    if (!isDesktop) return;
+
     const lenis = new Lenis({
       duration: 1.5,
       smoothWheel: true,
@@ -574,238 +605,227 @@ function FeaturedPortfolio() {
 
     let rafId;
 
-    function raf(time) {
+    const raf = (time) => {
       lenis.raf(time);
       rafId = requestAnimationFrame(raf);
-    }
+    };
 
     rafId = requestAnimationFrame(raf);
 
-    // Fetch featured projects
-    authFetch("/api/projects/featured")
-      .then((data) => {
-        const featured = Array.isArray(data) ? data : [];
-        setProjects(featured);
-      })
-      .catch((err) => {
-        console.error("Error fetching featured projects:", err);
-        setProjects([]);
-      })
-      .finally(() => setLoading(false));
-
-    // Cleanup
     return () => {
       cancelAnimationFrame(rafId);
       lenis.destroy();
     };
-  }, []);
+  }, [isDesktop]);
 
-  // Show 4 by default; "Show All Featured" reveals the rest
-  const visibleProjects = showAll ? projects : projects.slice(0, 6);
+  useEffect(() => {
+    authFetch("/api/projects/featured")
+      .then((data) => {
+        setProjects(Array.isArray(data) ? data : []);
+      })
+      .catch((err) => {
+        console.error(err);
+        setProjects([]);
+      })
+      .finally(() => setLoading(false));
+  }, [authFetch]);
 
   return (
-    <section className="relative overflow-hidden bg-black py-28">
-      {/* Background */}
-      <video
-        src={BG}
-        autoPlay
-        muted
-        loop
-        playsInline
-        preload="metadata"
-        className="absolute inset-0 h-full w-full object-cover"
-      />
+    /* Track Wrapper: Determines total scroll length (300vh allows a smooth scrolling distance) */
+    <section
+      ref={sectionRef}
+      className={`relative bg-white ${isDesktop ? "h-[300vh]" : "py-20"
+        }`}
+    >
+      {/* Background Media & Overlays (Pinned through h-screen) */}
+      <div
+        className={`w-full flex flex-col justify-center ${isDesktop
+          ? "sticky top-0 h-screen overflow-hidden"
+          : "relative min-h-screen"
+          }`}
+      >        {/* <video
+          src={BG} // Ensure BG variable is imported or passed in
+          autoPlay
+          muted
+          loop
+          playsInline
+          preload="metadata"
+          className="absolute inset-0 h-full w-full object-cover"
+        /> */}
+        <div className="absolute inset-0 bg-white" />
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:48px_48px]" />
 
-      <div className="absolute inset-0 bg-black/70" />
+        {/* Content Container */}
+        <div className="relative z-10 w-full flex flex-col justify-between h-full py-16">
 
-      <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:48px_48px]" />
+          {/* Header (Top Anchor) */}
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center w-full">
+            <FadeIn className="max-w-4xl mx-auto">
+              <span className="inline-flex items-center gap-3 text-black/50 text-sm uppercase tracking-[0.3em]">
+                <span className="w-10 h-px bg-black/30" />
+                Featured Work
+                <span className="w-10 h-px bg-black/30" />
+              </span>
 
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+              <h2 className="mt-4 text-3xl sm:text-5xl font-bold text-black tracking-tight">
+                Selected projects
+              </h2>
 
-        {/* Header */}
-        <FadeIn className="mb-20 text-center max-w-4xl mx-auto">
-          <span className="inline-flex items-center gap-3 text-white/50 text-sm uppercase tracking-[0.3em]">
-            <span className="w-10 h-px bg-white/30" />
-            Featured Work
-            <span className="w-10 h-px bg-white/30" />
-          </span>
-
-          <h2 className="mt-8 text-4xl sm:text-6xl font-bold text-white tracking-tight">
-            Selected projects
-          </h2>
-
-          <p className="mt-6 text-lg text-white/60 leading-8">
-            A curated selection of brands, digital experiences,
-            and campaigns crafted to create lasting impact.
-          </p>
-
-          <Link
-            to="/portfolio"
-            className="inline-flex items-center gap-2 mt-8 text-white font-medium group"
-          >
-            View All Projects
-            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-          </Link>
-        </FadeIn>
-
-        {/* Loading */}
-        {loading && (
-          <div className="flex justify-center py-24">
-            <div className="w-8 h-8 rounded-full border-2 border-white/20 border-t-white animate-spin" />
-          </div>
-        )}
-
-        {/* Empty */}
-        {!loading && projects.length === 0 && (
-          <div className="text-center py-24">
-            <ImageIcon className="mx-auto w-12 h-12 text-white/30" />
-            <p className="mt-6 text-white/70">
-              No featured projects available.
-            </p>
-          </div>
-        )}
-
-        {/* Portfolio Grid */}
-        {/* Projects Grid */}
-        {!loading && visibleProjects.length > 0 && (
-          <>
-            <FadeIn
-              delay={0.2}
-              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
-            >
-              {visibleProjects.map((item, index) => (
-                <FadeIn
-                  key={item.id}
-                  delay={0.15 + index * 0.08}
-                  direction="up"
-                  className="group"
-                >
-                  <Link
-                    to={`/portfolio/${item.slug || item.id}`}
-                    className="relative block overflow-hidden rounded-[36px]
-            h-[560px] sm:h-[620px]
-            border border-white/10 bg-black"
-                  >
-                    {/* Image */}
-                    {item.image ? (
-                      <img
-                        src={resolveImageUrl(item.image)}
-                        alt={item.title}
-                        className="absolute inset-0 h-full w-full object-cover
-                transition-transform duration-1000 group-hover:scale-105"
-                      />
-                    ) : (
-                      <div className="absolute inset-0 flex items-center justify-center bg-white/[0.03]">
-                        <ImageIcon className="w-12 h-12 text-white/30" />
-                      </div>
-                    )}
-
-                    {/* Overlay */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black via-black/35 to-transparent" />
-
-                    {/* Top Badge */}
-                    <div className="absolute top-6 left-6 z-20">
-                      <span
-                        className="inline-flex items-center rounded-full
-                border border-white/10 bg-white/10 backdrop-blur-md
-                px-5 py-2 text-xs uppercase tracking-[0.2em]
-                text-white/90"
-                      >
-                        Featured
-                      </span>
-                    </div>
-
-                    {/* Arrow Button */}
-                    <div
-                      className="absolute top-6 right-6 z-20
-              h-12 w-12 rounded-full border border-white/10
-              bg-white/10 backdrop-blur-md
-              flex items-center justify-center
-              opacity-0 translate-y-3
-              group-hover:opacity-100
-              group-hover:translate-y-0
-              transition-all duration-500"
-                    >
-                      <ArrowRight className="w-5 h-5 text-white -rotate-45" />
-                    </div>
-
-                    {/* Bottom Content */}
-                    <div className="absolute bottom-0 left-0 right-0 z-20 p-8">
-
-                      {/* Category */}
-                      <span
-                        className="text-sm uppercase tracking-[0.25em]
-                text-white/50"
-                      >
-                        {item.category}
-                      </span>
-
-                      {/* Title */}
-                      <h3
-                        className="mt-4 text-4xl sm:text-5xl
-                font-bold text-white leading-none"
-                      >
-                        {item.title}
-                      </h3>
-
-                      {/* Client */}
-                      {item.client && (
-                        <p className="mt-4 text-lg text-white/60">
-                          {item.client}
-                        </p>
-                      )}
-
-                      {/* Description */}
-                      {item.description && (
-                        <p
-                          className="mt-6 max-w-sm text-sm leading-7 text-white/50
-                  opacity-0 translate-y-6
-                  group-hover:opacity-100
-                  group-hover:translate-y-0
-                  transition-all duration-500"
-                        >
-                          {item.description}
-                        </p>
-                      )}
-                    </div>
-
-                    {/* Border Glow */}
-                    <div
-                      className="absolute inset-0 rounded-[36px]
-              border border-transparent
-              group-hover:border-white/20
-              transition-all duration-500"
-                    />
-                  </Link>
-                </FadeIn>
-              ))}
+              <p className="mt-2 text-base text-black/60 max-w-2xl mx-auto">
+                A curated selection of brands, digital experiences, and campaigns crafted to create lasting impact.
+              </p>
             </FadeIn>
+          </div>
 
-            {/* Show More Button */}
-            {projects.length > 6 && (
-              <FadeIn delay={0.35} className="mt-16 text-center">
-                <button
-                  onClick={() => setShowAll((v) => !v)}
-                  className="group inline-flex items-center gap-3
-          rounded-full border border-white/10
-          bg-white/[0.05] px-8 py-4
-          text-white hover:bg-white/[0.08]
-          transition-all duration-300"
-                >
-                  {showAll
-                    ? "Show Less"
-                    : `View All ${projects.length} Projects`}
+          {/* Loading State */}
+          {loading && (
+            <div className="flex justify-center my-auto">
+              <div className="w-8 h-8 rounded-full border-2 border-black/20 border-t-black animate-spin" />
+            </div>
+          )}
 
-                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                </button>
-              </FadeIn>
-            )}
-          </>
-        )}
+          {/* Empty State */}
+          {!loading && projects.length === 0 && (
+            <div className="text-center my-auto">
+              <ImageIcon className="mx-auto w-12 h-12 text-white/30" />
+              <p className="mt-6 text-white/70">No featured projects available.</p>
+            </div>
+          )}
+
+          {/* Horizontal Scroller Rail */}
+          {!loading && visibleProjects.length > 0 && (
+            <>
+              {isDesktop ? (
+                // Desktop: Horizontal scroll animation
+                <div className="w-full overflow-hidden my-auto cursor-grab active:cursor-grabbing">
+                  <motion.div
+                    style={{ x }}
+                    className="flex gap-8 px-8 sm:px-16 md:px-32 w-max"
+                  >
+                    {visibleProjects.slice(0, 6).map((item) => (
+                      <div
+                        key={item.id}
+                        className="group relative block w-[80vw] sm:w-[460px] md:w-[540px] flex-shrink-0"
+                      >
+                        <Link
+                          to={`/portfolio/${item.slug || item.id}`}
+                          className="relative block overflow-hidden h-[480px] sm:h-[540px] border border-white/10 bg-black"
+                        >
+                          {/* Image */}
+                          {item.image ? (
+                            <img
+                              src={resolveImageUrl(item.image)}
+                              alt={item.title}
+                              className="absolute inset-0 h-full w-full object-cover transition-transform duration-1000 group-hover:scale-105"
+                            />
+                          ) : (
+                            <div className="absolute inset-0 flex items-center justify-center bg-white/[0.03]">
+                              <ImageIcon className="w-12 h-12 text-white/30" />
+                            </div>
+                          )}
+
+                          <div className="absolute inset-0 bg-gradient-to-t from-black via-black/35 to-transparent" />
+
+                          <div className="absolute top-6 left-6 z-20">
+                            <span className="inline-flex items-center rounded-full border border-white/10 bg-white/10 backdrop-blur-md px-5 py-2 text-xs uppercase tracking-[0.2em] text-white/90">
+                              Featured
+                            </span>
+                          </div>
+
+                          <div className="absolute top-6 right-6 z-20 h-12 w-12 rounded-full border border-white/10 bg-white/10 backdrop-blur-md flex items-center justify-center opacity-0 translate-y-3 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-500">
+                            <ArrowRight className="w-5 h-5 text-white -rotate-45" />
+                          </div>
+
+                          <div className="absolute bottom-0 left-0 right-0 z-20 p-8">
+                            <span className="text-sm uppercase tracking-[0.25em] text-white/50">
+                              {item.category}
+                            </span>
+
+                            <h3 className="mt-2 text-3xl sm:text-4xl font-bold text-white leading-tight">
+                              {item.title}
+                            </h3>
+
+                            {item.client && (
+                              <p className="mt-2 text-base text-white/60">
+                                {item.client}
+                              </p>
+                            )}
+
+                            {item.description && (
+                              <p className="mt-4 max-w-sm text-sm leading-6 text-white/50 opacity-0 translate-y-6 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-500">
+                                {item.description}
+                              </p>
+                            )}
+                          </div>
+
+                          <div className="absolute inset-0 rounded-[36px] border border-transparent group-hover:border-white/20 transition-all duration-500" />
+                        </Link>
+                      </div>
+                    ))}
+                  </motion.div>
+                </div>
+              ) : (
+                // Mobile & Tablet: Grid Layout
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 px-6 py-8">
+                  {visibleProjects.slice(0, 6).map((item) => (
+                    <Link
+                      key={item.id}
+                      to={`/portfolio/${item.slug || item.id}`}
+                      className="group relative block overflow-hidden h-[380px] border border-white/10 bg-black"
+                    >
+                      {item.image ? (
+                        <img
+                          src={resolveImageUrl(item.image)}
+                          alt={item.title}
+                          className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+                        />
+                      ) : (
+                        <div className="absolute inset-0 flex items-center justify-center bg-white/[0.03]">
+                          <ImageIcon className="w-12 h-12 text-white/30" />
+                        </div>
+                      )}
+
+                      <div className="absolute inset-0 bg-gradient-to-t from-black via-black/35 to-transparent" />
+
+                      <div className="absolute bottom-0 left-0 right-0 p-6">
+                        <span className="text-xs uppercase tracking-[0.2em] text-white/60">
+                          {item.category}
+                        </span>
+
+                        <h3 className="mt-2 text-2xl font-bold text-white">
+                          {item.title}
+                        </h3>
+
+                        {item.client && (
+                          <p className="mt-2 text-sm text-white/60">
+                            {item.client}
+                          </p>
+                        )}
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              )}
+            </>
+          )}
+
+          {/* Footer Navigation Link (Bottom Anchor) */}
+          <div className="text-center w-full">
+            <Link
+              to="/portfolio"
+              className="inline-flex items-center gap-2 text-white/80 hover:text-white font-medium group transition-colors"
+            >
+              View All Featured Portfolio
+              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+            </Link>
+          </div>
+
+        </div>
       </div>
     </section>
   );
 }
+
 
 /* ───── Helper cards used in the expertise section ───── */
 function ImageCard({ item, minHeight = "min-h-[260px]" }) {
@@ -948,9 +968,12 @@ export default function Home() {
 
   const { scrollYProgress } = useScroll({
     target: sectionRef,
-    offset: ["start end", "end start"],
+    // START tracking when the top of the container hits the top of the viewport
+    // END tracking when the bottom of the container hits the bottom of the viewport
+    offset: ["start start", "end end"],
   });
 
+  // Now scrollYProgress will perfectly map 0 to 1 *while* the section is stuck!
   const scale = useTransform(
     scrollYProgress,
     [0, 0.3, 0.7, 1],
@@ -1006,31 +1029,31 @@ export default function Home() {
 
       {/* intro about company */}
 
-      <section className="relative overflow-hidden bg-black py-28">
+      <section className="relative overflow-hidden bg-white py-28">
         {/* Grid Background */}
-        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:48px_48px]" />
+        {/* <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:48px_48px]" /> */}
 
         {/* Glow */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-violet-600/10 blur-[140px]" />
-
+        {/* <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-violet-600/10 blur-[140px]" />
+ */}
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
           {/* Header */}
           <FadeIn className="max-w-5xl mx-auto text-center">
-            <span className="inline-flex items-center gap-3 text-white/50 text-sm uppercase tracking-[0.35em]">
-              <span className="w-10 h-px bg-white/30" />
+            <span className="inline-flex items-center gap-3 text-black/50 text-sm uppercase tracking-[0.35em]">
+              <span className="w-10 h-px bg-black/30" />
               About Adway
-              <span className="w-10 h-px bg-white/30" />
+              <span className="w-10 h-px bg-black/30" />
             </span>
 
-            <h2 className="mt-8 text-4xl sm:text-6xl lg:text-7xl font-bold text-white leading-[0.95] tracking-tight">
+            <h2 className="mt-8 text-4xl sm:text-6xl lg:text-7xl font-bold text-black leading-[0.95] tracking-tight">
               We create brands
-              <span className="block text-white/45">
+              <span className="block text-black/45">
                 that people remember.
               </span>
             </h2>
 
-            <p className="mt-8 max-w-3xl mx-auto text-lg leading-8 text-white/60">
+            <p className="mt-8 max-w-3xl mx-auto text-lg leading-8 text-black/60">
               Adway is a premium branding and digital agency helping
               ambitious businesses build distinctive identities,
               memorable digital experiences, and measurable growth
@@ -1048,7 +1071,7 @@ export default function Home() {
               ].map((item) => (
                 <span
                   key={item}
-                  className="px-5 py-2.5 rounded-full border border-white/10 bg-white/[0.04] text-sm text-white/70"
+                  className="px-5 py-2.5 font-medium rounded-full border border-black/50 bg-white text-sm text-black"
                 >
                   {item}
                 </span>
@@ -1077,16 +1100,16 @@ export default function Home() {
                 },
               ].map((item) => (
                 <FadeIn key={item.title}>
-                  <div className="group h-full rounded-3xl border border-white/10 bg-white/[0.03] p-8 text-center hover:bg-white/[0.05] transition-all duration-500">
+                  <div className="group h-full rounded-3xl border border-black/50 bg-black p-8 text-center hover:bg-black/[0.05] transition-all duration-500">
                     <div className="mx-auto w-14 h-14 rounded-2xl border border-white/10 bg-white/[0.04] flex items-center justify-center mb-6">
-                      <item.icon className="w-6 h-6 text-white" />
+                      <item.icon className="w-6 h-6 text-white transition-colors duration-300 group-hover:text-black" />
                     </div>
 
-                    <h3 className="text-xl font-semibold text-white">
+                    <h3 className="text-xl font-semibold text-white mb-3 transition-colors duration-300 group-hover:text-black">
                       {item.title}
                     </h3>
 
-                    <p className="mt-4 text-sm leading-7 text-white/50">
+                    <p className="mt-4 text-sm font-medium leading-7 text-white mb-3 transition-colors duration-300 group-hover:text-black">
                       {item.desc}
                     </p>
                   </div>
@@ -1105,11 +1128,11 @@ export default function Home() {
                   ["98%", "Client Satisfaction"],
                 ].map(([number, text]) => (
                   <div key={text}>
-                    <h3 className="text-5xl lg:text-6xl font-bold text-white">
+                    <h3 className="text-5xl lg:text-6xl font-bold text-black">
                       {number}
                     </h3>
 
-                    <p className="mt-3 text-sm text-white/45">
+                    <p className="mt-3 font-medium text-sm text-black">
                       {text}
                     </p>
                   </div>

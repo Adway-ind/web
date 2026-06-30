@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { Mail, Lock, Eye, EyeOff, Shield, AlertCircle } from "lucide-react";
@@ -12,6 +12,35 @@ export default function AdminLogin() {
   const [showPass, setShowPass] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    document.title = "Adway Creations Staff Portal";
+
+    const previousRobots = document
+      .querySelector('meta[name="robots"]')
+      ?.getAttribute("content");
+    let robots = document.querySelector('meta[name="robots"]');
+    if (!robots) {
+      robots = document.createElement("meta");
+      robots.setAttribute("name", "robots");
+      document.head.appendChild(robots);
+    }
+    robots.setAttribute("content", "noindex, nofollow, noarchive");
+
+    let canonical = document.querySelector('link[rel="canonical"]');
+    if (!canonical) {
+      canonical = document.createElement("link");
+      canonical.setAttribute("rel", "canonical");
+      document.head.appendChild(canonical);
+    }
+    canonical.setAttribute("href", `${window.location.origin}/admin/login`);
+
+    return () => {
+      if (previousRobots) {
+        robots.setAttribute("content", previousRobots);
+      }
+    };
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -36,9 +65,11 @@ export default function AdminLogin() {
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-violet-600 to-indigo-600 shadow-lg shadow-violet-500/20 mb-4">
             <Shield className="w-8 h-8 text-white" />
           </div>
-          <h1 className="text-2xl font-bold text-white">Adway Admin</h1>
+          <h1 className="text-2xl font-bold text-white">
+            Adway Creations Staff Portal
+          </h1>
           <p className="text-white/40 text-sm mt-1">
-            Secure access to your dashboard
+            Private dashboard access for authorized team members only
           </p>
         </div>
 
@@ -53,6 +84,12 @@ export default function AdminLogin() {
               </div>
             )}
 
+            <div className="rounded-xl border border-white/10 bg-white/[0.04] px-4 py-3 text-xs leading-5 text-white/45">
+              This sign-in page belongs to Adway Creations. Do not enter
+              credentials unless you are an authorized staff member on the
+              official Adway domain.
+            </div>
+
             {/* Email */}
             <div>
               <label className="block text-xs font-medium text-white/50 uppercase tracking-wider mb-2">
@@ -64,7 +101,7 @@ export default function AdminLogin() {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="admin@adway.com"
+                  placeholder="staff@adway.agency"
                   required
                   autoComplete="email"
                   className="w-full pl-11 pr-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-white/20 outline-none focus:border-violet-500/50 focus:ring-1 focus:ring-violet-500/20 transition-all"
@@ -114,7 +151,7 @@ export default function AdminLogin() {
                   Authenticating...
                 </>
               ) : (
-                "Sign In"
+                "Sign in to Adway"
               )}
             </button>
           </form>
@@ -122,9 +159,9 @@ export default function AdminLogin() {
           {/* Security note */}
           <div className="mt-6 pt-5 border-t border-white/5 text-center">
             <p className="text-[11px] text-white/20 leading-relaxed">
-              Protected by JWT authentication with bcrypt encryption.
+              Official private admin area for Adway Creations.
               <br />
-              All sessions expire after 2 hours of inactivity.
+              Sessions are protected and monitored for unauthorized access.
             </p>
           </div>
         </div>

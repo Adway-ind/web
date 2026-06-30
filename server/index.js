@@ -110,6 +110,12 @@ app.use(express.urlencoded({
   limit: "2mb"
 }));
 
+app.use(["/api/auth", "/api/admin"], (req, res, next) => {
+  res.setHeader("X-Robots-Tag", "noindex, nofollow, noarchive");
+  res.setHeader("Cache-Control", "no-store");
+  next();
+});
+
 
 // Rate limiting
 const authLimiter = rateLimit({

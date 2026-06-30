@@ -359,7 +359,7 @@ export default function ChatBot() {
         </div>
       </div>
 
-      <div className="fixed z-[9998] bottom-10 right-4 sm:right-10">
+      <div className="fixed z-[30] bottom-20 sm:bottom-10 right-4 sm:right-10">
         {!isOpen && (
           <span className="absolute -top-1 -right-1 z-10 flex h-5 w-5 items-center justify-center rounded-full bg-rose-500 text-[10px] font-bold text-white ">
             3
