@@ -2,6 +2,7 @@
   "installCommand": "npm ci",
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
+
   "headers": [
     {
       "source": "/admin/(.*)",
@@ -17,6 +18,21 @@
       ]
     }
   ],
+
+  "redirects": [
+    {
+      "source": "/:path*",
+      "has": [
+        {
+          "type": "host",
+          "value": "web-orcin-omega-52.vercel.app"
+        }
+      ],
+      "destination": "https://adwaycreations.com/:path*",
+      "permanent": true
+    }
+  ],
+
   "rewrites": [
     {
       "source": "/(.*)",
