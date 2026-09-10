@@ -7,16 +7,8 @@ import { motion } from "framer-motion";
 import Client from "../components/ClientsSection";
 import { Helmet } from "react-helmet-async";
 import {
-  createCreativeWorkSchema,
   createBreadcrumbSchema,
 } from "../SEO/structuredData";
-
-const portfolioSchema = createCreativeWorkSchema({
-  name: project.title,
-  description: project.description,
-  image: project.image,
-  slug: project.slug,
-});
 
 const breadcrumbSchema = createBreadcrumbSchema([
   {
@@ -27,11 +19,8 @@ const breadcrumbSchema = createBreadcrumbSchema([
     name: "Portfolio",
     url: "https://adwaycreations.com/portfolio",
   },
-  {
-    name: project.title,
-    url: `https://adwaycreations.com/portfolio/${project.slug}`,
-  },
 ]);
+
 
 
 const resolveImageUrl = (url) => {
@@ -131,10 +120,6 @@ export default function Portfolio() {
           content="Explore branding, packaging, website and creative projects by Adway Creations."
         />
         <meta name="twitter:image" content="https://adwaycreations.com/og-image.jpg" />
-
-        <script type="application/ld+json">
-          {JSON.stringify(pageSchema)}
-        </script>
 
         <script type="application/ld+json">
           {JSON.stringify(breadcrumbSchema)}
