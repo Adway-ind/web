@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import {
   createServiceSchema,
   createBreadcrumbSchema,
-} from "./seo/structuredData";
+} from "../SEO/structuredData";
 import {
   ArrowRight,
   Palette,

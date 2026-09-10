@@ -1,5 +1,28 @@
+# ==========================================
+# Dependencies
+# ==========================================
+node_modules/
+**/node_modules/
+
+# ==========================================
+# Environment variables / secrets
+# ==========================================
+.env
+.env.*
+!.env.example
+
+# ==========================================
+# Build output
+# ==========================================
+dist/
+**/dist/
+build/
+**/build/
+
+# ==========================================
 # Logs
-logs
+# ==========================================
+logs/
 *.log
 npm-debug.log*
 yarn-debug.log*
@@ -7,20 +30,50 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-node_modules
+# ==========================================
+# Vite
+# ==========================================
+.vite/
 
-
-*.local
-
-# Editor directories and files
+# ==========================================
+# Editor
+# ==========================================
 .vscode/*
 !.vscode/extensions.json
-.idea
-.DS_Store
+.idea/
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 *.sw?
 
-.env*
+# ==========================================
+# OS
+# ==========================================
+.DS_Store
+Thumbs.db
+
+# ==========================================
+# Temporary files
+# ==========================================
+tmp/
+temp/
+*.tmp
+
+# ==========================================
+# Server uploads
+# ==========================================
+server/uploads/*
+
+# Keep upload folders in Git
+!server/uploads/
+!server/uploads/logos/
+!server/uploads/resumes/
+
+# Don't upload actual user files
+server/uploads/logos/*
+server/uploads/resumes/*
+
+# Keep folders with .gitkeep
+!server/uploads/logos/.gitkeep
+!server/uploads/resumes/.gitkeep

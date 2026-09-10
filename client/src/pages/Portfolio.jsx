@@ -3,14 +3,14 @@ import { Link } from "react-router-dom";
 import { ArrowUpRight, SlidersHorizontal } from "lucide-react";
 import Video from "../assets/video/portfolio-one.mp4";
 import { API } from "../config/api";
-import SEO from "../components/SEO";
+import SEO from "./components/SEO";
 import { motion } from "framer-motion";
 import Client from "../components/ClientsSection";
 import { Helmet } from "react-helmet-async";
 import {
   createCreativeWorkSchema,
   createBreadcrumbSchema,
-} from "./seo/structuredData";
+} from "../SEO/structuredData";
 
 const portfolioSchema = createCreativeWorkSchema({
   name: project.title,

@@ -4,7 +4,7 @@ import { Helmet } from "react-helmet-async";
 import {
   createWebPageSchema,
   createBreadcrumbSchema,
-} from "./seo/structuredData";
+} from "../SEO/structuredData";
 import {
   ArrowRight,
   Users,
