@@ -20,10 +20,6 @@ import {
 
 import Video from "../assets/video/service-one.mp4";
 import { Helmet } from "react-helmet-async";
-import {
-  createServiceSchema,
-  createBreadcrumbSchema,
-} from "./seo/structuredData";
 
 const serviceSchema = createServiceSchema({
   name: "Branding & Digital Marketing Services",
@@ -233,7 +229,7 @@ export default function Services() {
           content="https://adwaycreations.com/og-image.jpg"
         />
         <script type="application/ld+json">
-          {JSON.stringify(pageSchema)}
+          {JSON.stringify(serviceSchema)}
         </script>
 
         <script type="application/ld+json">
