@@ -1,0 +1,10 @@
+◇ injected env (0) from .env // tip: ⌁ auth for agents [www.vestauth.com]
+📁 Upload directory: D:\amal\WEB\adway\web-main\server\uploads
+📎 Mail config: { EMAIL_USER: false, EMAIL_PASS: false }
+
+🚀 Adway Admin Server running on port 5000
+📧 Admin email: admin@adway.com
+🔑 JWT Secret: b4678ac60d22...
+
+⚠️  Change ADMIN_EMAIL, ADMIN_PASS, JWT_SECRET in .env for production!
+

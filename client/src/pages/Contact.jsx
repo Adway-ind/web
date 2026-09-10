@@ -1,0 +1,488 @@
+import { useState } from "react";
+import { Mail, Phone, MapPin, Clock, Send, CheckCircle2 } from "lucide-react";
+import SEO from "../components/SEO";
+import { Helmet } from "react-helmet-async";
+
+const contactInfo = [
+  {
+    icon: Mail,
+    title: "Email Us",
+    detail: "adwaycreations@gmail.com",
+    sub: "We reply within 24 hours",
+  },
+  {
+    icon: Phone,
+    title: "Call Us",
+    detail: "+91 8606880634",
+    sub: "Mon-Fri, 9am-6pm EST",
+  },
+  {
+    icon: MapPin,
+    title: "Visit Us",
+    detail: "Kattappana",
+    sub: "Adway Building, 23/7, near Vi Office, Kattappana, Kerala",
+  },
+  {
+    icon: Clock,
+    title: "Working Hours",
+    detail: "Mon - Fri",
+    sub: "9:00 AM - 6:00 PM EST",
+  },
+];
+
+const API_URL = import.meta.env.VITE_API_URL
+
+export default function Contact() {
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    company: "",
+    service: "",
+    budget: "",
+    message: "",
+  });
+  const [submitted, setSubmitted] = useState(false);
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    try {
+      const response = await fetch(
+        `${API_URL}/api/contact-enquiries`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(formData),
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message);
+      }
+
+      setSubmitted(true);
+
+      setFormData({
+        name: "",
+        email: "",
+        company: "",
+        service: "",
+        budget: "",
+        message: "",
+      });
+
+      setTimeout(() => setSubmitted(false), 5000);
+    } catch (error) {
+      console.error("Error submitting form:", error);
+    }
+  };
+
+  return (
+    <>
+      <Helmet>
+        <title>
+          Contact Adway Creations | Branding & Digital Marketing Agency
+        </title>
+
+        <meta
+          name="description"
+          content="Get in touch with Adway Creations for branding, logo design, packaging design, web development, UI/UX design, social media marketing and digital marketing services."
+        />
+
+        <meta
+          name="robots"
+          content="index, follow"
+        />
+
+        <link
+          rel="canonical"
+          href="https://adwaycreations.com/contact"
+        />
+
+        {/* Open Graph */}
+        <meta
+          property="og:type"
+          content="website"
+        />
+
+        <meta
+          property="og:site_name"
+          content="Adway Creations"
+        />
+
+        <meta
+          property="og:title"
+          content="Contact Adway Creations | Branding & Digital Marketing Agency"
+        />
+
+        <meta
+          property="og:description"
+          content="Have a project in mind? Contact Adway Creations for branding, design, web development and digital marketing solutions."
+        />
+
+        <meta
+          property="og:url"
+          content="https://adwaycreations.com/contact"
+        />
+
+        <meta
+          property="og:image"
+          content="https://adwaycreations.com/og-image.jpg"
+        />
+
+        {/* Twitter / X */}
+        <meta
+          name="twitter:card"
+          content="summary_large_image"
+        />
+
+        <meta
+          name="twitter:title"
+          content="Contact Adway Creations | Branding & Digital Marketing Agency"
+        />
+
+        <meta
+          name="twitter:description"
+          content="Contact Adway Creations to discuss your next branding, design, website or digital marketing project."
+        />
+
+        <meta
+          name="twitter:image"
+          content="https://adwaycreations.com/og-image.jpg"
+        />
+      </Helmet>
+
+      {/* Hero */}
+      <section className="relative bg-black pt-32 pb-20 overflow-hidden">
+        <div className="relative max-w-7xl mx-auto px-6 lg:px-12">
+          {/* Eyebrow rule */}
+          <div className="flex items-center gap-4 mb-10">
+            <span className="text-[11px] tracking-[0.12em] uppercase text-white/50">
+              Adway Studio — Contact
+            </span>
+            <div className="flex-1 h-px bg-white/15" />
+          </div>
+
+          {/* Headline */}
+          <h1
+            className="text-white text-center leading-[1.0] tracking-[-0.03em] font-medium"
+            style={{
+              fontVariationSettings: "'opsz' 144",
+              fontSize: "clamp(52px, 8vw, 88px)",
+            }}
+          >
+            Let's start
+            <br />{" "}
+            <em className="text-blue-500" style={{ fontStyle: "italic" }}>
+              something great
+            </em>
+          </h1>
+
+          <p className="mt-5 text-[15px] text-white/50 text-center leading-relaxed max-w-7xl font-light">
+            Ready to start your next project? We're here to help. Reach out to
+            us through any of the channels below, or fill out the contact form
+            and we'll get back to you within 24 hours. Whether you have a
+            specific project in mind or just want to explore possibilities, we'd
+            love to hear from you.
+          </p>
+
+          {/* Stats + scroll hint */}
+        </div>
+      </section>
+
+      {/* Contact Info Cards */}
+      <section className="py-16 bg-neutral-950">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 -mt-24 relative z-10">
+            {contactInfo.map((info) => (
+              <div
+                key={info.title}
+                className="relative overflow-hidden bg-white rounded-2xl p-6 border border-white/10 hover:border-white/25 transition-all duration-300 group"
+              >
+                {/* Grid Pattern */}
+                <div className="absolute bottom-0 right-0 w-40 h-40 opacity-10 pointer-events-none">
+                  <div
+                    className="w-full h-full"
+                    style={{
+                      backgroundImage: `
+        linear-gradient(to right, #000 1px, transparent 1px),
+        linear-gradient(to bottom, #000 1px, transparent 1px)
+      `,
+                      backgroundSize: "12px 12px",
+                      WebkitMaskImage:
+                        "radial-gradient(circle at bottom right, black 25%, transparent 85%)",
+                      maskImage:
+                        "radial-gradient(circle at bottom right, black 25%, transparent 85%)",
+                    }}
+                  />
+                </div>
+
+                <div className="w-12 h-12 bg-black/10 rounded-xl flex items-center justify-center mb-4 group-hover:bg-black transition-colors duration-300">
+                  <info.icon className="w-6 h-6 text-black/70 group-hover:text-white transition-colors" />
+                </div>
+
+                <h3 className="font-bold text-black mb-1">{info.title}</h3>
+                <p className="text-black font-medium">{info.detail}</p>
+                <p className="text-black/80 font-heading text-sm">{info.sub}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Contact Form + Map */}
+      <section className="py-24 bg-neutral-950">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 lg:grid-cols-5 gap-16">
+            {/* Form */}
+            <div className="lg:col-span-3">
+              <h2 className="text-3xl sm:text-4xl font-bold text-white tracking-tight">
+                Tell us about your project
+              </h2>
+              <p className="mt-3 text-white/60 text-lg">
+                Fill out the form below and we'll get back to you within 24
+                hours.
+              </p>
+              <p className="mt-3 text-white/50 text-base">
+                The more details you provide about your project goals, timeline,
+                and budget, the better we can tailor our response to your needs.
+                All fields marked with an asterisk (*) are required.
+              </p>
+
+              {submitted ? (
+                <div className="mt-10 p-8 bg-white/5 border border-white/10 rounded-2xl text-center">
+                  <CheckCircle2 className="w-16 h-16 text-white/40 mx-auto mb-4" />
+                  <h3 className="text-2xl font-bold text-white mb-2">
+                    Thank you!
+                  </h3>
+                  <p className="text-white/60">
+                    We've received your message and will get back to you within
+                    24 hours.
+                  </p>
+                  <button
+                    onClick={() => {
+                      setSubmitted(false);
+                      setFormData({
+                        name: "",
+                        email: "",
+                        company: "",
+                        service: "",
+                        budget: "",
+                        message: "",
+                      });
+                    }}
+                    className="mt-6 px-6 py-3 bg-white text-black rounded-full font-semibold hover:bg-white/90 transition-all"
+                  >
+                    Send Another Message
+                  </button>
+                </div>
+              ) : (
+                <form onSubmit={handleSubmit} className="mt-10 space-y-6">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    <div>
+                      <label className="block text-sm font-medium text-white/70 mb-2">
+                        Full Name *
+                      </label>
+                      <input
+                        type="text"
+                        name="name"
+                        required
+                        value={formData.name}
+                        onChange={handleChange}
+                        placeholder="John Doe"
+                        className="w-full px-4 py-3 rounded-xl border border-white/10 focus:border-white/30 focus:ring-2 focus:ring-white/10 outline-none transition-all bg-white/5 text-white placeholder:text-white/30 focus:bg-white/10"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-white/70 mb-2">
+                        Email Address *
+                      </label>
+                      <input
+                        type="email"
+                        name="email"
+                        required
+                        value={formData.email}
+                        onChange={handleChange}
+                        placeholder="john@company.com"
+                        className="w-full px-4 py-3 rounded-xl border border-white/10 focus:border-white/30 focus:ring-2 focus:ring-white/10 outline-none transition-all bg-white/5 text-white placeholder:text-white/30 focus:bg-white/10"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    <div>
+                      <label className="block text-sm font-medium text-white/70 mb-2">
+                        Company Name
+                      </label>
+                      <input
+                        type="text"
+                        name="company"
+                        value={formData.company}
+                        onChange={handleChange}
+                        placeholder="Your Company"
+                        className="w-full px-4 py-3 rounded-xl border border-white/10 focus:border-white/30 focus:ring-2 focus:ring-white/10 outline-none transition-all bg-white/5 text-white placeholder:text-white/30 focus:bg-white/10"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-white/70 mb-2">
+                        Service Interested In
+                      </label>
+                      <select
+                        name="service"
+                        value={formData.service}
+                        onChange={handleChange}
+                        className="w-full px-4 py-3 rounded-xl border border-white/10 focus:border-white/30 focus:ring-2 focus:ring-white/10 outline-none transition-all bg-white/5 text-white focus:bg-white/10"
+                      >
+                        <option value="" className="bg-neutral-900">
+                          Select a service
+                        </option>
+                        <option
+                          value="brand-strategy"
+                          className="bg-neutral-900"
+                        >
+                          Brand Strategy
+                        </option>
+                        <option
+                          value="visual-identity"
+                          className="bg-neutral-900"
+                        >
+                          Visual Identity
+                        </option>
+                        <option
+                          value="digital-design"
+                          className="bg-neutral-900"
+                        >
+                          Digital Design
+                        </option>
+                        <option
+                          value="motion-graphics"
+                          className="bg-neutral-900"
+                        >
+                          Motion Graphics
+                        </option>
+                        <option value="brand-growth" className="bg-neutral-900">
+                          Brand Growth
+                        </option>
+                        <option
+                          value="brand-guidelines"
+                          className="bg-neutral-900"
+                        >
+                          Brand Guidelines
+                        </option>
+                      </select>
+                    </div>
+                  </div>
+
+                  {/* <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Estimated Budget
+                    </label>
+                    <select
+                      name="budget"
+                      value={formData.budget}
+                      onChange={handleChange}
+                      className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-accent focus:ring-2 focus:ring-accent/20 outline-none transition-all bg-gray-50 focus:bg-white"
+                    >
+                      <option value="">Select a range</option>
+                      <option value="5k-10k">$5,000 - $10,000</option>
+                      <option value="10k-25k">$10,000 - $25,000</option>
+                      <option value="25k-50k">$25,000 - $50,000</option>
+                      <option value="50k+">$50,000+</option>
+                    </select>
+                  </div> */}
+
+                  <div>
+                    <label className="block text-sm font-medium text-white/70 mb-2">
+                      Project Details *
+                    </label>
+                    <textarea
+                      name="message"
+                      required
+                      rows={5}
+                      value={formData.message}
+                      onChange={handleChange}
+                      placeholder="Tell us about your project, goals, and timeline..."
+                      className="w-full px-4 py-3 rounded-xl border border-white/10 focus:border-white/30 focus:ring-2 focus:ring-white/10 outline-none transition-all bg-white/5 text-white placeholder:text-white/30 focus:bg-white/10 resize-none"
+                    />
+                  </div>
+
+                  <button
+                    type="submit"
+                    className="group w-full sm:w-auto px-8 py-4 bg-white text-black rounded-xl font-semibold text-lg hover:bg-white/90 transition-all duration-300 shadow-lg hover:shadow-xl flex items-center justify-center gap-2"
+                  >
+                    Send Message
+                    <Send className="w-5 h-5 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
+                  </button>
+                </form>
+              )}
+            </div>
+
+            {/* Map Placeholder + Info */}
+            <div className="lg:col-span-2 space-y-8">
+              {/* Map */}
+              <div className="aspect-square rounded-2xl overflow-hidden relative">
+                <iframe
+                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3932.1048844231896!2d77.1152728!3d9.757182799999999!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3b07a9e6a01cace5%3A0x5f4fbbc7a91ae06c!2sAdway%20Creations!5e0!3m2!1sen!2sin!4v1779278790942!5m2!1sen!2sin"
+                  className="absolute inset-0 w-full h-full"
+                  style={{ border: 0 }}
+                  allowFullScreen
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                  title="Adway Creations Location"
+                />
+
+                {/* Optional overlay pattern */}
+                <div
+                  className="absolute inset-0 pointer-events-none opacity-10"
+                  style={{
+                    backgroundImage:
+                      "radial-gradient(circle, white 1px, transparent 1px)",
+                    backgroundSize: "30px 30px",
+                  }}
+                />
+              </div>
+
+              {/* FAQ */}
+              <div className="bg-white/5 rounded-2xl p-8">
+                <h3 className="text-xl font-bold text-white mb-6">
+                  Frequently Asked
+                </h3>
+                <div className="space-y-4">
+                  {[
+                    {
+                      q: "How long does a typical project take?",
+                      a: "Most branding projects take 6-12 weeks depending on scope and complexity.",
+                    },
+                    {
+                      q: "What is your pricing structure?",
+                      a: "We offer project-based pricing tailored to your specific needs and budget.",
+                    },
+                    {
+                      q: "Do you work with startups?",
+                      a: "Absolutely! We love working with ambitious teams at every stage of growth.",
+                    },
+                  ].map((faq) => (
+                    <div key={faq.q}>
+                      <h4 className="font-semibold text-white text-sm">
+                        {faq.q}
+                      </h4>
+                      <p className="text-white/50 text-sm mt-1">{faq.a}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </>
+  );
+}
