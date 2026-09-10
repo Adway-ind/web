@@ -9,7 +9,7 @@ const SEO = ({
   type = "website",
   structuredData = null
 }) => {
-  const siteUrl = "https://adway.agency";
+ const SITE_URL = "https://adwaycreations.com";
   const pageUrl = url ? `${siteUrl}${url}` : siteUrl;
 
   useEffect(() => {

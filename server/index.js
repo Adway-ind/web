@@ -93,11 +93,11 @@ app.use(helmet({ crossOriginResourcePolicy: false }));
 const allowedOrigins = [
   "http://localhost:5173",
   "http://127.0.0.1:5173",
-  "https://web-orcin-omega-52.vercel.app",
+
+  "https://adwaycreations.com",
+  "https://www.adwaycreations.com",
+
   process.env.CLIENT_URL,
-  process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : null,
-  "https://adway-web.vercel.app",
-  "https://adway.agency",
 ].filter(Boolean);
 app.use(
   cors({

@@ -988,8 +988,8 @@ export default function Home() {
     "@context": "https://schema.org",
     "@type": "Organization",
     name: "Adway",
-    url: "https://adway.agency",
-    logo: "https://adway.agency/favicon.svg",
+    url: "https://adwaycreations.com",
+    logo: "https://adwaycreations.com/favicon.svg",
     description: "Premium Branding & Digital Marketing Agency",
     address: {
       "@type": "PostalAddress",

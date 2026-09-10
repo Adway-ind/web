@@ -35,7 +35,7 @@ export default defineConfig({
         sitemapOutDir = config.build.outDir;
       },
       async closeBundle() {
-        const SITE_URL = "https://adway.agency";
+        const SITE_URL = "https://adwaycreations.com";
         const routes = [
           { path: "/", priority: "1.0", changefreq: "daily" },
           { path: "/about", priority: "0.8", changefreq: "monthly" },
