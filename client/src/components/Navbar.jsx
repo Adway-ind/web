@@ -142,16 +142,17 @@ export default function Navbar() {
 
       {/* Mobile sidebar */}
       <div
-        className={`md:hidden fixed top-0 right-0 h-full w-80 max-w-[85vw] bg-neutral-950 border-l border-white/10 z-9999 transform transition-transform duration-500 ease-out ${isOpen ? "translate-x-0" : "translate-x-full"
-          }`}
+        className={`md:hidden fixed top-0 right-0 h-full w-80 max-w-[85vw] bg-neutral-950 border-l border-white/10 z-[9999] transform transition-transform duration-500 ease-out ${isOpen ? "translate-x-0" : "translate-x-full"
+          } flex flex-col`}
       >
         {/* Sidebar header */}
-        <div className="flex items-center justify-between px-6 py-5 border-b border-white/10">
+        <div className="flex-shrink-0 flex items-center justify-between px-6 py-5 border-b border-white/10">
           <img
             src={LogoBlack}
             alt="Adway Creations"
             className="h-auto w-[120px] brightness-0 invert"
           />
+
           <button
             onClick={() => setIsOpen(false)}
             className="p-2 rounded-lg text-white/60 hover:text-white hover:bg-white/5 transition-all"
@@ -160,38 +161,71 @@ export default function Navbar() {
           </button>
         </div>
 
-        {/* Sidebar navigation */}
-        <div className="px-6 py-8 space-y-1 overflow-y-auto h-[calc(100vh-140px)]">
+        {/* Sidebar navigation - Scrollable */}
+        <div
+          className="
+      flex-1
+      overflow-y-auto
+      overscroll-contain
+      px-6 py-8
+      space-y-1
+      scrollbar-thin
+      scrollbar-thumb-white/20
+      scrollbar-track-transparent
+    "
+        >
           {navLinks.map((link, index) => (
             <a
               key={link.path}
               href={link.path}
               onClick={(e) => handleNav(e, link.path)}
               className={`group flex items-center justify-between px-4 py-4 rounded-xl text-base font-medium transition-all duration-300 ${location.pathname === link.path
-                ? "bg-white/10 text-white"
-                : "text-white/60 hover:bg-white/5 hover:text-white"
+                  ? "bg-white/10 text-white"
+                  : "text-white/60 hover:bg-white/5 hover:text-white"
                 }`}
               style={{
                 animationDelay: `${index * 50}ms`,
-                animation: isOpen ? "slideInRight 0.4s ease-out forwards" : "none",
+                animation: isOpen
+                  ? "slideInRight 0.4s ease-out forwards"
+                  : "none",
               }}
             >
               <span>{link.label}</span>
-              <ArrowRight className="w-4 h-4 opacity-0 group-hover:opacity-100 -translate-x-2 group-hover:translate-x-0 transition-all duration-300" />
+
+              <ArrowRight
+                className="
+            w-4 h-4
+            opacity-0
+            group-hover:opacity-100
+            -translate-x-2
+            group-hover:translate-x-0
+            transition-all duration-300
+          "
+              />
             </a>
           ))}
         </div>
 
-        {/* Sidebar footer */}
-        <div className="absolute bottom-0 left-0 right-0 p-6 border-t border-white/10 bg-neutral-950">
+        {/* Sidebar footer - Fixed */}
+        <div className="flex-shrink-0 p-6 border-t border-white/10 bg-neutral-950">
           <a
             href="/contact"
             onClick={(e) => handleNav(e, "/contact")}
-            className="flex items-center justify-center gap-2 w-full px-6 py-4 bg-white text-black rounded-xl text-sm font-semibold hover:bg-white/90 transition-all duration-300 shadow-lg hover:shadow-xl"
+            className="
+        flex items-center justify-center gap-2
+        w-full px-6 py-4
+        bg-white text-black
+        rounded-xl
+        text-sm font-semibold
+        hover:bg-white/90
+        transition-all duration-300
+        shadow-lg hover:shadow-xl
+      "
           >
             Get Started
             <ArrowRight className="w-4 h-4" />
           </a>
+
           <p className="text-center text-white/40 text-xs mt-4">
             © 2026 Adway Creations
           </p>

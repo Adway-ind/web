@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { ArrowUpRight, SlidersHorizontal } from "lucide-react";
-import Video from "../assets/video/portfolio-one.mp4";
+import Video from "../assets/video/portfolio-one.webm";
 import { API } from "../config/api";
 import { motion } from "framer-motion";
 import Client from "../components/ClientsSection";
@@ -148,8 +148,8 @@ export default function Portfolio() {
 
           {/* Headline */}
           <h1
-            className="font-medium text-center text-white leading-[1.0] tracking-[-0.03em]"
-            style={{ fontVariationSettings: "'opsz' 144", fontSize: "clamp(52px, 8vw, 88px)" }}
+            className="font-medium text-left sm:text-center text-white leading-[1.0] tracking-[-0.03em]"
+            style={{ fontVariationSettings: "'opsz' 144", fontSize: "clamp(22px, 8vw, 88px)" }}
           >
             Work that<br />
             speaks{" "}
@@ -158,7 +158,7 @@ export default function Portfolio() {
             </em>
           </h1>
 
-          <p className="mt-5 text-[15px] text-center text-white/50 leading-relaxed max-w-7xl  font-light">
+          <p className="mt-5 text-[15px] text-left sm:text-center text-white/50 leading-relaxed max-w-7xl  font-light">
             A curated selection of brands we've helped build, transform, and elevate.
           </p>
 

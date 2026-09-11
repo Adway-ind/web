@@ -110,16 +110,16 @@ export default function Footer() {
             <ul className="space-y-4">
               <li className="flex items-start gap-3">
                 <Mail className="w-5 h-5 text-black/70 mt-0.5 shrink-0" />
-                <span className="text-black font-medium">hello@adway.com</span>
+                <span className="text-black font-medium">adwaycreations@gmail.com</span>
               </li>
               <li className="flex items-start gap-3">
                 <Phone className="w-5 h-5 text-black/60 mt-0.5 shrink-0" />
-                <span className="text-black font-medium">+1 (555) 123-4567</span>
+                <span className="text-black font-medium">+91 8606880634</span>
               </li>
               <li className="flex items-start gap-3">
                 <MapPin className="w-5 h-5 text-black/60 mt-0.5 shrink-0" />
                 <span className="text-black font-medium">
-                  123 Creative Ave, Design District, NY 10001
+                  Adway Building, 23/7, near Vi Office, Kattappana, Kerala 685508
                 </span>
               </li>
             </ul>

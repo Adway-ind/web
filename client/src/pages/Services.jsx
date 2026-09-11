@@ -18,7 +18,7 @@ import {
   CheckCircle2,
 } from "lucide-react";
 
-import Video from "../assets/video/service-one.mp4";
+import Video from "../assets/video/service-one.webm";
 import { Helmet } from "react-helmet-async";
 
 const serviceSchema = createServiceSchema({
@@ -262,10 +262,10 @@ export default function Services() {
 
           {/* Headline */}
           <h3
-            className="font-medium text-center text-white leading-[1.0] tracking-[-0.03em]"
+            className="font-medium text-left sm:text-center text-white leading-[1.0] tracking-[-0.03em]"
             style={{
               fontVariationSettings: "'opsz' 144",
-              fontSize: "clamp(52px, 8vw, 88px)",
+              fontSize: "clamp(22px, 8vw, 88px)",
             }}
           >
             Everything
@@ -276,7 +276,7 @@ export default function Services() {
             </em>
           </h3>
 
-          <p className="mt-5 text-[15px] text-center text-white/50 leading-relaxed max-w-7xl font-light">
+          <p className="mt-5 text-[15px] text-left text-white/50 leading-relaxed max-w-7xl font-light">
             From strategy to execution, we provide a complete suite of branding
             services to help you stand out in a crowded marketplace.
           </p>
@@ -362,7 +362,7 @@ export default function Services() {
       {/* Process */}
       <section className="py-24 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center max-w-5xl mx-auto mb-16">
+          <div className="text-left sm:text-center max-w-5xl mx-auto mb-16">
             <span className="text-black/50 font-semibold text-sm uppercase tracking-wider">
               How It Works
             </span>
@@ -372,7 +372,7 @@ export default function Services() {
             <p className="mt-4 text-lg text-black/60">
               A structured approach that ensures exceptional results every time.
             </p>
-            <p className="mt-4 text-base text-black/50 max-w-2xl mx-auto">
+            <p className="mt-4 text-left text-1xl text-black/80 max-w-2xl mx-auto">
               Our five-step process has been refined through years of experience
               and hundreds of successful projects. Each phase is designed to
               build upon the previous one, creating a solid foundation for your

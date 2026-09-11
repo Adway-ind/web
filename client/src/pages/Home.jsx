@@ -31,15 +31,24 @@ import Lenis from "lenis";
 import Client from "../components/ClientsSection";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay } from "swiper/modules";
-import VideoSlide from "../assets/video/slide/video-slide-3.mp4";
-import VideoSlide1 from "../assets/video/slide/video-slide.mp4";
-import VideoSlide2 from "../assets/video/slide/video-slide-2.mp4";
+import VideoSlide from "../assets/video/slide/Strategic.webm";
+import VideoSlide1 from "../assets/video/slide/digital_marketing.webm";
+import VideoSlide2 from "../assets/video/slide/Strategic.webm";
+import VideoSlide3 from "../assets/video/slide/Creative.webm";
+import VideoSlide4 from "../assets/video/slide/Tech.webm";
 import { API } from "../config/api";
 import { useAuth } from "../context/AuthContext";
 import Antigravity from "../components/Antigravity";
 import SEO from "../components/SEO";
 import BG from "../assets/video/bg.mp4";
 import CurvedTextDivider from "../components/CurvedTextDivider";
+import Insta from "../assets/image/Branding/Instagram.webp";
+import Photo1 from "../assets/image/Branding/photo-01.webp";
+import Photo2 from "../assets/image/Branding/photo-02.webp";
+import Photo3 from "../assets/image/Branding/photo-03.webp";
+import Photo4 from "../assets/image/Branding/photo-04.webp";
+import Photo5 from "../assets/image/Branding/photo-05.webp";
+
 
 import "swiper/css";
 
@@ -69,7 +78,7 @@ const heroSlides = [
       "We specialize in establishing your brand and marketing strategy to attract consumers.",
   },
   {
-    video: VideoSlide,
+    video: VideoSlide3,
     title: "Creative",
     highlight: "Branding",
     tagline: "03",
@@ -77,7 +86,7 @@ const heroSlides = [
       "We are experts in logo design, packaging design, and brand communications design.",
   },
   {
-    video: VideoSlide1,
+    video: VideoSlide4,
     title: "Technology",
     highlight: "Solutions",
     tagline: "04",
@@ -90,7 +99,7 @@ const showcaseData = {
   featured: {
     id: 1,
     type: "image",
-    image: "https://images.unsplash.com/photo-1634942537034-2531766767d1?w=800",
+    image: Insta,
     tag: "Brand Identity",
     title: "Meridian Visual Identity System",
   },
@@ -98,10 +107,10 @@ const showcaseData = {
     id: 2,
     type: "gallery",
     images: [
-      "https://images.unsplash.com/photo-1561070791-2526d30994b5?w=400",
-      "https://images.unsplash.com/photo-1558655146-9f40138edfeb?w=400",
-      "https://images.unsplash.com/photo-1572044162444-ad60f128bdea?w=400",
-      "https://images.unsplash.com/photo-1609921212029-bb5a28e60960?w=400",
+      Photo1,
+      Photo2,
+      Photo3,
+      Photo4,
     ],
   },
   insight1: {
@@ -131,7 +140,7 @@ const showcaseData = {
   campaign: {
     id: 6,
     type: "image",
-    image: "https://images.unsplash.com/photo-1542744094-3a31f272c490?w=800",
+    image: [Photo5],
     tag: "Campaign",
     title: "Storytelling that builds lasting brand equity",
   },
@@ -350,20 +359,6 @@ function HeroSlider() {
         }}
       />
 
-      {/* ── Top nav bar area ── */}
-      {/* <div className="absolute top-0 left-0 right-0 z-30 flex items-center justify-between px-6 sm:px-10 lg:px-16 py-6">
-        <div className="flex items-center gap-3">
-          <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-          <span className="text-white/60 text-xs sm:text-sm font-medium tracking-wider uppercase">
-            Creative Agency
-          </span>
-        </div>
-        <div className="hidden sm:flex items-center gap-6 text-white/40 text-xs font-medium tracking-wider uppercase">
-          <span className="text-white">{String(current + 1).padStart(2, "0")}</span>
-          <span>/</span>
-          <span>{String(total).padStart(2, "0")}</span>
-        </div>
-      </div> */}
 
       {/* ── Main Content ── */}
       <div className="relative z-20 h-full w-full flex flex-col justify-center px-6 sm:px-10 lg:px-16 pb-2 sm:pb-32">
@@ -639,7 +634,7 @@ function FeaturedPortfolio() {
     /* Track Wrapper: Determines total scroll length (300vh allows a smooth scrolling distance) */
     <section
       ref={sectionRef}
-      className={`relative bg-white ${isDesktop ? "h-[300vh]" : "py-20"
+      className={`relative bg-white ${isDesktop ? "h-[300vh]" : "py-10"
         }`}
     >
       {/* Background Media & Overlays (Pinned through h-screen) */}
@@ -1063,478 +1058,474 @@ export default function Home() {
           {JSON.stringify(websiteSchema)}
         </script>
 
-        </ Helmet>
-        <style>{`
+      </ Helmet>
+      <style>{`
         @keyframes servicesMarquee {
           from { transform: translateX(0); }
           to { transform: translateX(-50%); }
         }
       `}</style>
 
-        {/* Hero Slider */}
-        <HeroSlider />
+      {/* Hero Slider */}
+      <HeroSlider />
 
-        {/* intro about company */}
+      {/* intro about company */}
 
-        <section className="relative overflow-hidden bg-white py-28">
-          {/* Grid Background */}
-          {/* <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:48px_48px]" /> */}
+      <section className="relative overflow-hidden bg-white py-10">
+        {/* Grid Background */}
+        {/* <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:48px_48px]" /> */}
 
-          {/* Glow */}
-          {/* <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-violet-600/10 blur-[140px]" />
+        {/* Glow */}
+        {/* <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-violet-600/10 blur-[140px]" />
  */}
-          <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
-            {/* Header */}
-            <FadeIn className="max-w-5xl mx-auto text-center">
-              <span className="inline-flex items-center gap-3 text-black/50 text-sm uppercase tracking-[0.35em]">
-                <span className="w-10 h-px bg-black/30" />
-                About Adway
-                <span className="w-10 h-px bg-black/30" />
+          {/* Header */}
+          <FadeIn className="max-w-5xl mx-auto text-center">
+            <span className="inline-flex items-center gap-3 text-black/50 text-sm uppercase tracking-[0.35em]">
+              <span className="w-10 h-px bg-black/30" />
+              About Adway
+              <span className="w-10 h-px bg-black/30" />
+            </span>
+
+            <h2 className="mt-8 text-3xl sm:text-6xl lg:text-7xl font-bold text-black leading-[0.95] tracking-tight">
+              We create brands
+              <span className="block text-black/45">
+                that people remember.
+              </span>
+            </h2>
+
+            <p className="mt-8 max-w-3xl mx-auto text-lg leading-8 text-black/60">
+              Adway is a premium branding and digital agency helping
+              ambitious businesses build distinctive identities,
+              memorable digital experiences, and measurable growth
+              strategies that drive long-term success.
+            </p>
+
+            {/* Service Tags */}
+            <div className="mt-10 flex flex-wrap justify-center gap-3">
+              {[
+                "Brand Strategy",
+                "Digital Marketing",
+                "Web Development",
+                "Creative Branding",
+                "Consulting",
+              ].map((item) => (
+                <span
+                  key={item}
+                  className="px-5 py-2.5 font-medium rounded-full border border-black/50 bg-white text-sm text-black"
+                >
+                  {item}
+                </span>
+              ))}
+            </div>
+          </FadeIn>
+
+          <FadeIn>
+            {/* Features */}
+            <div className="mt-20 grid md:grid-cols-3 gap-6">
+              {[
+                {
+                  icon: Target,
+                  title: "Strategic clarity",
+                  desc: "Positioning and messaging that differentiate your brand.",
+                },
+                {
+                  icon: Palette,
+                  title: "Distinctive identity",
+                  desc: "Visual systems designed to scale across every touchpoint.",
+                },
+                {
+                  icon: TrendingUp,
+                  title: "Growth focused",
+                  desc: "Creative solutions aligned with measurable business goals.",
+                },
+              ].map((item) => (
+                <FadeIn key={item.title}>
+                  <div className="group h-full rounded-3xl border border-black/50 bg-black p-8 text-center hover:bg-black/[0.05] transition-all duration-500">
+                    <div className="mx-auto w-14 h-14 rounded-2xl border border-white/10 bg-white/[0.04] flex items-center justify-center mb-6">
+                      <item.icon className="w-6 h-6 text-white transition-colors duration-300 group-hover:text-black" />
+                    </div>
+
+                    <h3 className="text-xl font-semibold text-white mb-3 transition-colors duration-300 group-hover:text-black">
+                      {item.title}
+                    </h3>
+
+                    <p className="mt-4 text-sm font-medium leading-7 text-white mb-3 transition-colors duration-300 group-hover:text-black">
+                      {item.desc}
+                    </p>
+                  </div>
+                </FadeIn>
+              ))}
+            </div>
+
+            {/* Stats */}
+            <div className="mt-20 border-t border-white/10 pt-12">
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-10 text-center">
+
+                {[
+                  ["10+", "Years Experience"],
+                  ["240+", "Projects Delivered"],
+                  ["18", "Industries Served"],
+                  ["98%", "Client Satisfaction"],
+                ].map(([number, text]) => (
+                  <div key={text}>
+                    <h3 className="text-5xl lg:text-6xl font-bold text-black">
+                      {number}
+                    </h3>
+
+                    <p className="mt-3 font-medium text-sm text-black">
+                      {text}
+                    </p>
+                  </div>
+                ))}
+
+              </div>
+            </div>
+          </FadeIn>
+
+        </div>
+      </section>
+
+      {/* Services Overview */}
+      <section className="relative py-0 bg-black overflow-hidden">
+
+
+        <motion.section
+          ref={sectionRef}
+          style={{ scale }}
+          className="relative py-10 bg-black overflow-hidden origin-center will-change-transform"
+        >
+
+
+          <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <FadeIn className="text-center max-w-5xl mx-auto mb-16">
+              <span className="text-white/50 font-semibold text-sm uppercase tracking-wider">
+                What We Do
               </span>
 
-              <h2 className="mt-8 text-4xl sm:text-6xl lg:text-7xl font-bold text-black leading-[0.95] tracking-tight">
-                We create brands
-                <span className="block text-black/45">
-                  that people remember.
-                </span>
+              <h2 className="mt-4 text-3xl sm:text-5xl font-bold max-w-5xl mx-auto text-white tracking-tight">
+                Services built for impact
               </h2>
 
-              <p className="mt-8 max-w-3xl mx-auto text-lg leading-8 text-black/60">
-                Adway is a premium branding and digital agency helping
-                ambitious businesses build distinctive identities,
-                memorable digital experiences, and measurable growth
-                strategies that drive long-term success.
+              <p className="mt-4 text-base text-white/60 max-w-4xl mx-auto text-justify sm:text-center">
+                We provide complete branding solutions that help businesses build
+                strong, memorable brands. From brand strategy and visual identity
+                design to digital marketing and web development, we create tailored
+                solutions that drive growth, strengthen brand presence, and deliver
+                measurable results.
               </p>
-
-              {/* Service Tags */}
-              <div className="mt-10 flex flex-wrap justify-center gap-3">
-                {[
-                  "Brand Strategy",
-                  "Digital Marketing",
-                  "Web Development",
-                  "Creative Branding",
-                  "Consulting",
-                ].map((item) => (
-                  <span
-                    key={item}
-                    className="px-5 py-2.5 font-medium rounded-full border border-black/50 bg-white text-sm text-black"
-                  >
-                    {item}
-                  </span>
-                ))}
-              </div>
             </FadeIn>
 
-            <FadeIn>
-              {/* Features */}
-              <div className="mt-20 grid md:grid-cols-3 gap-6">
-                {[
-                  {
-                    icon: Target,
-                    title: "Strategic clarity",
-                    desc: "Positioning and messaging that differentiate your brand.",
-                  },
-                  {
-                    icon: Palette,
-                    title: "Distinctive identity",
-                    desc: "Visual systems designed to scale across every touchpoint.",
-                  },
-                  {
-                    icon: TrendingUp,
-                    title: "Growth focused",
-                    desc: "Creative solutions aligned with measurable business goals.",
-                  },
-                ].map((item) => (
-                  <FadeIn key={item.title}>
-                    <div className="group h-full rounded-3xl border border-black/50 bg-black p-8 text-center hover:bg-black/[0.05] transition-all duration-500">
-                      <div className="mx-auto w-14 h-14 rounded-2xl border border-white/10 bg-white/[0.04] flex items-center justify-center mb-6">
-                        <item.icon className="w-6 h-6 text-white transition-colors duration-300 group-hover:text-black" />
+            <FadeIn className="relative">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {services.map((service, idx) => (
+                  <FadeIn
+                    key={`${service.title}-${idx}`}
+                    delay={idx * 0.04}
+                  >
+                    <div
+                      className="group relative min-h-[280px] p-8 rounded-2xl overflow-hidden border border-white/20 bg-gradient-to-br from-white/[0.07] to-white/[0.01] backdrop-blur-xl shadow-2xl shadow-black/40 hover:border-white/30 hover:from-white/[0.12] hover:to-white/[0.03] hover:-translate-y-1 transition-all duration-500"
+                      onMouseMove={(e) => {
+                        const rect = e.currentTarget.getBoundingClientRect();
+
+                        const x = (
+                          ((e.clientX - rect.left) / rect.width) *
+                          100
+                        ).toFixed(1);
+
+                        const y = (
+                          ((e.clientY - rect.top) / rect.height) *
+                          100
+                        ).toFixed(1);
+
+                        e.currentTarget.style.setProperty("--gx", `${x}%`);
+                        e.currentTarget.style.setProperty("--gy", `${y}%`);
+                      }}
+                    >
+                      {/* Noise texture */}
+                      <div
+                        className="absolute inset-0 opacity-[0.03] mix-blend-overlay pointer-events-none"
+                        style={{
+                          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
+                        }}
+                      />
+
+                      {/* Top sheen */}
+                      <div className="absolute inset-0 bg-gradient-to-b from-white/[0.05] to-transparent pointer-events-none" />
+
+                      {/* Mouse glare effect */}
+                      <div
+                        className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
+                        style={{
+                          background:
+                            "radial-gradient(circle at var(--gx, 50%) var(--gy, 50%), rgba(255,255,255,0.13) 0%, rgba(255,255,255,0.04) 40%, transparent 70%)",
+                        }}
+                      />
+
+                      <div className="relative z-10">
+                        <div className="w-14 h-14 bg-gradient-to-br from-white/10 to-white/[0.02] border border-white/20 backdrop-blur-md rounded-xl flex items-center justify-center mb-6 group-hover:bg-white group-hover:scale-110 transition-all duration-300">
+                          <service.icon className="w-7 h-7 text-white group-hover:text-black transition-colors" />
+                        </div>
+
+                        <h3 className="text-xl font-bold text-white mb-3">
+                          {service.title}
+                        </h3>
+
+                        <p className="text-white/70 text-sm leading-relaxed font-light">
+                          {service.desc}
+                        </p>
                       </div>
-
-                      <h3 className="text-xl font-semibold text-white mb-3 transition-colors duration-300 group-hover:text-black">
-                        {item.title}
-                      </h3>
-
-                      <p className="mt-4 text-sm font-medium leading-7 text-white mb-3 transition-colors duration-300 group-hover:text-black">
-                        {item.desc}
-                      </p>
                     </div>
                   </FadeIn>
                 ))}
               </div>
-
-              {/* Stats */}
-              <div className="mt-20 border-t border-white/10 pt-12">
-                <div className="grid grid-cols-2 lg:grid-cols-4 gap-10 text-center">
-
-                  {[
-                    ["10+", "Years Experience"],
-                    ["240+", "Projects Delivered"],
-                    ["18", "Industries Served"],
-                    ["98%", "Client Satisfaction"],
-                  ].map(([number, text]) => (
-                    <div key={text}>
-                      <h3 className="text-5xl lg:text-6xl font-bold text-black">
-                        {number}
-                      </h3>
-
-                      <p className="mt-3 font-medium text-sm text-black">
-                        {text}
-                      </p>
-                    </div>
-                  ))}
-
-                </div>
-              </div>
             </FadeIn>
 
-          </div>
-        </section>
-
-        {/* Services Overview */}
-        <section className="relative py-20 bg-black overflow-hidden">
-          {/* <div className="absolute top-1/4 left-[-10%] w-[500px] h-[500px] rounded-full bg-purple-600/20 blur-[120px] pointer-events-none mix-blend-screen animate-pulse duration-[6000ms]" />
-        <div className="absolute bottom-1/4 right-[-10%] w-[600px] h-[600px] rounded-full bg-blue-600/15 blur-[140px] pointer-events-none mix-blend-screen animate-pulse duration-[8000ms]" />
-        <div className="absolute top-1/2 left-1/3 w-[400px] h-[400px] rounded-full bg-fuchsia-500/10 blur-[100px] pointer-events-none mix-blend-screen" /> */}
-
-          <motion.section
-            ref={sectionRef}
-            style={{ scale }}
-            className="relative py-20 bg-black overflow-hidden origin-center will-change-transform"
-          >
-            {/* <div className="absolute top-1/4 left-[-10%] w-[500px] h-[500px] rounded-full bg-purple-600/20 blur-[120px] pointer-events-none mix-blend-screen animate-pulse duration-[6000ms]" />
-      <div className="absolute bottom-1/4 right-[-10%] w-[600px] h-[600px] rounded-full bg-blue-600/15 blur-[140px] pointer-events-none mix-blend-screen animate-pulse duration-[8000ms]" />
-      <div className="absolute top-1/2 left-1/3 w-[400px] h-[400px] rounded-full bg-fuchsia-500/10 blur-[100px] pointer-events-none mix-blend-screen" /> */}
-
-            <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-              <FadeIn className="text-center max-w-5xl mx-auto mb-16">
-                <span className="text-white/50 font-semibold text-sm uppercase tracking-wider">
-                  What We Do
-                </span>
-
-                <h2 className="mt-4 text-3xl sm:text-5xl font-bold max-w-5xl mx-auto text-white tracking-tight">
-                  Services built for impact
-                </h2>
-
-                <p className="mt-4 text-base text-white/60 max-w-4xl mx-auto text-justify sm:text-center">
-                  We provide complete branding solutions that help businesses build
-                  strong, memorable brands. From brand strategy and visual identity
-                  design to digital marketing and web development, we create tailored
-                  solutions that drive growth, strengthen brand presence, and deliver
-                  measurable results.
-                </p>
-              </FadeIn>
-
-              <FadeIn className="relative">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {services.map((service, idx) => (
-                    <FadeIn
-                      key={`${service.title}-${idx}`}
-                      delay={idx * 0.04}
-                    >
-                      <div
-                        className="group relative min-h-[280px] p-8 rounded-2xl overflow-hidden border border-white/20 bg-gradient-to-br from-white/[0.07] to-white/[0.01] backdrop-blur-xl shadow-2xl shadow-black/40 hover:border-white/30 hover:from-white/[0.12] hover:to-white/[0.03] hover:-translate-y-1 transition-all duration-500"
-                        onMouseMove={(e) => {
-                          const rect = e.currentTarget.getBoundingClientRect();
-
-                          const x = (
-                            ((e.clientX - rect.left) / rect.width) *
-                            100
-                          ).toFixed(1);
-
-                          const y = (
-                            ((e.clientY - rect.top) / rect.height) *
-                            100
-                          ).toFixed(1);
-
-                          e.currentTarget.style.setProperty("--gx", `${x}%`);
-                          e.currentTarget.style.setProperty("--gy", `${y}%`);
-                        }}
-                      >
-                        {/* Noise texture */}
-                        <div
-                          className="absolute inset-0 opacity-[0.03] mix-blend-overlay pointer-events-none"
-                          style={{
-                            backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
-                          }}
-                        />
-
-                        {/* Top sheen */}
-                        <div className="absolute inset-0 bg-gradient-to-b from-white/[0.05] to-transparent pointer-events-none" />
-
-                        {/* Mouse glare effect */}
-                        <div
-                          className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
-                          style={{
-                            background:
-                              "radial-gradient(circle at var(--gx, 50%) var(--gy, 50%), rgba(255,255,255,0.13) 0%, rgba(255,255,255,0.04) 40%, transparent 70%)",
-                          }}
-                        />
-
-                        <div className="relative z-10">
-                          <div className="w-14 h-14 bg-gradient-to-br from-white/10 to-white/[0.02] border border-white/20 backdrop-blur-md rounded-xl flex items-center justify-center mb-6 group-hover:bg-white group-hover:scale-110 transition-all duration-300">
-                            <service.icon className="w-7 h-7 text-white group-hover:text-black transition-colors" />
-                          </div>
-
-                          <h3 className="text-xl font-bold text-white mb-3">
-                            {service.title}
-                          </h3>
-
-                          <p className="text-white/70 text-sm leading-relaxed font-light">
-                            {service.desc}
-                          </p>
-                        </div>
-                      </div>
-                    </FadeIn>
-                  ))}
-                </div>
-              </FadeIn>
-
-              <FadeIn className="text-center mt-16 pb-8">
-                <Link
-                  to="/services"
-                  className="group inline-flex items-center gap-2 text-white font-semibold hover:gap-3 transition-all"
-                >
-                  Explore All Services
-                  <ArrowRight className="w-4 h-4" />
-                </Link>
-              </FadeIn>
-            </div>
-          </motion.section>
-        </section>
-
-        <CurvedTextDivider />
-
-        {/* ── Featured Portfolio (API-driven) ── */}
-        <section className="pt-24 pb-8 bg-black">
-          <FeaturedPortfolio />
-        </section>
-
-        {/* Testimonials */}
-        <section className="py-24 bg-black">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <FadeIn className="text-center max-w-4xl mx-auto mb-16">
-              <span className="text-white/50 font-semibold text-sm uppercase tracking-wider">
-                Testimonials
-              </span>
-              <h2 className="mt-4 text-4xl sm:text-5xl font-bold text-white tracking-tight">
-                What our clients say
-              </h2>
-              <p className="mt-4 text-lg text-justify sm:text-center text-white/60">
-                Don't just take our word for it. Here's what business owners and
-                marketing leaders have to say about working with Adway. Our
-                clients' success stories reflect our commitment to delivering
-                exceptional branding and digital marketing solutions that drive
-                real business growth.
-              </p>
-            </FadeIn>
-
-            <FadeIn>
-              <Swiper
-                modules={[Autoplay]}
-                spaceBetween={30}
-                slidesPerView={1}
-                loop={true}
-                autoplay={{ delay: 3000, disableOnInteraction: false }}
-                breakpoints={{
-                  768: { slidesPerView: 2 },
-                  1024: { slidesPerView: 3 },
-                }}
+            <FadeIn className="text-center mt-16 pb-8">
+              <Link
+                to="/services"
+                className="group inline-flex items-center gap-2 text-white font-semibold hover:gap-3 transition-all"
               >
-                {testimonials.map((t) => (
-                  <SwiperSlide key={t.name}>
-                    <div className="relative p-8 rounded-2xl bg-white/5 border border-white/10 hover:border-white/25 hover:shadow-lg transition-all duration-300 h-full">
-                      <Quote className="w-10 h-10 text-white/10 mb-4" />
-                      <p className="text-white/70 leading-relaxed mb-6">{t.text}</p>
-                      <div className="flex items-center gap-1 mb-4">
-                        {[...Array(t.rating)].map((_, j) => (
-                          <Star
-                            key={j}
-                            className="w-4 h-4 text-amber-400 fill-amber-400"
-                          />
-                        ))}
-                      </div>
-                      <div>
-                        <div className="font-semibold text-white">{t.name}</div>
-                        <div className="text-sm text-white/50">{t.role}</div>
-                      </div>
-                    </div>
-                  </SwiperSlide>
-                ))}
-              </Swiper>
+                Explore All Services
+                <ArrowRight className="w-4 h-4" />
+              </Link>
             </FadeIn>
           </div>
-        </section>
+        </motion.section>
+      </section>
 
-        <Client />
+      <CurvedTextDivider />
 
-        <section className="relative overflow-hidden bg-[#f7f5f2] py-20">
-          {/* Subtle background texture */}
-          <div
-            className="absolute inset-0 opacity-[0.03]"
-            style={{
-              backgroundImage:
-                "linear-gradient(rgba(15,23,42,0.4) 1px, transparent 1px), linear-gradient(90deg, rgba(15,23,42,0.4) 1px, transparent 1px)",
-              backgroundSize: "36px 36px",
-            }}
-          />
+      {/* ── Featured Portfolio (API-driven) ── */}
+      <section className="pt-24 pb-8 bg-black">
+        <FeaturedPortfolio />
+      </section>
 
-          <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            {/* Header */}
-            <div className="mb-12">
-              <span className="text-[11px] tracking-[0.25em] uppercase text-neutral-400 font-medium">
-                Our Expertise
+      {/* Testimonials */}
+      <section className="py-24 bg-black">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <FadeIn className="text-center max-w-4xl mx-auto mb-16">
+            <span className="text-white/50 font-semibold text-sm uppercase tracking-wider">
+              Testimonials
+            </span>
+            <h2 className="mt-4 text-4xl sm:text-5xl font-bold text-white tracking-tight">
+              What our clients say
+            </h2>
+            <p className="mt-4 text-lg text-justify sm:text-center text-white/60">
+              Don't just take our word for it. Here's what business owners and
+              marketing leaders have to say about working with Adway. Our
+              clients' success stories reflect our commitment to delivering
+              exceptional branding and digital marketing solutions that drive
+              real business growth.
+            </p>
+          </FadeIn>
+
+          <FadeIn>
+            <Swiper
+              modules={[Autoplay]}
+              spaceBetween={30}
+              slidesPerView={1}
+              loop={true}
+              autoplay={{ delay: 3000, disableOnInteraction: false }}
+              breakpoints={{
+                768: { slidesPerView: 2 },
+                1024: { slidesPerView: 3 },
+              }}
+            >
+              {testimonials.map((t) => (
+                <SwiperSlide key={t.name}>
+                  <div className="relative p-8 rounded-2xl bg-white/5 border border-white/10 hover:border-white/25 hover:shadow-lg transition-all duration-300 h-full">
+                    <Quote className="w-10 h-10 text-white/10 mb-4" />
+                    <p className="text-white/70 leading-relaxed mb-6">{t.text}</p>
+                    <div className="flex items-center gap-1 mb-4">
+                      {[...Array(t.rating)].map((_, j) => (
+                        <Star
+                          key={j}
+                          className="w-4 h-4 text-amber-400 fill-amber-400"
+                        />
+                      ))}
+                    </div>
+                    <div>
+                      <div className="font-semibold text-white">{t.name}</div>
+                      <div className="text-sm text-white/50">{t.role}</div>
+                    </div>
+                  </div>
+                </SwiperSlide>
+              ))}
+            </Swiper>
+          </FadeIn>
+        </div>
+      </section>
+
+      <Client />
+
+      <section className="relative overflow-hidden bg-[#f7f5f2] py-20">
+        {/* Subtle background texture */}
+        <div
+          className="absolute inset-0 opacity-[0.03]"
+          style={{
+            backgroundImage:
+              "linear-gradient(rgba(15,23,42,0.4) 1px, transparent 1px), linear-gradient(90deg, rgba(15,23,42,0.4) 1px, transparent 1px)",
+            backgroundSize: "36px 36px",
+          }}
+        />
+
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Header */}
+          <div className="mb-12">
+            <span className="text-[11px] tracking-[0.25em] uppercase text-neutral-400 font-medium">
+              Our Expertise
+            </span>
+            <div className="mt-6 flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+              <h2 className="text-4xl md:text-5xl font-medium tracking-tight text-neutral-900 max-w-md leading-[1.15]">
+                Creative Branding Experience
+              </h2>
+              <div>
+                <div className="hidden lg:block w-8 h-px bg-neutral-300 mb-3" />
+                <p className="text-sm leading-7 text-neutral-500 max-w-xs">
+                  We blend strategy, visual systems, storytelling, and digital
+                  execution to build brands that move culture, not just trends.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Grid */}
+          <div className="grid grid-cols-12 gap-3">
+
+            {/* Row 1 — Featured image (5 cols) + Gallery (7 cols) */}
+            <div className="col-span-12 md:col-span-5">
+              <ImageCard item={showcaseData.featured} minHeight="min-h-[280px]" />
+            </div>
+
+            <div className="col-span-12 md:col-span-7">
+              <GalleryCard item={showcaseData.gallery} />
+            </div>
+
+            {/* Row 2 — Content (4) + Stat (4) + Content (4) */}
+            <div className="col-span-12 md:col-span-4">
+              <ContentCard item={showcaseData.insight1} />
+            </div>
+
+            <div className="col-span-12 md:col-span-4">
+              <StatCard item={showcaseData.stat} />
+            </div>
+
+            <div className="col-span-12 md:col-span-4">
+              <ContentCard item={showcaseData.insight2} />
+            </div>
+
+            {/* Row 3 — Wide image (7) + Feature (5) */}
+            <div className="col-span-12 md:col-span-7">
+              <ImageCard item={showcaseData.campaign} minHeight="min-h-[200px]" />
+            </div>
+
+            <div className="col-span-12 md:col-span-5">
+              <FeatureCard item={showcaseData.feature} />
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      {/* Process Section */}
+      <section className="relative overflow-hidden bg-neutral-950 py-24 text-white">
+        <div className="absolute inset-0 overflow-hidden">
+          <div className="absolute left-1/2 top-0 h-[420px] w-[420px] -translate-x-1/2 rounded-full bg-violet-600/10 blur-3xl" />
+          <div className="absolute bottom-0 right-0 h-[320px] w-[320px] rounded-full bg-fuchsia-500/5 blur-3xl" />
+        </div>
+
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <FadeIn className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between mb-16">
+            <div className="max-w-3xl">
+              <span className="text-white/50 font-semibold text-sm uppercase tracking-[0.3em]">
+                Our Process
               </span>
-              <div className="mt-6 flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
-                <h2 className="text-4xl md:text-5xl font-medium tracking-tight text-neutral-900 max-w-md leading-[1.15]">
-                  Creative Branding Experience
-                </h2>
-                <div>
-                  <div className="hidden lg:block w-8 h-px bg-neutral-300 mb-3" />
-                  <p className="text-sm leading-7 text-neutral-500 max-w-xs">
-                    We blend strategy, visual systems, storytelling, and digital
-                    execution to build brands that move culture, not just trends.
-                  </p>
-                </div>
-              </div>
+              <h2 className="mt-4 text-3xl sm:text-5xl font-bold tracking-tight">
+                How we bring your brand to life
+              </h2>
             </div>
+            <p className="max-w-2xl text-base text-white/60 lg:text-left">
+              Our proven four-step process keeps every project aligned,
+              collaborative, and focused on results from discovery to launch.
+            </p>
+          </FadeIn>
 
-            {/* Grid */}
-            <div className="grid grid-cols-12 gap-3">
-
-              {/* Row 1 — Featured image (5 cols) + Gallery (7 cols) */}
-              <div className="col-span-12 md:col-span-5">
-                <ImageCard item={showcaseData.featured} minHeight="min-h-[280px]" />
-              </div>
-
-              <div className="col-span-12 md:col-span-7">
-                <GalleryCard item={showcaseData.gallery} />
-              </div>
-
-              {/* Row 2 — Content (4) + Stat (4) + Content (4) */}
-              <div className="col-span-12 md:col-span-4">
-                <ContentCard item={showcaseData.insight1} />
-              </div>
-
-              <div className="col-span-12 md:col-span-4">
-                <StatCard item={showcaseData.stat} />
-              </div>
-
-              <div className="col-span-12 md:col-span-4">
-                <ContentCard item={showcaseData.insight2} />
-              </div>
-
-              {/* Row 3 — Wide image (7) + Feature (5) */}
-              <div className="col-span-12 md:col-span-7">
-                <ImageCard item={showcaseData.campaign} minHeight="min-h-[200px]" />
-              </div>
-
-              <div className="col-span-12 md:col-span-5">
-                <FeatureCard item={showcaseData.feature} />
-              </div>
-
-            </div>
-          </div>
-        </section>
-
-        {/* Process Section */}
-        <section className="relative overflow-hidden bg-neutral-950 py-24 text-white">
-          <div className="absolute inset-0 overflow-hidden">
-            <div className="absolute left-1/2 top-0 h-[420px] w-[420px] -translate-x-1/2 rounded-full bg-violet-600/10 blur-3xl" />
-            <div className="absolute bottom-0 right-0 h-[320px] w-[320px] rounded-full bg-fuchsia-500/5 blur-3xl" />
-          </div>
-
-          <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <FadeIn className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between mb-16">
-              <div className="max-w-3xl">
-                <span className="text-white/50 font-semibold text-sm uppercase tracking-[0.3em]">
-                  Our Process
-                </span>
-                <h2 className="mt-4 text-3xl sm:text-5xl font-bold tracking-tight">
-                  How we bring your brand to life
-                </h2>
-              </div>
-              <p className="max-w-2xl text-base text-white/60 lg:text-left">
-                Our proven four-step process keeps every project aligned,
-                collaborative, and focused on results from discovery to launch.
-              </p>
-            </FadeIn>
-
-            <div className="relative">
-              <div className="absolute left-0 right-0 top-10 hidden h-px bg-gradient-to-r from-transparent via-white/10 to-transparent lg:block" />
-              <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
-                {[
-                  {
-                    step: "01",
-                    title: "Discover",
-                    desc: "We study your market, audience, and goals to uncover the right direction.",
-                  },
-                  {
-                    step: "02",
-                    title: "Strategize",
-                    desc: "We shape a clear story, positioning, and roadmap that fits your brand.",
-                  },
-                  {
-                    step: "03",
-                    title: "Design",
-                    desc: "We craft bold visuals, systems, and experiences that bring the brand to life.",
-                  },
-                  {
-                    step: "04",
-                    title: "Launch",
-                    desc: "We deliver, refine, and support the rollout so your brand grows with confidence.",
-                  },
-                ].map((item, idx) => (
-                  <motion.div
-                    key={item.step}
-                    className="group relative z-10 h-full rounded-3xl border border-white/10 bg-white/[0.03] p-8 backdrop-blur-sm transition-all duration-500 hover:border-violet-400/30 hover:bg-white/[0.05]"
-                    initial={{ opacity: 0, y: 40 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true, margin: "-60px" }}
-                    transition={{
-                      duration: 0.6,
-                      delay: idx * 0.2,
-                      ease: [0.22, 1, 0.36, 1],
-                    }}
-                  >
-                    <div className="flex items-center justify-between">
-                      <motion.div
-                        className="relative flex h-16 w-16 items-center justify-center rounded-2xl border border-white/10 bg-gradient-to-br from-violet-500/15 to-fuchsia-500/10"
-                        whileHover={{ scale: 1.06 }}
-                        transition={{ duration: 0.2 }}
-                      >
-                        <span className="text-base font-semibold text-white">
-                          {item.step}
-                        </span>
-                        <span className="absolute inset-0 rounded-2xl border border-violet-400/10" />
-                      </motion.div>
-                      <span className="text-xs uppercase tracking-[0.35em] text-white/25">
-                        Step {idx + 1}
+          <div className="relative">
+            <div className="absolute left-0 right-0 top-10 hidden h-px bg-gradient-to-r from-transparent via-white/10 to-transparent lg:block" />
+            <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
+              {[
+                {
+                  step: "01",
+                  title: "Discover",
+                  desc: "We study your market, audience, and goals to uncover the right direction.",
+                },
+                {
+                  step: "02",
+                  title: "Strategize",
+                  desc: "We shape a clear story, positioning, and roadmap that fits your brand.",
+                },
+                {
+                  step: "03",
+                  title: "Design",
+                  desc: "We craft bold visuals, systems, and experiences that bring the brand to life.",
+                },
+                {
+                  step: "04",
+                  title: "Launch",
+                  desc: "We deliver, refine, and support the rollout so your brand grows with confidence.",
+                },
+              ].map((item, idx) => (
+                <motion.div
+                  key={item.step}
+                  className="group relative z-10 h-full rounded-3xl border border-white/10 bg-white/[0.03] p-8 backdrop-blur-sm transition-all duration-500 hover:border-violet-400/30 hover:bg-white/[0.05]"
+                  initial={{ opacity: 0, y: 40 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: "-60px" }}
+                  transition={{
+                    duration: 0.6,
+                    delay: idx * 0.2,
+                    ease: [0.22, 1, 0.36, 1],
+                  }}
+                >
+                  <div className="flex items-center justify-between">
+                    <motion.div
+                      className="relative flex h-16 w-16 items-center justify-center rounded-2xl border border-white/10 bg-gradient-to-br from-violet-500/15 to-fuchsia-500/10"
+                      whileHover={{ scale: 1.06 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      <span className="text-base font-semibold text-white">
+                        {item.step}
                       </span>
-                    </div>
+                      <span className="absolute inset-0 rounded-2xl border border-violet-400/10" />
+                    </motion.div>
+                    <span className="text-xs uppercase tracking-[0.35em] text-white/25">
+                      Step {idx + 1}
+                    </span>
+                  </div>
 
-                    <div className="mt-8">
-                      <h3 className="text-2xl font-semibold text-white">
-                        {item.title}
-                      </h3>
-                      <p className="mt-3 text-sm leading-6 text-white/50">
-                        {item.desc}
-                      </p>
-                    </div>
+                  <div className="mt-8">
+                    <h3 className="text-2xl font-semibold text-white">
+                      {item.title}
+                    </h3>
+                    <p className="mt-3 text-sm leading-6 text-white/50">
+                      {item.desc}
+                    </p>
+                  </div>
 
-                    <div className="mt-8 flex items-center justify-between">
-                      <div className="h-px flex-1 bg-gradient-to-r from-white/0 via-white/10 to-white/0" />
-                      <span className="ml-3 text-xs uppercase tracking-[0.3em] text-white/20">
-                        0{idx + 1}
-                      </span>
-                    </div>
-                  </motion.div>
-                ))}
-              </div>
+                  <div className="mt-8 flex items-center justify-between">
+                    <div className="h-px flex-1 bg-gradient-to-r from-white/0 via-white/10 to-white/0" />
+                    <span className="ml-3 text-xs uppercase tracking-[0.3em] text-white/20">
+                      0{idx + 1}
+                    </span>
+                  </div>
+                </motion.div>
+              ))}
             </div>
           </div>
-        </section>
+        </div>
+      </section>
     </>
   );
 }

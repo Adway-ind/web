@@ -18,7 +18,7 @@ import {
   Gem,
 } from "lucide-react";
 import amalImage from "../assets/image/person/amal.jpeg";
-import Adway from "../assets/image/person/adway.jpeg";
+import Adway from "../assets/image/person/anadhu.png";
 import sony from "../assets/image/person/sony.png";
 import Video from "../assets/video/softaurora.webm";
 import { Canvas } from "@react-three/fiber";
@@ -203,21 +203,21 @@ export default function About() {
 
           {/* Headline */}
           <h1
-            className="font-medium text-center  text-white leading-[1.0] tracking-[-0.03em]"
+            className="font-medium text-left sm:text-center text-white leading-[1.05] tracking-[-0.035em]"
             style={{
               fontVariationSettings: "'opsz' 144",
-              fontSize: "clamp(52px, 8vw, 88px)",
+              fontSize: "clamp(20px, 10vw, 88px)",
             }}
           >
             The story
             <br />
             behind{" "}
-            <em className="text-blue-500" style={{ fontStyle: "italic" }}>
+            <em className="text-blue-500 italic">
               the brand.
             </em>
           </h1>
 
-          <p className="mt-5 text-[15px] text-center text-white/50 leading-relaxed max-w-7xl font-light">
+          <p className="mt-5 text-[15px] text-left text-white/50 leading-relaxed max-w-7xl font-light">
             We're a team of strategists, designers, and dreamers dedicated to
             building brands that make a lasting impact.
           </p>
@@ -227,7 +227,7 @@ export default function About() {
       </section>
 
       {/* Story Section */}
-      <section className="py-24 bg-white">
+      <section className="py-14 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
             {/* LEFT CONTENT */}
@@ -240,24 +240,30 @@ export default function About() {
                 Building brands since 2014
               </h2>
 
-              <p className="mt-6 text-black text-lg text-justify leading-relaxed">
-                At Adway, we help brands grow through creative digital
-                marketing, branding, content creation, SEO, SEM, and eCommerce
-                solutions. Based in Kochi, Kerala, we combine strategy,
-                innovation, and design to build strong online experiences that
-                drive real business growth.From startups and SMEs to global
-                brands, Adway delivers personalized and cost-effective marketing
-                solutions that attract, engage, and convert audiences. With a
-                focus on creativity, performance, and results, we help
-                businesses stand out in today's competitive digital
-                landscape.Our journey began with a simple vision: to make
-                world-class branding accessible to businesses of all sizes. Over
-                the years, we've grown from a small studio into a full-service
-                creative agency, serving clients across industries and
-                geographies. Our team brings together diverse expertise in
-                design, technology, marketing, and strategy, enabling us to
-                deliver comprehensive solutions that address every aspect of
+              {/* Desktop Description */}
+              <p className="hidden sm:block mt-6 text-black text-lg font-Normal text-hide sm:text-justify leading-relaxed">
+                At Adway, we help brands grow through creative digital marketing,
+                branding, content creation, SEO, SEM, and eCommerce solutions. Based in
+                Kochi, Kerala, we combine strategy, innovation, and design to build strong
+                online experiences that drive real business growth. From startups and SMEs
+                to global brands, Adway delivers personalized and cost-effective marketing
+                solutions that attract, engage, and convert audiences. With a focus on
+                creativity, performance, and results, we help businesses stand out in
+                today's competitive digital landscape. Our journey began with a simple
+                vision: to make world-class branding accessible to businesses of all sizes.
+                Over the years, we've grown from a small studio into a full-service creative
+                agency, serving clients across industries and geographies. Our team brings
+                together diverse expertise in design, technology, marketing, and strategy,
+                enabling us to deliver comprehensive solutions that address every aspect of
                 brand development and growth.
+              </p>
+
+              {/* Mobile Description */}
+              <p className="block sm:hidden mt-6 text-black text-lg font-Normal text-left leading-relaxed">
+                At Adway, we help brands grow through creative branding, digital marketing,
+                content, SEO, SEM, and eCommerce solutions. Based in Kochi, Kerala, we
+                combine strategy, creativity, and technology to build impactful brands and
+                digital experiences that drive real business growth.
               </p>
 
               {/* Color Picker */}
@@ -305,9 +311,9 @@ export default function About() {
       </section>
 
       {/* Values */}
-      <section className="py-24 bg-black">
+      <section className="py-14 bg-black">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center max-w-3xl mx-auto mb-16">
+          <div className="text-left sm:text-center max-w-3xl mx-auto mb-16">
             <span className="text-white/50 font-semibold text-sm uppercase tracking-wider">
               Our Values
             </span>
@@ -341,16 +347,16 @@ export default function About() {
       </section>
 
       {/* Team */}
-      <section className="py-24 bg-white">
+      <section className="py-14 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center max-w-5xl mx-auto mb-16">
+          <div className="text-left sm:text-center max-w-5xl mx-auto mb-16">
             <span className="text-black/50 font-semibold text-sm uppercase tracking-wider">
               Our Team
             </span>
             <h2 className="mt-4 text-4xl sm:text-5xl font-medium text-black tracking-tight">
               The creative minds
             </h2>
-            <p className="mt-4 text-2xl text-black text-center">
+            <p className="mt-4 text-1xl sm:3xl text-black text-left sm:bg-center">
               A passionate team of strategists, designers, developers, and
               marketers dedicated to building remarkable brands through
               creativity and innovation.

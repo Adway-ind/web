@@ -41,8 +41,8 @@ function DividerBanner() {
     >
       {/* Glow Effects */}
       <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute left-0 top-1/2 -translate-y-1/2 w-96 h-96 bg-purple-500/10 blur-[120px]" />
-        <div className="absolute right-0 top-1/2 -translate-y-1/2 w-96 h-96 bg-blue-500/10 blur-[120px]" />
+        <div className="absolute left-0 top-1/2 -translate-y-1/2 w-96 h-96 bg-black-500/10 blur-[120px]" />
+        <div className="absolute right-0 top-1/2 -translate-y-1/2 w-96 h-96 bg-black-500/10 blur-[120px]" />
       </div>
 
       {/* Top Ribbon */}

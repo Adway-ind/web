@@ -173,10 +173,10 @@ export default function Contact() {
 
           {/* Headline */}
           <h1
-            className="text-white text-center leading-[1.0] tracking-[-0.03em] font-medium"
+            className="text-white text-left sm:text-center leading-[1.0] tracking-[-0.03em] font-medium"
             style={{
               fontVariationSettings: "'opsz' 144",
-              fontSize: "clamp(52px, 8vw, 88px)",
+              fontSize: "clamp(22px, 8vw, 88px)",
             }}
           >
             Let's start
@@ -186,7 +186,7 @@ export default function Contact() {
             </em>
           </h1>
 
-          <p className="mt-5 text-[15px] text-white/50 text-center leading-relaxed max-w-7xl font-light">
+          <p className="mt-5 text-[15px] text-white/50 text-left sm:text-center leading-relaxed max-w-7xl font-light">
             Ready to start your next project? We're here to help. Reach out to
             us through any of the channels below, or fill out the contact form
             and we'll get back to you within 24 hours. Whether you have a
@@ -199,7 +199,7 @@ export default function Contact() {
       </section>
 
       {/* Contact Info Cards */}
-      <section className="py-16 bg-neutral-950">
+      <section className="py-10 bg-neutral-950">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 -mt-24 relative z-10">
             {contactInfo.map((info) => (
@@ -239,7 +239,7 @@ export default function Contact() {
       </section>
 
       {/* Contact Form + Map */}
-      <section className="py-24 bg-neutral-950">
+      <section className="py-10 bg-neutral-950">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-5 gap-16">
             {/* Form */}

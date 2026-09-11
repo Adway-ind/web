@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { ChevronDown, ArrowRight, ArrowUpRight } from "lucide-react";
-import Video from "../assets/video/carrer-one.mp4";
+import Video from "../assets/video/carrer-one.webm";
 import { API } from "../config/api";
 import SEO from "../components/SEO";
 import { Helmet } from "react-helmet-async";
@@ -357,10 +357,10 @@ export default function Career() {
 
           {/* Headline */}
           <h1
-            className="text-white text-center leading-[1.0] tracking-[-0.03em] font-medium"
+            className="text-white text-left sm:text-center leading-[1.0] tracking-[-0.03em] font-medium"
             style={{
               fontVariationSettings: "'opsz ' 144",
-              fontSize: "clamp(52px, 8vw, 88px)",
+              fontSize: "clamp(22px, 8vw, 88px)",
             }}
           >
             Shape the <br />
@@ -370,7 +370,7 @@ export default function Career() {
             </em>
           </h1>
 
-          <p className="mt-5 text-[15px] text-center text-white/50 leading-relaxed max-w-7xl font-light">
+          <p className="mt-5 text-[15px] text-left sm:text-center text-white/50 leading-relaxed max-w-7xl font-light">
             Join a team of strategists, designers, and dreamers building brands
             that leave a mark.
           </p>
@@ -380,16 +380,16 @@ export default function Career() {
       </section>
 
       {/* ═══ PERKS ═══ */}
-      <section className="py-28 bg-neutral-950">
+      <section className="py-10 bg-neutral-950">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <p className="text-xs uppercase tracking-[0.25em] text-white/40 font-medium mb-4 text-center">
+          <p className="text-xs uppercase tracking-[0.25em] text-white/40 font-medium mb-4 text-left sm:text-center">
             Why Adway
           </p>
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-medium text-white tracking-[-0.02em] text-center mb-6">
-            Perks that power
-            <br className="sm:hidden" /> your best work
+          <h2 className="text-2xl sm:text-4xl md:text-5xl font-medium text-white tracking-[-0.02em] text-left sm:text-center mb-6">
+            Perks that power your 
+            <br className="sm:hidden" /> best work
           </h2>
-          <p className="text-base text-white/40 max-w-4xl mx-auto text-center mb-20 leading-relaxed">
+          <p className="text-base text-white/40 max-w-4xl mx-auto text-left sm:text-center mb-20 leading-relaxed">
             We believe that great work comes from happy, supported teams. That's
             why we've built a workplace culture that prioritizes well-being,
             professional growth, and work-life balance. Our comprehensive
@@ -419,7 +419,7 @@ export default function Career() {
       </section>
 
       {/* ═══ CULTURE ═══ */}
-      <section className="py-28 bg-white">
+      <section className="py-14 bg-white">
         <div className="max-w-6xl mx-auto px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 items-center">
             <div>
@@ -490,10 +490,10 @@ export default function Career() {
       </section>
 
       {/* ═══ CURRENT OPENINGS — Premium Minimal ═══ */}
-      <section id="openings" className="py-28 bg-neutral-950">
+      <section id="openings" className="py-14 bg-neutral-950">
         <div className="max-w-[1200px] mx-auto px-6 lg:px-8">
           {/* Heading */}
-          <div className="text-center mb-20">
+          <div className="text-left sm:text-center mb-20">
             <h2 className="text-5xl sm:text-6xl md:text-7xl lg:text-[80px] font-semibold text-white tracking-[-0.03em] leading-[1.05]">
               Current Openings
             </h2>
@@ -543,7 +543,7 @@ export default function Career() {
         <div className="absolute inset-0">
           <div className="absolute top-0 right-1/3 w-96 h-96 bg-white/5 rounded-full blur-[120px]" />
         </div>
-        <div className="relative max-w-2xl mx-auto px-6 lg:px-8 text-center">
+        <div className="relative max-w-2xl mx-auto px-6 lg:px-8 text-left sm:text-center">
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-light text-white tracking-[-0.02em]">
             Don't see your role?
           </h2>
