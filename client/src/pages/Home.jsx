@@ -35,7 +35,7 @@ import VideoSlide from "../assets/video/slide/Strategic.webm";
 import VideoSlide1 from "../assets/video/slide/digital_marketing.webm";
 import VideoSlide2 from "../assets/video/slide/Strategic.webm";
 import VideoSlide3 from "../assets/video/slide/Creative.webm";
-import VideoSlide4 from "../assets/video/slide/Tech.webm";
+import VideoSlide4 from "../assets/video/slide/tech.webm";
 import { API } from "../config/api";
 import { useAuth } from "../context/AuthContext";
 import Antigravity from "../components/Antigravity";
