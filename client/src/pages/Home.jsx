@@ -31,16 +31,13 @@ import Lenis from "lenis";
 import Client from "../components/ClientsSection";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay } from "swiper/modules";
-import VideoSlide from "../assets/video/slide/Strategic.webm";
 import VideoSlide1 from "../assets/video/slide/digital_marketing.webm";
 import VideoSlide2 from "../assets/video/slide/Strategic.webm";
 import VideoSlide3 from "../assets/video/slide/Creative.webm";
 import VideoSlide4 from "../assets/video/slide/tech.webm";
 import { API } from "../config/api";
 import { useAuth } from "../context/AuthContext";
-import Antigravity from "../components/Antigravity";
-import SEO from "../components/SEO";
-import BG from "../assets/video/bg.mp4";
+
 import CurvedTextDivider from "../components/CurvedTextDivider";
 import Insta from "../assets/image/Branding/Instagram.webp";
 import Photo1 from "../assets/image/Branding/photo-01.webp";
@@ -988,15 +985,15 @@ export default function Home() {
     description: "Premium Branding & Digital Marketing Agency",
     address: {
       "@type": "PostalAddress",
-      streetAddress: "123 Creative Ave",
-      addressLocality: "Design District",
-      addressRegion: "NY",
-      postalCode: "10001",
-      addressCountry: "US",
+      streetAddress: "kattappana, Idukki",
+      addressLocality: "Idukki",
+      addressRegion: "kattappana",
+      postalCode: "685508",
+      addressCountry: "INDIA",
     },
     contactPoint: {
       "@type": "ContactPoint",
-      telephone: "+1-555-123-4567",
+      telephone: "+918606880634",
       contactType: "Customer Service",
     },
     sameAs: [
@@ -1013,12 +1010,12 @@ export default function Home() {
     <>
       <Helmet>
         <title>
-          Adway Creations | Branding & Digital Marketing Agency
+          Adway Creations | Branding & Digital Marketing Agency in Kerala
         </title>
 
         <meta
           name="description"
-          content="Adway Creations is a creative branding and digital marketing agency specializing in branding, logo design, packaging design, web development, UI/UX design and digital marketing."
+          content="Adway Creations is a creative branding and digital marketing agency in Kerala offering branding, logo design, packaging, web development, UI/UX and digital marketing."
         />
 
         <link
@@ -1028,12 +1025,12 @@ export default function Home() {
 
         <meta
           property="og:title"
-          content="Adway Creations | Branding & Digital Marketing Agency"
+          content="Adway Creations | Branding & Digital Marketing Agency in Kerala"
         />
 
         <meta
           property="og:description"
-          content="Creative branding, digital marketing, web development, package design and visual communication by Adway Creations."
+          content="Creative branding, logo design, packaging, web development, UI/UX and digital marketing solutions by Adway Creations."
         />
 
         <meta
@@ -1050,6 +1047,7 @@ export default function Home() {
           property="og:image"
           content="https://adwaycreations.com/og-image.jpg"
         />
+
         <script type="application/ld+json">
           {JSON.stringify(organizationSchema)}
         </script>
@@ -1057,8 +1055,7 @@ export default function Home() {
         <script type="application/ld+json">
           {JSON.stringify(websiteSchema)}
         </script>
-
-      </ Helmet>
+      </Helmet>
       <style>{`
         @keyframes servicesMarquee {
           from { transform: translateX(0); }

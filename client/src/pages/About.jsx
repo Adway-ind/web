@@ -122,9 +122,10 @@ export default function About() {
           About Adway Creations | Creative Branding Agency in Kerala
         </title>
 
+
         <meta
           name="description"
-          content="Learn about Adway Creations, a creative branding and digital marketing agency in Kerala helping businesses build strong brands through strategy, design, web development and digital marketing."
+          content="Adway Creations is a creative branding and digital marketing agency specializing in branding, logo design, packaging design, web development, UI/UX design and digital marketing."
         />
 
         <meta
