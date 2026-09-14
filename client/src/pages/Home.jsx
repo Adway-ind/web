@@ -4,6 +4,7 @@ import { Helmet } from "react-helmet-async";
 import {
   organizationSchema,
   websiteSchema,
+  localBusinessSchema,
 } from "../SEO/structuredData";
 import {
   ArrowRight,
@@ -982,14 +983,15 @@ export default function Home() {
     name: "Adway",
     url: "https://adwaycreations.com",
     logo: "https://adwaycreations.com/favicon.svg",
-    description: "Premium Branding & Digital Marketing Agency",
+    description:
+      "Branding and digital marketing agency in Kattappana, Kerala, helping businesses build memorable brands and digital experiences.",
     address: {
       "@type": "PostalAddress",
-      streetAddress: "kattappana, Idukki",
-      addressLocality: "Idukki",
-      addressRegion: "kattappana",
+      streetAddress: "Adway Building, 23/7, near Vi Office",
+      addressLocality: "Kattappana",
+      addressRegion: "Kerala",
       postalCode: "685508",
-      addressCountry: "INDIA",
+      addressCountry: "IN",
     },
     contactPoint: {
       "@type": "ContactPoint",
@@ -1054,6 +1056,10 @@ export default function Home() {
 
         <script type="application/ld+json">
           {JSON.stringify(websiteSchema)}
+        </script>
+
+        <script type="application/ld+json">
+          {JSON.stringify(localBusinessSchema({}))}
         </script>
       </Helmet>
       <style>{`

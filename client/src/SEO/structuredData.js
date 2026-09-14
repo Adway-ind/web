@@ -1,5 +1,13 @@
 const SITE_URL = "https://adwaycreations.com";
 const SITE_NAME = "Adway Creations";
+const BUSINESS_ADDRESS = {
+  "@type": "PostalAddress",
+  streetAddress: "Adway Building, 23/7, near Vi Office",
+  addressLocality: "Kattappana",
+  addressRegion: "Kerala",
+  postalCode: "685508",
+  addressCountry: "IN",
+};
 
 /**
  * Organization Schema
@@ -209,15 +217,27 @@ export const createCreativeWorkSchema = ({
  * before using this schema.
  */
 export const localBusinessSchema = ({
-  address,
-  telephone,
-  email,
+  address = BUSINESS_ADDRESS,
+  telephone = "+91 8606880634",
+  email = "adwaycreations@gmail.com",
 }) => ({
   "@context": "https://schema.org",
   "@type": "ProfessionalService",
 
   name: SITE_NAME,
   url: SITE_URL,
+  image: `${SITE_URL}/og-image.jpg`,
+  priceRange: "$$",
+  areaServed: [
+    {
+      "@type": "City",
+      name: "Kattappana",
+    },
+    {
+      "@type": "State",
+      name: "Kerala",
+    },
+  ],
 
   ...(telephone && {
     telephone,

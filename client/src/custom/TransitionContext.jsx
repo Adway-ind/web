@@ -10,17 +10,26 @@ export function TransitionProvider({ children }) {
   const navigateTo = useCallback(
     (to) => {
       if (transitioning) return;
+
+      // Start transition
       setTransitioning(true);
-      setTimeout(() => {
-        navigate(to);
-        setTimeout(() => setTransitioning(false), 300);
-      }, 400);
+
+      // Navigate immediately — NO WAIT
+      navigate(to);
+
+      // Immediately reset
+      setTransitioning(false);
     },
     [navigate, transitioning]
   );
 
   return (
-    <TransitionContext.Provider value={{ transitioning, navigateTo }}>
+    <TransitionContext.Provider
+      value={{
+        transitioning,
+        navigateTo,
+      }}
+    >
       {children}
     </TransitionContext.Provider>
   );
