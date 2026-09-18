@@ -77,7 +77,6 @@ CREATE TABLE chat_enquiries (
   id UUID PRIMARY KEY,
   service VARCHAR(255),
   project_type VARCHAR(255),
-  budget VARCHAR(255),
   timeline VARCHAR(255),
   contact_name VARCHAR(255),
   contact_business VARCHAR(255),

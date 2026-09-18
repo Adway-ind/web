@@ -360,8 +360,7 @@ function HeroSlider() {
 
       {/* ── Main Content ── */}
       <div className="relative z-20 h-full w-full flex flex-col justify-center px-6 sm:px-10 lg:px-16 pb-2 sm:pb-32">
-        <div className="max-w-7xl mx-auto w-full flex flex-col lg:flex-row items-end justify-between gap-10 lg:gap-16">
-          {/* ── Left: Animated Text Content ── */}
+        <div className="max-w-7xl mx-auto w-full flex flex-col lg:flex-row items-start lg:items-end justify-between gap-10 lg:gap-16">          {/* ── Left: Animated Text Content ── */}
           <div className="flex-1 max-w-2xl">
             <AnimatePresence mode="wait">
               <motion.div
@@ -388,9 +387,7 @@ function HeroSlider() {
                 <motion.h1
                   variants={textVariants}
                   custom={1}
-                  className="text-5xl sm:text-7xl md:text-8xl lg:text-[9rem] font-medium  text-white leading-[0.88] tracking-[-0.04em]"
-                  style={{ fontFamily: "'Poppins', sans-serif" }}
-                >
+                  className=" text-5xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-[9rem] font-medium text-white leading-[0.88] tracking-[-0.04em] text-left font-medium  text-white leading-[0.88] tracking-[-0.04em]" style={{ fontFamily: "'Poppins', sans-serif" }}>
                   {heroSlides[current].title}
                   <span className="block mt-2 bg-gradient-to-r ">
                     {heroSlides[current].highlight}
@@ -632,7 +629,7 @@ function FeaturedPortfolio() {
     /* Track Wrapper: Determines total scroll length (300vh allows a smooth scrolling distance) */
     <section
       ref={sectionRef}
-      className={`relative bg-white ${isDesktop ? "h-[300vh]" : "py-10"
+      className={`relative bg-black pt-24 pb-8 ${isDesktop ? "h-[100vh]" : "py-10"
         }`}
     >
       {/* Background Media & Overlays (Pinned through h-screen) */}
@@ -654,171 +651,158 @@ function FeaturedPortfolio() {
         <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:48px_48px]" />
 
         {/* Content Container */}
-        <div className="relative z-10 w-full flex flex-col justify-between h-full py-16">
-
-          {/* Header (Top Anchor) */}
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center w-full">
-            <FadeIn className="max-w-4xl mx-auto">
-              <span className="inline-flex items-center gap-3 text-black/50 text-sm uppercase tracking-[0.3em]">
-                <span className="w-10 h-px bg-black/30" />
-                Featured Work
-                <span className="w-10 h-px bg-black/30" />
-              </span>
-
-              <h2 className="mt-4 text-3xl sm:text-5xl font-bold text-black tracking-tight">
-                Selected projects
-              </h2>
-
-              <p className="mt-2 text-base text-black/60 max-w-2xl mx-auto">
-                A curated selection of brands, digital experiences, and campaigns crafted to create lasting impact.
-              </p>
-            </FadeIn>
+        {/* Loading State */}
+        {loading && (
+          <div className="flex justify-center my-auto">
+            <div className="w-8 h-8 rounded-full border-2 border-black/20 border-t-black animate-spin" />
           </div>
+        )}
 
-          {/* Loading State */}
-          {loading && (
-            <div className="flex justify-center my-auto">
-              <div className="w-8 h-8 rounded-full border-2 border-black/20 border-t-black animate-spin" />
-            </div>
-          )}
+        {/* Featured Projects */}
+        {/* Loading State */}
+        {loading && (
+          <div className="relative z-10 min-h-[60vh] flex items-center justify-center">
+            <div className="w-8 h-8 rounded-full border-2 border-black/20 border-t-black animate-spin" />
+          </div>
+        )}
 
-          {/* Empty State */}
-          {!loading && projects.length === 0 && (
-            <div className="text-center my-auto">
-              <ImageIcon className="mx-auto w-12 h-12 text-white/30" />
-              <p className="mt-6 text-white/70">No featured projects available.</p>
-            </div>
-          )}
+        {/* No Featured Projects */}
+        {!loading && visibleProjects.length === 0 && (
+          <div className="relative z-10 min-h-[60vh] flex flex-col items-center justify-center text-center px-6">
+            <ImageIcon className="w-12 h-12 text-black/20 mb-5" />
 
-          {/* Horizontal Scroller Rail */}
-          {!loading && visibleProjects.length > 0 && (
-            <>
-              {isDesktop ? (
-                // Desktop: Horizontal scroll animation
-                <div className="w-full overflow-hidden my-auto cursor-grab active:cursor-grabbing">
-                  <motion.div
-                    style={{ x }}
-                    className="flex gap-8 px-8 sm:px-16 md:px-32 w-max"
-                  >
-                    {visibleProjects.slice(0, 6).map((item) => (
-                      <div
-                        key={item.id}
-                        className="group relative block w-[80vw] sm:w-[460px] md:w-[540px] flex-shrink-0"
+            <h3 className="text-2xl font-semibold text-black">
+              No featured projects added
+            </h3>
+
+            <p className="mt-2 text-sm text-black/50">
+              Featured projects will appear here once they are added.
+            </p>
+          </div>
+        )}
+
+        {/* Featured Projects */}
+        {!loading && visibleProjects.length > 0 && (
+          <>
+            {isDesktop ? (
+              <div className="w-full overflow-hidden my-auto cursor-grab active:cursor-grabbing">
+                <motion.div
+                  style={{ x }}
+                  className="flex gap-8 px-8 sm:px-16 md:px-32 w-max"
+                >
+                  {visibleProjects.slice(0, 6).map((item) => (
+                    <div
+                      key={item.id}
+                      className="group relative block w-[80vw] sm:w-[460px] md:w-[540px] flex-shrink-0"
+                    >
+                      <Link
+                        to={`/portfolio/${item.slug || item.id}`}
+                        className="relative block overflow-hidden h-[480px] sm:h-[540px] border border-black/10 bg-black"
                       >
-                        <Link
-                          to={`/portfolio/${item.slug || item.id}`}
-                          className="relative block overflow-hidden h-[480px] sm:h-[540px] border border-white/10 bg-black"
-                        >
-                          {/* Image */}
-                          {item.image ? (
-                            <img
-                              src={resolveImageUrl(item.image)}
-                              alt={item.title}
-                              className="absolute inset-0 h-full w-full object-cover transition-transform duration-1000 group-hover:scale-105"
-                            />
-                          ) : (
-                            <div className="absolute inset-0 flex items-center justify-center bg-white/[0.03]">
-                              <ImageIcon className="w-12 h-12 text-white/30" />
-                            </div>
+                        {item.image ? (
+                          <img
+                            src={resolveImageUrl(item.image)}
+                            alt={item.title}
+                            className="absolute inset-0 h-full w-full object-cover transition-transform duration-1000 group-hover:scale-105"
+                          />
+                        ) : (
+                          <div className="absolute inset-0 flex items-center justify-center bg-black/[0.03]">
+                            <ImageIcon className="w-12 h-12 text-black/30" />
+                          </div>
+                        )}
+
+                        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/35 to-transparent" />
+
+                        <div className="absolute top-6 left-6 z-20">
+                          <span className="inline-flex items-center rounded-full border border-white/10 bg-white/10 backdrop-blur-md px-5 py-2 text-xs uppercase tracking-[0.2em] text-white/90">
+                            Featured
+                          </span>
+                        </div>
+
+                        <div className="absolute top-6 right-6 z-20 h-12 w-12 rounded-full border border-white/10 bg-white/10 backdrop-blur-md flex items-center justify-center opacity-0 translate-y-3 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-500">
+                          <ArrowRight className="w-5 h-5 text-white -rotate-45" />
+                        </div>
+
+                        <div className="absolute bottom-0 left-0 right-0 z-20 p-8">
+                          <span className="text-sm uppercase tracking-[0.25em] text-white/50">
+                            {item.category}
+                          </span>
+
+                          <h3 className="mt-2 text-3xl sm:text-4xl font-bold text-white leading-tight">
+                            {item.title}
+                          </h3>
+
+                          {item.client && (
+                            <p className="mt-2 text-base text-white/60">
+                              {item.client}
+                            </p>
                           )}
 
-                          <div className="absolute inset-0 bg-gradient-to-t from-black via-black/35 to-transparent" />
-
-                          <div className="absolute top-6 left-6 z-20">
-                            <span className="inline-flex items-center rounded-full border border-white/10 bg-white/10 backdrop-blur-md px-5 py-2 text-xs uppercase tracking-[0.2em] text-white/90">
-                              Featured
-                            </span>
-                          </div>
-
-                          <div className="absolute top-6 right-6 z-20 h-12 w-12 rounded-full border border-white/10 bg-white/10 backdrop-blur-md flex items-center justify-center opacity-0 translate-y-3 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-500">
-                            <ArrowRight className="w-5 h-5 text-white -rotate-45" />
-                          </div>
-
-                          <div className="absolute bottom-0 left-0 right-0 z-20 p-8">
-                            <span className="text-sm uppercase tracking-[0.25em] text-white/50">
-                              {item.category}
-                            </span>
-
-                            <h3 className="mt-2 text-3xl sm:text-4xl font-bold text-white leading-tight">
-                              {item.title}
-                            </h3>
-
-                            {item.client && (
-                              <p className="mt-2 text-base text-white/60">
-                                {item.client}
-                              </p>
-                            )}
-
-                            {item.description && (
-                              <p className="mt-4 max-w-sm text-sm leading-6 text-white/50 opacity-0 translate-y-6 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-500">
-                                {item.description}
-                              </p>
-                            )}
-                          </div>
-
-                          <div className="absolute inset-0 rounded-[36px] border border-transparent group-hover:border-white/20 transition-all duration-500" />
-                        </Link>
-                      </div>
-                    ))}
-                  </motion.div>
-                </div>
-              ) : (
-                // Mobile & Tablet: Grid Layout
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 px-6 py-8">
-                  {visibleProjects.slice(0, 6).map((item) => (
-                    <Link
-                      key={item.id}
-                      to={`/portfolio/${item.slug || item.id}`}
-                      className="group relative block overflow-hidden h-[380px] border border-white/10 bg-black"
-                    >
-                      {item.image ? (
-                        <img
-                          src={resolveImageUrl(item.image)}
-                          alt={item.title}
-                          className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
-                        />
-                      ) : (
-                        <div className="absolute inset-0 flex items-center justify-center bg-white/[0.03]">
-                          <ImageIcon className="w-12 h-12 text-white/30" />
+                          {item.description && (
+                            <p className="mt-4 max-w-sm text-sm leading-6 text-white/50 opacity-0 translate-y-6 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-500">
+                              {item.description}
+                            </p>
+                          )}
                         </div>
-                      )}
-
-                      <div className="absolute inset-0 bg-gradient-to-t from-black via-black/35 to-transparent" />
-
-                      <div className="absolute bottom-0 left-0 right-0 p-6">
-                        <span className="text-xs uppercase tracking-[0.2em] text-white/60">
-                          {item.category}
-                        </span>
-
-                        <h3 className="mt-2 text-2xl font-bold text-white">
-                          {item.title}
-                        </h3>
-
-                        {item.client && (
-                          <p className="mt-2 text-sm text-white/60">
-                            {item.client}
-                          </p>
-                        )}
-                      </div>
-                    </Link>
+                      </Link>
+                    </div>
                   ))}
-                </div>
-              )}
-            </>
-          )}
+                </motion.div>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 px-6 py-8">
+                {visibleProjects.slice(0, 6).map((item) => (
+                  <Link
+                    key={item.id}
+                    to={`/portfolio/${item.slug || item.id}`}
+                    className="group relative block overflow-hidden h-[380px] border border-white/10 bg-black"
+                  >
+                    {item.image ? (
+                      <img
+                        src={resolveImageUrl(item.image)}
+                        alt={item.title}
+                        className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+                      />
+                    ) : (
+                      <div className="absolute inset-0 flex items-center justify-center bg-white/[0.03]">
+                        <ImageIcon className="w-12 h-12 text-white/30" />
+                      </div>
+                    )}
 
-          {/* Footer Navigation Link (Bottom Anchor) */}
-          <div className="text-center w-full">
-            <Link
-              to="/portfolio"
-              className="inline-flex items-center gap-2 text-white/80 hover:text-white font-medium group transition-colors"
-            >
-              View All Featured Portfolio
-              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-            </Link>
-          </div>
+                    <div className="absolute inset-0 bg-gradient-to-t from-black via-black/35 to-transparent" />
 
-        </div>
+                    <div className="absolute bottom-0 left-0 right-0 p-6">
+                      <span className="text-xs uppercase tracking-[0.2em] text-white/60">
+                        {item.category}
+                      </span>
+
+                      <h3 className="mt-2 text-2xl font-bold text-white">
+                        {item.title}
+                      </h3>
+
+                      {item.client && (
+                        <p className="mt-2 text-sm text-white/60">
+                          {item.client}
+                        </p>
+                      )}
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            )}
+
+            {/* Footer Navigation Link — only when projects exist */}
+            <div className="text-center w-full mt-8">
+              <Link
+                to="/portfolio"
+                className="inline-flex items-center gap-2 text-white/70 hover:text-white font-medium group transition-colors"
+              >
+                View All Featured Portfolio
+                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+              </Link>
+            </div>
+          </>
+        )}
       </div>
     </section>
   );
@@ -1301,12 +1285,10 @@ export default function Home() {
       <CurvedTextDivider />
 
       {/* ── Featured Portfolio (API-driven) ── */}
-      <section className="pt-24 pb-8 bg-black">
-        <FeaturedPortfolio />
-      </section>
+      <FeaturedPortfolio />
 
       {/* Testimonials */}
-      <section className="py-24 bg-black">
+      <section className="py-24 bg-black mt-4">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <FadeIn className="text-center max-w-4xl mx-auto mb-16">
             <span className="text-white/50 font-semibold text-sm uppercase tracking-wider">

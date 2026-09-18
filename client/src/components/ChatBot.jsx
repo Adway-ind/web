@@ -43,12 +43,6 @@ const projectTypeOptions = {
   ],
 };
 
-const budgetOptions = [
-  "₹25K–₹50K",
-  "₹50K–₹1L",
-  "₹1L–₹3L",
-  "₹3L+",
-];
 
 const timelineOptions = [
   "Immediately",
@@ -75,7 +69,6 @@ export default function ChatBot() {
   const [stage, setStage] = useState("service");
   const [selectedService, setSelectedService] = useState("");
   const [selectedProjectType, setSelectedProjectType] = useState("");
-  const [selectedBudget, setSelectedBudget] = useState("");
   const [selectedTimeline, setSelectedTimeline] = useState("");
   const [contact, setContact] = useState({
     name: "",
@@ -127,17 +120,17 @@ export default function ChatBot() {
 
       if (stage === "projectType") {
         setSelectedProjectType(option);
-        appendBotMessage("What's your approximate budget?", budgetOptions);
-        setStage("budget");
-        return;
-      }
 
-      if (stage === "budget") {
-        setSelectedBudget(option);
-        appendBotMessage("How soon would you like to start?", timelineOptions);
+        appendBotMessage(
+          "How soon would you like to start?",
+          timelineOptions
+        );
+
         setStage("timeline");
         return;
       }
+
+      
 
       if (stage === "timeline") {
         setSelectedTimeline(option);
@@ -177,7 +170,6 @@ export default function ChatBot() {
       const payload = {
         service: selectedService,
         projectType: selectedProjectType,
-        budget: selectedBudget,
         timeline: selectedTimeline,
         contact,
       };
@@ -219,8 +211,8 @@ export default function ChatBot() {
     <>
       <div
         className={`fixed z-[9999] transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] bottom-44 right-4 sm:right-6 w-[calc(100vw-2rem)] sm:w-[400px] max-h-[70vh] sm:max-h-[520px] ${isOpen
-            ? "opacity-100 translate-y-0 scale-100 pointer-events-auto"
-            : "opacity-0 translate-y-8 scale-95 pointer-events-none"
+          ? "opacity-100 translate-y-0 scale-100 pointer-events-auto"
+          : "opacity-0 translate-y-8 scale-95 pointer-events-none"
           }`}
       >
         <div className="flex flex-col bg-white border border-black/10 rounded-2xl shadow-2xl shadow-black/10 overflow-hidden h-[70vh] sm:h-[520px]">
@@ -262,8 +254,8 @@ export default function ChatBot() {
 
                 <div
                   className={`max-w-[80%] px-4 py-2.5 rounded-2xl text-sm leading-relaxed ${msg.role === "bot"
-                      ? "bg-black/5 text-black rounded-tl-sm"
-                      : "bg-black text-white rounded-tr-sm"
+                    ? "bg-black/5 text-black rounded-tl-sm"
+                    : "bg-black text-white rounded-tr-sm"
                     }`}
                 >
                   {msg.text}
@@ -369,8 +361,8 @@ export default function ChatBot() {
           onClick={() => setIsOpen(!isOpen)}
           aria-label={isOpen ? "Close chat" : "Open chat"}
           className={`relative flex h-[55px] w-[55px] items-center justify-center rounded-full transition-all duration-300 ease-out overflow-visible ${isOpen
-              ? "scale-90 border border-white bg-black hover:bg-violet-600"
-              : "border border-violet-500/10 bg-violet-600 hover:bg-violet-600/30"
+            ? "scale-90 border border-white bg-black hover:bg-violet-600"
+            : "border border-violet-500/10 bg-violet-600 hover:bg-violet-600/30"
             }`}
         >
           {!isOpen && (

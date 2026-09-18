@@ -10,18 +10,17 @@ export default function Footer() {
       {/* CTA Section */}
       <div className="border-b border-black/10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-            <div>
-              <h2 className="text-3xl md:text-4xl font-medium text-black">
-                Ready to elevate your brand?
-              </h2>
-              <p className="text-black/60 mt-2 text-lg">
-                Let's create something extraordinary together.
-              </p>
-              <p className="text-black mt-2 text-base font-normal max-w-xl">
-                Whether you're launching a new brand, refreshing an existing one, or looking to expand your digital presence, our team is ready to help you achieve your goals with strategic creativity and proven expertise.
-              </p>
-            </div>
+          <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-8 lg:gap-6">            <div>
+            <h2 className="text-3xl md:text-4xl font-medium text-black">
+              Ready to elevate your brand?
+            </h2>
+            <p className="text-black/60 mt-2 text-lg">
+              Let's create something extraordinary together.
+            </p>
+            <p className="text-black mt-2 text-base font-normal max-w-xl">
+              Whether you're launching a new brand, refreshing an existing one, or looking to expand your digital presence, our team is ready to help you achieve your goals with strategic creativity and proven expertise.
+            </p>
+          </div>
             <Link
               to="/contact"
               className="group flex items-center justify-center gap-2 px-8 py-4 bg-black text-white rounded-full font-semibold hover:bg-black/90 transition-all duration-300 shadow-lg hover:shadow-xl w-full sm:w-auto"
@@ -35,11 +34,10 @@ export default function Footer() {
 
       {/* Main Footer */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
-          {/* Brand */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 sm:gap-12 lg:gap-16">          {/* Brand */}
           <div className="lg:col-span-1">
             <Link to="/" className="flex items-center gap-2">
-              <img src={LogoBlack} alt="Adway Studio" className="h-auto w-50" />
+              <img src={LogoBlack} alt="Adway Studio" className="h-auto w-[180px] sm:w-[200px]" />
             </Link>
             <p className="mt-4 text-black/80 text-[14px] font-normal leading-relaxed text-justify">
               We craft brands that resonate, inspire, and leave lasting
@@ -162,7 +160,10 @@ export default function Footer() {
         </div>
       </section>
       <div className="mt-16 mb-4 text-center">
-        <h2 className="text-6xl md:text-8xl lg:text-[25rem] font-black tracking-tighter text-black/10 select-none">
+        <h2
+          className="text-6xl sm:text-7xl md:text-8xl lg:text-[15rem] xl:text-[20rem] 2xl:text-[25rem] font-black tracking-tighter text-black/10 select-none leading-none
+  "
+        >
           ADWAY
         </h2>
       </div>
@@ -170,7 +171,7 @@ export default function Footer() {
       {/* Bottom Bar */}
       <div className="border-t border-black/10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
             <p className="text-black/50 text-sm font-medium">
               &copy; {new Date().getFullYear()} Adway. All rights reserved.
             </p>

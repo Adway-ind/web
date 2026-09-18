@@ -762,13 +762,16 @@ app.delete("/api/admin/messages/:id", authMiddleware, (req, res) => {
 
 app.get("/api/admin/chat-enquiries", authMiddleware, async (req, res) => {
   try {
-    const [rows] = await db.query("SELECT * FROM chat_enquiries ORDER BY created_at DESC");
+    const [rows] = await db.query(
+      "SELECT * FROM chat_enquiries ORDER BY created_at DESC"
+    );
+
     const mapped = rows.map((e) => ({
       id: e.id,
       service: e.service,
       projectType: e.project_type,
-      budget: e.budget,
       timeline: e.timeline,
+
       contact: {
         name: e.contact_name,
         business: e.contact_business,
@@ -776,13 +779,18 @@ app.get("/api/admin/chat-enquiries", authMiddleware, async (req, res) => {
         phone: e.contact_phone,
         requirements: e.contact_requirements,
       },
+
       read: !!e.read,
       createdAt: e.created_at,
       updatedAt: e.updated_at,
     }));
+
     res.json(mapped);
   } catch (err) {
-    res.status(500).json({ error: "Failed to fetch chat enquiries", details: err.message });
+    res.status(500).json({
+      error: "Failed to fetch chat enquiries",
+      details: err.message,
+    });
   }
 });
 
@@ -799,8 +807,8 @@ app.patch("/api/admin/chat-enquiries/:id/read", authMiddleware, async (req, res)
       id: enquiry.id,
       service: enquiry.service,
       projectType: enquiry.project_type,
-      budget: enquiry.budget,
       timeline: enquiry.timeline,
+
       contact: {
         name: enquiry.contact_name,
         business: enquiry.contact_business,
@@ -808,6 +816,7 @@ app.patch("/api/admin/chat-enquiries/:id/read", authMiddleware, async (req, res)
         phone: enquiry.contact_phone,
         requirements: enquiry.contact_requirements,
       },
+
       read: newRead,
       createdAt: enquiry.created_at,
       updatedAt: enquiry.updated_at,
@@ -1451,18 +1460,57 @@ app.post("/api/chatbot", async (req, res) => {
 });
 
 app.post("/api/chat-enquiries", async (req, res) => {
-  const { service, projectType, budget, timeline, contact } = req.body || {};
+  const {
+    service,
+    projectType,
+    timeline,
+    contact,
+  } = req.body || {};
 
-  if (!service || !projectType || !budget || !timeline || !contact || !contact.name || !contact.email || !contact.phone) {
-    return res.status(400).json({ error: "Required inquiry fields are missing." });
+  if (
+    !service ||
+    !projectType ||
+    !timeline ||
+    !contact ||
+    !contact.name ||
+    !contact.email ||
+    !contact.phone
+  ) {
+    return res.status(400).json({
+      error: "Required inquiry fields are missing.",
+    });
   }
 
   try {
     const id = crypto.randomUUID();
+
     await db.query(
-      `INSERT INTO chat_enquiries (id, service, project_type, budget, timeline, contact_name, contact_business, contact_email, contact_phone, contact_requirements, \`read\`, created_at, updated_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, NOW(), NOW())`,
-      [id, service, projectType, budget, timeline, contact.name, contact.business || "", contact.email, contact.phone, contact.requirements || ""]
+      `INSERT INTO chat_enquiries (
+        id,
+        service,
+        project_type,
+        timeline,
+        contact_name,
+        contact_business,
+        contact_email,
+        contact_phone,
+        contact_requirements,
+        \`read\`,
+        created_at,
+        updated_at
+      )
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 0, NOW(), NOW())`,
+      [
+        id,
+        service,
+        projectType,
+        timeline,
+        contact.name,
+        contact.business || "",
+        contact.email,
+        contact.phone,
+        contact.requirements || "",
+      ]
     );
 
     res.status(201).json({
@@ -1471,7 +1519,6 @@ app.post("/api/chat-enquiries", async (req, res) => {
         id,
         service,
         projectType,
-        budget,
         timeline,
         contact: {
           name: contact.name,
@@ -1487,7 +1534,11 @@ app.post("/api/chat-enquiries", async (req, res) => {
     });
   } catch (err) {
     console.error("Chat enquiry save failed:", err);
-    res.status(500).json({ error: "Failed to save inquiry.", details: err.message });
+
+    res.status(500).json({
+      error: "Failed to save inquiry.",
+      details: err.message,
+    });
   }
 });
 
