@@ -1,0 +1,10 @@
+{
+  "name": "adway-app",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "start": "node server/index.js",
+    "dev": "node server/index.js",
+    "build": "npm run build --prefix client"
+  }
+}
