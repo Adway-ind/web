@@ -26,8 +26,10 @@ const resend = process.env.RESEND_API_KEY
 // Use the persistent deployment volume when supplied, otherwise keep uploads
 // inside this project so the server works on a local machine as well.
 const UPLOAD_DIR = process.env.UPLOAD_DIR || path.join(__dirname, "uploads");
-const COVER_DIR = "/data/uploads/covers";
-const GALLERY_DIR = "/data/uploads/gallery";
+// const COVER_DIR = "/data/uploads/covers";
+// const GALLERY_DIR = "/data/uploads/gallery";
+const COVER_DIR = path.join(UPLOAD_DIR, "covers");
+const GALLERY_DIR = path.join(UPLOAD_DIR, "gallery");
 const RESUME_DIR = path.join(UPLOAD_DIR, "resumes");
 const LOGO_DIR = path.join(UPLOAD_DIR, "logos");
 const BLOG_DIR = path.join(UPLOAD_DIR, "blogs");
@@ -55,13 +57,11 @@ if (!fs.existsSync(BLOG_DIR)) {
 
 const db = require("./config/db");
 
-
 [UPLOAD_DIR, COVER_DIR, GALLERY_DIR].forEach((dir) => {
   if (!fs.existsSync(dir)) {
     fs.mkdirSync(dir, { recursive: true });
   }
 });
-
 
 // console.log("📁 Server directory:", __dirname);
 
@@ -85,7 +85,7 @@ app.use(
     setHeaders: (res) => {
       res.setHeader("Cross-Origin-Resource-Policy", "cross-origin");
     },
-  })
+  }),
 );
 
 /* ═══ SECURITY MIDDLEWARE ═══ */
@@ -104,25 +104,28 @@ app.use(
     origin: (origin, callback) => {
       if (!origin) return callback(null, true);
       if (allowedOrigins.includes(origin)) return callback(null, true);
-      callback(new Error(`CORS policy does not allow access from origin ${origin}`));
+      callback(
+        new Error(`CORS policy does not allow access from origin ${origin}`),
+      );
     },
     credentials: true,
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
-  })
+  }),
 );
 app.use(express.json({ limit: "2mb" }));
-app.use(express.urlencoded({
-  extended: true,
-  limit: "2mb"
-}));
+app.use(
+  express.urlencoded({
+    extended: true,
+    limit: "2mb",
+  }),
+);
 
 app.use(["/api/auth", "/api/admin"], (req, res, next) => {
   res.setHeader("X-Robots-Tag", "noindex, nofollow, noarchive");
   res.setHeader("Cache-Control", "no-store");
   next();
 });
-
 
 // Rate limiting
 const authLimiter = rateLimit({
@@ -150,7 +153,8 @@ function writeJSON(file, data) {
 
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 const OPENAI_MODEL = process.env.OPENAI_MODEL || "gpt-3.5-turbo";
-const OPENAI_API_BASE = process.env.OPENAI_API_BASE || "https://api.openai.com/v1";
+const OPENAI_API_BASE =
+  process.env.OPENAI_API_BASE || "https://api.openai.com/v1";
 const CHATBOT_PROMPT_FILE = path.join(__dirname, "chatbot.md");
 const CHATBOT_ENQUIRIES_FILE = "chatbot_enquiries.json";
 
@@ -244,7 +248,8 @@ End with:
 function loadChatbotKnowledge() {
   const defaultKnowledge = {
     brandName: "Adway",
-    brandTagline: "Creative branding, digital design, and motion marketing that helps businesses grow.",
+    brandTagline:
+      "Creative branding, digital design, and motion marketing that helps businesses grow.",
     description:
       "Adway is a creative branding studio that builds modern brands, digital products, motion experiences, and marketing design for startups and growth teams.",
     values: "Creativity, collaboration, quality, and brand-led growth.",
@@ -270,7 +275,11 @@ function buildChatbotSystemMessage() {
 
 function getLocalChatbotReply(message, knowledge) {
   const lower = message.toLowerCase();
-  if (lower.includes("service") || lower.includes("offer") || lower.includes("what do you")) {
+  if (
+    lower.includes("service") ||
+    lower.includes("offer") ||
+    lower.includes("what do you")
+  ) {
     return `Adway offers ${knowledge.services.join(", ")}. Each service is tailored to your business needs — from brand strategy and identity to digital product design, motion graphics, and brand growth.`;
   }
   if (
@@ -289,19 +298,30 @@ function getLocalChatbotReply(message, knowledge) {
   ) {
     return "Project timelines depend on the scope: identity work can take 6–8 weeks, while a full branding and digital design initiative can take 10–12 weeks or more. Let us know your goals so we can recommend the right pace.";
   }
-  if (lower.includes("career") || lower.includes("job") || lower.includes("hiring") || lower.includes("apply")) {
+  if (
+    lower.includes("career") ||
+    lower.includes("job") ||
+    lower.includes("hiring") ||
+    lower.includes("apply")
+  ) {
     return `${knowledge.careers} You can review current openings on the careers page and submit your application there.`;
   }
-  if (lower.includes("portfolio") || lower.includes("work") || lower.includes("projects")) {
+  if (
+    lower.includes("portfolio") ||
+    lower.includes("work") ||
+    lower.includes("projects")
+  ) {
     return "Adway creates brand-led digital experiences, identity systems, motion graphics, and product design work. Check our portfolio page to see recent projects and case studies.";
   }
-  if (lower.includes("contact") || lower.includes("hire") || lower.includes("connect")) {
+  if (
+    lower.includes("contact") ||
+    lower.includes("hire") ||
+    lower.includes("connect")
+  ) {
     return `You can reach out through the contact page, or share your project details there and our team will respond.`;
   }
   return "Thanks for your question! For the most accurate answer, I recommend sharing a few details about your goals, and our team will be happy to help.";
 }
-
-
 
 async function getChatbotReply(message, history = []) {
   const knowledge = loadChatbotKnowledge();
@@ -315,7 +335,10 @@ async function getChatbotReply(message, history = []) {
     try {
       return await fetchOpenAIChatCompletion(messages);
     } catch (error) {
-      console.error("OpenAI chatbot error, falling back:", error.message || error);
+      console.error(
+        "OpenAI chatbot error, falling back:",
+        error.message || error,
+      );
     }
   }
 
@@ -336,7 +359,8 @@ function logActivity(action, userEmail, ip) {
 }
 
 const GOOGLE_SERVICE_ACCOUNT_EMAIL = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL;
-const GOOGLE_SERVICE_ACCOUNT_KEY = process.env.GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY?.replace(/\\n/g, "\n");
+const GOOGLE_SERVICE_ACCOUNT_KEY =
+  process.env.GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY?.replace(/\\n/g, "\n");
 const GOOGLE_SHEETS_ID = process.env.GOOGLE_SHEETS_ID;
 const GOOGLE_SHEET_NAME = process.env.GOOGLE_SHEET_NAME || "Sheet1";
 
@@ -345,7 +369,8 @@ const MS_GRAPH_CLIENT_ID = process.env.MS_GRAPH_CLIENT_ID;
 const MS_GRAPH_CLIENT_SECRET = process.env.MS_GRAPH_CLIENT_SECRET;
 const MS_GRAPH_USER_ID = process.env.MS_GRAPH_USER_ID;
 const MS_GRAPH_WORKBOOK_ITEM_ID = process.env.MS_GRAPH_WORKBOOK_ITEM_ID;
-const MS_GRAPH_WORKBOOK_SHEET_NAME = process.env.MS_GRAPH_WORKBOOK_SHEET_NAME || "Sheet1";
+const MS_GRAPH_WORKBOOK_SHEET_NAME =
+  process.env.MS_GRAPH_WORKBOOK_SHEET_NAME || "Sheet1";
 
 function buildApplicationTableRows(apps) {
   const header = [
@@ -401,7 +426,9 @@ async function createApplicationsExcelBuffer(apps) {
 }
 
 async function getAllApplications() {
-  const [rows] = await db.query("SELECT * FROM applications ORDER BY created_at DESC");
+  const [rows] = await db.query(
+    "SELECT * FROM applications ORDER BY created_at DESC",
+  );
   return rows.map(normalizeApplication);
 }
 
@@ -410,8 +437,10 @@ function normalizeApplication(app) {
     ...app,
     experience: app.experience ?? app.experience_years ?? "",
     experience_years: app.experience_years ?? app.experience ?? "",
-    startDate: app.startDate ?? app.start_date ?? app.earliest_start_date ?? null,
-    earliest_start_date: app.earliest_start_date ?? app.startDate ?? app.start_date ?? null,
+    startDate:
+      app.startDate ?? app.start_date ?? app.earliest_start_date ?? null,
+    earliest_start_date:
+      app.earliest_start_date ?? app.startDate ?? app.start_date ?? null,
   };
 }
 
@@ -428,7 +457,11 @@ async function getGoogleAuth() {
 }
 
 async function syncApplicationsToGoogleSheet(apps) {
-  if (!GOOGLE_SHEETS_ID || !GOOGLE_SERVICE_ACCOUNT_EMAIL || !GOOGLE_SERVICE_ACCOUNT_KEY) {
+  if (
+    !GOOGLE_SHEETS_ID ||
+    !GOOGLE_SERVICE_ACCOUNT_EMAIL ||
+    !GOOGLE_SERVICE_ACCOUNT_KEY
+  ) {
     throw new Error("Google Sheets sync is not configured.");
   }
 
@@ -445,7 +478,8 @@ async function syncApplicationsToGoogleSheet(apps) {
 }
 
 async function getMicrosoftGraphAccessToken() {
-  if (!MS_GRAPH_TENANT_ID || !MS_GRAPH_CLIENT_ID || !MS_GRAPH_CLIENT_SECRET) return null;
+  if (!MS_GRAPH_TENANT_ID || !MS_GRAPH_CLIENT_ID || !MS_GRAPH_CLIENT_SECRET)
+    return null;
   const url = `https://login.microsoftonline.com/${MS_GRAPH_TENANT_ID}/oauth2/v2.0/token`;
   const body = new URLSearchParams({
     client_id: MS_GRAPH_CLIENT_ID,
@@ -461,12 +495,20 @@ async function getMicrosoftGraphAccessToken() {
   });
 
   const data = await res.json();
-  if (!res.ok) throw new Error(data.error_description || data.error || "Graph token request failed.");
+  if (!res.ok)
+    throw new Error(
+      data.error_description || data.error || "Graph token request failed.",
+    );
   return data.access_token;
 }
 
 async function syncApplicationsToMicrosoftGraph(apps) {
-  if (!MS_GRAPH_WORKBOOK_ITEM_ID || !MS_GRAPH_TENANT_ID || !MS_GRAPH_CLIENT_ID || !MS_GRAPH_CLIENT_SECRET) {
+  if (
+    !MS_GRAPH_WORKBOOK_ITEM_ID ||
+    !MS_GRAPH_TENANT_ID ||
+    !MS_GRAPH_CLIENT_ID ||
+    !MS_GRAPH_CLIENT_SECRET
+  ) {
     throw new Error("Microsoft Graph sync is not configured.");
   }
 
@@ -498,7 +540,11 @@ async function syncApplicationRecords() {
   const apps = await getAllApplications();
   const result = { google: null, microsoft: null };
 
-  if (GOOGLE_SHEETS_ID && GOOGLE_SERVICE_ACCOUNT_EMAIL && GOOGLE_SERVICE_ACCOUNT_KEY) {
+  if (
+    GOOGLE_SHEETS_ID &&
+    GOOGLE_SERVICE_ACCOUNT_EMAIL &&
+    GOOGLE_SERVICE_ACCOUNT_KEY
+  ) {
     try {
       await syncApplicationsToGoogleSheet(apps);
       result.google = "ok";
@@ -507,7 +553,12 @@ async function syncApplicationRecords() {
     }
   }
 
-  if (MS_GRAPH_WORKBOOK_ITEM_ID && MS_GRAPH_TENANT_ID && MS_GRAPH_CLIENT_ID && MS_GRAPH_CLIENT_SECRET) {
+  if (
+    MS_GRAPH_WORKBOOK_ITEM_ID &&
+    MS_GRAPH_TENANT_ID &&
+    MS_GRAPH_CLIENT_ID &&
+    MS_GRAPH_CLIENT_SECRET
+  ) {
     try {
       await syncApplicationsToMicrosoftGraph(apps);
       result.microsoft = "ok";
@@ -520,16 +571,22 @@ async function syncApplicationRecords() {
 }
 
 /* ═══ ADMIN USER SETUP ═══ */
-const ADMIN_EMAIL = (process.env.ADMIN_EMAIL || "admin@adway.com").trim().toLowerCase();
+const ADMIN_EMAIL = (process.env.ADMIN_EMAIL || "admin@adway.com")
+  .trim()
+  .toLowerCase();
 const ADMIN_PASS = process.env.ADMIN_PASS || "Adway@2026!";
-const JWT_SECRET = process.env.JWT_SECRET || crypto.randomBytes(64).toString("hex");
+const JWT_SECRET =
+  process.env.JWT_SECRET || crypto.randomBytes(64).toString("hex");
 const JWT_EXPIRES = "2h";
 
 async function ensureAdminUserInDatabase() {
   const normalizedEmail = ADMIN_EMAIL.trim().toLowerCase();
   const hashedPassword = bcrypt.hashSync(ADMIN_PASS, 12);
 
-  const [existingRows] = await db.execute("SELECT * FROM users WHERE email = ? LIMIT 1", [normalizedEmail]);
+  const [existingRows] = await db.execute(
+    "SELECT * FROM users WHERE email = ? LIMIT 1",
+    [normalizedEmail],
+  );
   if (existingRows.length > 0) {
     const existingUser = existingRows[0];
     const updates = [];
@@ -547,21 +604,33 @@ async function ensureAdminUserInDatabase() {
 
     if (updates.length > 0) {
       values.push(existingUser.id);
-      await db.execute(`UPDATE users SET ${updates.join(", ")} WHERE id = ?`, values);
+      await db.execute(
+        `UPDATE users SET ${updates.join(", ")} WHERE id = ?`,
+        values,
+      );
     }
 
     return { email: normalizedEmail, password: ADMIN_PASS };
   }
 
-  const [adminRows] = await db.execute("SELECT * FROM users WHERE role = 'admin' LIMIT 1");
+  const [adminRows] = await db.execute(
+    "SELECT * FROM users WHERE role = 'admin' LIMIT 1",
+  );
   if (adminRows.length > 0) {
     const existingAdmin = adminRows[0];
-    await db.execute("UPDATE users SET email = ?, password = ? WHERE id = ?", [normalizedEmail, hashedPassword, existingAdmin.id]);
+    await db.execute("UPDATE users SET email = ?, password = ? WHERE id = ?", [
+      normalizedEmail,
+      hashedPassword,
+      existingAdmin.id,
+    ]);
     return { email: normalizedEmail, password: ADMIN_PASS };
   }
 
   const userId = crypto.randomUUID();
-  await db.execute("INSERT INTO users (id, email, password, role) VALUES (?, ?, ?, ?)", [userId, normalizedEmail, hashedPassword, "admin"]);
+  await db.execute(
+    "INSERT INTO users (id, email, password, role) VALUES (?, ?, ?, ?)",
+    [userId, normalizedEmail, hashedPassword, "admin"],
+  );
   return { email: normalizedEmail, password: ADMIN_PASS };
 }
 
@@ -613,7 +682,7 @@ const resumeUpload = multer({
       file.mimetype === "application/pdf" ||
       file.mimetype === "application/msword" ||
       file.mimetype ===
-      "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
     ) {
       cb(null, true);
     } else {
@@ -622,12 +691,13 @@ const resumeUpload = multer({
   },
 });
 
-
 app.post("/api/auth/login", authLimiter, async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    const [rows] = await db.execute("SELECT * FROM users WHERE email = ?", [email]);
+    const [rows] = await db.execute("SELECT * FROM users WHERE email = ?", [
+      email,
+    ]);
     const user = rows[0];
 
     if (!user || !bcrypt.compareSync(password, user.password)) {
@@ -674,12 +744,26 @@ app.get("/api/admin/stats", authMiddleware, async (req, res) => {
     const messages = readJSON("messages.json", []);
     const sevenDaysAgo = new Date(Date.now() - 7 * 86400000);
 
-    const [[{ count: chatEnquiriesCount }]] = await db.query("SELECT COUNT(*) as count FROM chat_enquiries");
-    const [[{ count: chatEnquiriesNewCount }]] = await db.query("SELECT COUNT(*) as count FROM chat_enquiries WHERE created_at >= ?", [sevenDaysAgo]);
-    const [[{ count: portfolioCount }]] = await db.query("SELECT COUNT(*) as count FROM projects");
-    const [[{ count: applicationsCount }]] = await db.query("SELECT COUNT(*) as count FROM applications");
-    const [[{ count: newApplicationsCount }]] = await db.query("SELECT COUNT(*) as count FROM applications WHERE created_at >= ?", [sevenDaysAgo]);
-    const [[{ count: contactEnquiriesCount }]] = await db.query("SELECT COUNT(*) AS count FROM contact_enquiries");
+    const [[{ count: chatEnquiriesCount }]] = await db.query(
+      "SELECT COUNT(*) as count FROM chat_enquiries",
+    );
+    const [[{ count: chatEnquiriesNewCount }]] = await db.query(
+      "SELECT COUNT(*) as count FROM chat_enquiries WHERE created_at >= ?",
+      [sevenDaysAgo],
+    );
+    const [[{ count: portfolioCount }]] = await db.query(
+      "SELECT COUNT(*) as count FROM projects",
+    );
+    const [[{ count: applicationsCount }]] = await db.query(
+      "SELECT COUNT(*) as count FROM applications",
+    );
+    const [[{ count: newApplicationsCount }]] = await db.query(
+      "SELECT COUNT(*) as count FROM applications WHERE created_at >= ?",
+      [sevenDaysAgo],
+    );
+    const [[{ count: contactEnquiriesCount }]] = await db.query(
+      "SELECT COUNT(*) AS count FROM contact_enquiries",
+    );
 
     res.json({
       applications: applicationsCount,
@@ -699,46 +783,88 @@ app.get("/api/admin/stats", authMiddleware, async (req, res) => {
 });
 
 // Applications CRUD
-app.get(["/api/admin/applications", "/api/admin/career-applications"], authMiddleware, async (req, res) => {
-  try {
-    const [rows] = await db.query("SELECT * FROM applications ORDER BY created_at DESC");
-    res.json(rows.map(normalizeApplication));
-  } catch (err) {
-    res.status(500).json({ error: "Failed to fetch applications", details: err.message });
-  }
-});
+app.get(
+  ["/api/admin/applications", "/api/admin/career-applications"],
+  authMiddleware,
+  async (req, res) => {
+    try {
+      const [rows] = await db.query(
+        "SELECT * FROM applications ORDER BY created_at DESC",
+      );
+      res.json(rows.map(normalizeApplication));
+    } catch (err) {
+      res
+        .status(500)
+        .json({ error: "Failed to fetch applications", details: err.message });
+    }
+  },
+);
 
-app.patch(["/api/admin/applications/:id/status", "/api/admin/career-applications/:id/status"], authMiddleware, async (req, res) => {
-  const { status } = req.body;
-  if (!["new", "reviewed", "shortlisted", "rejected", "hired"].includes(status))
-    return res.status(400).json({ error: "Invalid status" });
+app.patch(
+  [
+    "/api/admin/applications/:id/status",
+    "/api/admin/career-applications/:id/status",
+  ],
+  authMiddleware,
+  async (req, res) => {
+    const { status } = req.body;
+    if (
+      !["new", "reviewed", "shortlisted", "rejected", "hired"].includes(status)
+    )
+      return res.status(400).json({ error: "Invalid status" });
 
-  try {
-    const [rows] = await db.query("SELECT * FROM applications WHERE id = ?", [req.params.id]);
-    if (rows.length === 0) return res.status(404).json({ error: "Not found" });
+    try {
+      const [rows] = await db.query("SELECT * FROM applications WHERE id = ?", [
+        req.params.id,
+      ]);
+      if (rows.length === 0)
+        return res.status(404).json({ error: "Not found" });
 
-    await db.query("UPDATE applications SET status = ?, updated_at = NOW() WHERE id = ?", [status, req.params.id]);
-    const [updated] = await db.query("SELECT * FROM applications WHERE id = ?", [req.params.id]);
-    res.json(updated[0]);
-  } catch (err) {
-    res.status(500).json({ error: "Failed to update application status", details: err.message });
-  }
-});
+      await db.query(
+        "UPDATE applications SET status = ?, updated_at = NOW() WHERE id = ?",
+        [status, req.params.id],
+      );
+      const [updated] = await db.query(
+        "SELECT * FROM applications WHERE id = ?",
+        [req.params.id],
+      );
+      res.json(updated[0]);
+    } catch (err) {
+      res
+        .status(500)
+        .json({
+          error: "Failed to update application status",
+          details: err.message,
+        });
+    }
+  },
+);
 
-app.delete(["/api/admin/applications/:id", "/api/admin/career-applications/:id"], authMiddleware, async (req, res) => {
-  try {
-    const [result] = await db.query("DELETE FROM applications WHERE id = ?", [req.params.id]);
-    if (result.affectedRows === 0) return res.status(404).json({ error: "Not found" });
-    res.json({ success: true });
-  } catch (err) {
-    res.status(500).json({ error: "Failed to delete application", details: err.message });
-  }
-});
+app.delete(
+  ["/api/admin/applications/:id", "/api/admin/career-applications/:id"],
+  authMiddleware,
+  async (req, res) => {
+    try {
+      const [result] = await db.query("DELETE FROM applications WHERE id = ?", [
+        req.params.id,
+      ]);
+      if (result.affectedRows === 0)
+        return res.status(404).json({ error: "Not found" });
+      res.json({ success: true });
+    } catch (err) {
+      res
+        .status(500)
+        .json({ error: "Failed to delete application", details: err.message });
+    }
+  },
+);
 
 // Contact Messages CRUD
 app.get("/api/admin/messages", authMiddleware, (req, res) => {
   const msgs = readJSON("messages.json", []);
-  const sorted = msgs.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+  const sorted = msgs.sort(
+    (a, b) => new Date(b.createdAt) - new Date(a.createdAt),
+  );
   res.json(sorted);
 });
 
@@ -763,7 +889,7 @@ app.delete("/api/admin/messages/:id", authMiddleware, (req, res) => {
 app.get("/api/admin/chat-enquiries", authMiddleware, async (req, res) => {
   try {
     const [rows] = await db.query(
-      "SELECT * FROM chat_enquiries ORDER BY created_at DESC"
+      "SELECT * FROM chat_enquiries ORDER BY created_at DESC",
     );
 
     const mapped = rows.map((e) => ({
@@ -794,56 +920,79 @@ app.get("/api/admin/chat-enquiries", authMiddleware, async (req, res) => {
   }
 });
 
-app.patch("/api/admin/chat-enquiries/:id/read", authMiddleware, async (req, res) => {
-  try {
-    const [rows] = await db.query("SELECT * FROM chat_enquiries WHERE id = ?", [req.params.id]);
-    if (rows.length === 0) return res.status(404).json({ error: "Not found" });
+app.patch(
+  "/api/admin/chat-enquiries/:id/read",
+  authMiddleware,
+  async (req, res) => {
+    try {
+      const [rows] = await db.query(
+        "SELECT * FROM chat_enquiries WHERE id = ?",
+        [req.params.id],
+      );
+      if (rows.length === 0)
+        return res.status(404).json({ error: "Not found" });
 
-    const enquiry = rows[0];
-    const newRead = !enquiry.read;
-    await db.query("UPDATE chat_enquiries SET `read` = ? WHERE id = ?", [newRead, req.params.id]);
+      const enquiry = rows[0];
+      const newRead = !enquiry.read;
+      await db.query("UPDATE chat_enquiries SET `read` = ? WHERE id = ?", [
+        newRead,
+        req.params.id,
+      ]);
 
-    res.json({
-      id: enquiry.id,
-      service: enquiry.service,
-      projectType: enquiry.project_type,
-      timeline: enquiry.timeline,
+      res.json({
+        id: enquiry.id,
+        service: enquiry.service,
+        projectType: enquiry.project_type,
+        timeline: enquiry.timeline,
 
-      contact: {
-        name: enquiry.contact_name,
-        business: enquiry.contact_business,
-        email: enquiry.contact_email,
-        phone: enquiry.contact_phone,
-        requirements: enquiry.contact_requirements,
-      },
+        contact: {
+          name: enquiry.contact_name,
+          business: enquiry.contact_business,
+          email: enquiry.contact_email,
+          phone: enquiry.contact_phone,
+          requirements: enquiry.contact_requirements,
+        },
 
-      read: newRead,
-      createdAt: enquiry.created_at,
-      updatedAt: enquiry.updated_at,
-    });
-  } catch (err) {
-    res.status(500).json({ error: "Failed to update enquiry", details: err.message });
-  }
-});
+        read: newRead,
+        createdAt: enquiry.created_at,
+        updatedAt: enquiry.updated_at,
+      });
+    } catch (err) {
+      res
+        .status(500)
+        .json({ error: "Failed to update enquiry", details: err.message });
+    }
+  },
+);
 
-app.delete("/api/admin/chat-enquiries/:id", authMiddleware, async (req, res) => {
-  try {
-    const [result] = await db.query("DELETE FROM chat_enquiries WHERE id = ?", [req.params.id]);
-    if (result.affectedRows === 0) return res.status(404).json({ error: "Not found" });
-    res.json({ success: true });
-  } catch (err) {
-    res.status(500).json({ error: "Failed to delete enquiry", details: err.message });
-  }
-});
+app.delete(
+  "/api/admin/chat-enquiries/:id",
+  authMiddleware,
+  async (req, res) => {
+    try {
+      const [result] = await db.query(
+        "DELETE FROM chat_enquiries WHERE id = ?",
+        [req.params.id],
+      );
+      if (result.affectedRows === 0)
+        return res.status(404).json({ error: "Not found" });
+      res.json({ success: true });
+    } catch (err) {
+      res
+        .status(500)
+        .json({ error: "Failed to delete enquiry", details: err.message });
+    }
+  },
+);
 
 // Portfolio CRUD (Admin)
 app.get("/api/admin/portfolio", authMiddleware, async (req, res) => {
   try {
     const [rows] = await db.query("SELECT * FROM projects ORDER BY id DESC");
-    const projects = rows.map(p => ({
+    const projects = rows.map((p) => ({
       ...p,
-      tags: p.tags ? p.tags.split(",").map(t => t.trim()) : [],
-      images: p.images ? JSON.parse(p.images) : []
+      tags: p.tags ? p.tags.split(",").map((t) => t.trim()) : [],
+      images: p.images ? JSON.parse(p.images) : [],
     }));
     res.json(projects);
   } catch (err) {
@@ -856,7 +1005,7 @@ app.post(
   authMiddleware,
   upload.fields([
     { name: "coverImage", maxCount: 1 },
-    { name: "galleryImages", maxCount: 20 }
+    { name: "galleryImages", maxCount: 20 },
   ]),
   async (req, res) => {
     try {
@@ -869,12 +1018,12 @@ app.post(
         year,
         client,
         challenge,
-        result
+        result,
       } = req.body;
 
       if (!title || !category) {
         return res.status(400).json({
-          error: "Title and Category are required"
+          error: "Title and Category are required",
         });
       }
 
@@ -894,11 +1043,11 @@ app.post(
           .resize({
             width: 1200,
             fit: "inside",
-            withoutEnlargement: true
+            withoutEnlargement: true,
           })
           .webp({
             quality: 75,
-            effort: 6
+            effort: 6,
           })
           .toFile(path.join(COVER_DIR, fileName));
 
@@ -919,14 +1068,12 @@ app.post(
             .resize({
               width: 1600,
               fit: "inside",
-              withoutEnlargement: true
+              withoutEnlargement: true,
             })
             .webp({ quality: 80 })
             .toFile(path.join(GALLERY_DIR, fileName));
 
-          galleryImages.push(
-            `/uploads/gallery/${fileName}`
-          );
+          galleryImages.push(`/uploads/gallery/${fileName}`);
         }
       }
 
@@ -948,8 +1095,8 @@ app.post(
           challenge || "",
           result || "",
           JSON.stringify(galleryImages),
-          req.body.featured || 0
-        ]
+          req.body.featured || 0,
+        ],
       );
 
       res.status(201).json({
@@ -959,23 +1106,20 @@ app.post(
         category,
         desc,
         image: coverImagePath,
-        tags: tagsStr
-          ? tagsStr.split(",").map(t => t.trim())
-          : [],
+        tags: tagsStr ? tagsStr.split(",").map((t) => t.trim()) : [],
         year,
         client,
         challenge,
         result,
-        images: galleryImages
+        images: galleryImages,
       });
-
     } catch (err) {
       res.status(500).json({
         error: "Server error",
-        details: err.message
+        details: err.message,
       });
     }
-  }
+  },
 );
 
 app.delete("/api/admin/portfolio/:id", authMiddleware, async (req, res) => {
@@ -983,7 +1127,10 @@ app.delete("/api/admin/portfolio/:id", authMiddleware, async (req, res) => {
     const { id } = req.params;
 
     // First check if project exists
-    const [rows] = await db.query("SELECT id, image FROM projects WHERE id = ?", [id]);
+    const [rows] = await db.query(
+      "SELECT id, image FROM projects WHERE id = ?",
+      [id],
+    );
     if (rows.length === 0) {
       return res.status(404).json({ error: "Project not found" });
     }
@@ -998,7 +1145,9 @@ app.delete("/api/admin/portfolio/:id", authMiddleware, async (req, res) => {
     res.json({ success: true, message: "Project deleted successfully" });
   } catch (err) {
     console.error("Delete project error:", err);
-    res.status(500).json({ error: "Failed to delete project", details: err.message });
+    res
+      .status(500)
+      .json({ error: "Failed to delete project", details: err.message });
   }
 });
 
@@ -1006,7 +1155,7 @@ app.delete("/api/admin/portfolio/:id", authMiddleware, async (req, res) => {
 app.get("/api/projects/featured", async (req, res) => {
   try {
     const [rows] = await db.query(
-      "SELECT * FROM projects WHERE featured = 1 ORDER BY id DESC LIMIT 6"
+      "SELECT * FROM projects WHERE featured = 1 ORDER BY id DESC LIMIT 6",
     );
 
     const formattedProjects = rows.map((project) => ({
@@ -1018,7 +1167,12 @@ app.get("/api/projects/featured", async (req, res) => {
     res.json(formattedProjects);
   } catch (error) {
     console.error("Featured fetch error:", error);
-    res.status(500).json({ error: "Failed to fetch featured projects", details: error.message });
+    res
+      .status(500)
+      .json({
+        error: "Failed to fetch featured projects",
+        details: error.message,
+      });
   }
 });
 
@@ -1026,7 +1180,10 @@ app.get("/api/projects/featured", async (req, res) => {
 app.get("/api/projects/:id", async (req, res) => {
   try {
     const { id } = req.params;
-    const [rows] = await db.query("SELECT * FROM projects WHERE id = ? OR slug = ?", [id, id]);
+    const [rows] = await db.query(
+      "SELECT * FROM projects WHERE id = ? OR slug = ?",
+      [id, id],
+    );
 
     if (rows.length === 0) {
       return res.status(404).json({ error: "Project not found" });
@@ -1043,14 +1200,17 @@ app.patch(
   authMiddleware,
   upload.fields([
     { name: "coverImage", maxCount: 1 },
-    { name: "galleryImages", maxCount: 20 }
+    { name: "galleryImages", maxCount: 20 },
   ]),
   async (req, res) => {
     try {
       const { id } = req.params;
 
-      const [rows] = await db.query("SELECT * FROM projects WHERE id = ?", [id]);
-      if (rows.length === 0) return res.status(404).json({ error: "Not found" });
+      const [rows] = await db.query("SELECT * FROM projects WHERE id = ?", [
+        id,
+      ]);
+      if (rows.length === 0)
+        return res.status(404).json({ error: "Not found" });
 
       const current = rows[0];
 
@@ -1064,7 +1224,7 @@ app.patch(
         client,
         challenge,
         result,
-        featured // Destructured correctly here
+        featured, // Destructured correctly here
       } = req.body;
 
       let coverImagePath = current.image;
@@ -1095,7 +1255,10 @@ app.patch(
       if (req.files?.galleryImages?.length) {
         for (const file of req.files.galleryImages) {
           const fileName =
-            Date.now() + "-" + Math.random().toString(36).substring(2) + ".webp";
+            Date.now() +
+            "-" +
+            Math.random().toString(36).substring(2) +
+            ".webp";
 
           await sharp(file.buffer)
             .resize({ width: 1600, fit: "inside", withoutEnlargement: true })
@@ -1110,11 +1273,14 @@ app.patch(
 
       const finalTags =
         tags !== undefined
-          ? (Array.isArray(tags) ? tags.join(", ") : tags)
+          ? Array.isArray(tags)
+            ? tags.join(", ")
+            : tags
           : current.tags;
 
       // Handle boolean / integer value for 'featured' fallback safely
-      const finalFeatured = featured !== undefined ? featured : current.featured;
+      const finalFeatured =
+        featured !== undefined ? featured : current.featured;
 
       await db.query(
         `UPDATE projects SET 
@@ -1145,7 +1311,7 @@ app.patch(
           JSON.stringify(galleryImages),
           finalFeatured, // Fixed: passing the correct variable here
           id,
-        ]
+        ],
       );
 
       res.json({
@@ -1156,24 +1322,26 @@ app.patch(
         desc: desc || current.desc,
         image: coverImagePath,
         tags: finalTags
-          ? finalTags.split(",").map((t) => t.trim()).filter(Boolean)
+          ? finalTags
+              .split(",")
+              .map((t) => t.trim())
+              .filter(Boolean)
           : [],
         year: year || current.year,
         client: client || current.client,
         challenge: challenge || current.challenge,
         result: result || current.result,
         images: galleryImages,
-        featured: finalFeatured
+        featured: finalFeatured,
       });
-
     } catch (err) {
       console.error("PATCH ERROR:", err); // Clear terminal indicator
       res.status(500).json({
         error: "Server error",
-        details: err.message
+        details: err.message,
       });
     }
-  }
+  },
 );
 
 app.get("/api/admin/careers", authMiddleware, async (req, res) => {
@@ -1182,7 +1350,9 @@ app.get("/api/admin/careers", authMiddleware, async (req, res) => {
     res.json(categories);
   } catch (err) {
     console.error("Failed to load career jobs:", err);
-    res.status(500).json({ error: "Failed to load career jobs", details: err.message });
+    res
+      .status(500)
+      .json({ error: "Failed to load career jobs", details: err.message });
   }
 });
 
@@ -1190,27 +1360,33 @@ app.post("/api/admin/careers", authMiddleware, async (req, res) => {
   try {
     const { category, title, location, type, description } = req.body;
     if (!category || !title || !location || !type) {
-      return res.status(400).json({ error: "Category, title, location, and type are required." });
+      return res
+        .status(400)
+        .json({ error: "Category, title, location, and type are required." });
     }
 
     const [existing] = await db.query(
       "SELECT id FROM career_jobs WHERE category = ? AND title = ?",
-      [category, title]
+      [category, title],
     );
     if (existing.length > 0) {
-      return res.status(409).json({ error: "This role already exists in that category." });
+      return res
+        .status(409)
+        .json({ error: "This role already exists in that category." });
     }
 
     await db.query(
       "INSERT INTO career_jobs (category, title, location, type, description, created_at, updated_at) VALUES (?, ?, ?, ?, ?, NOW(), NOW())",
-      [category, title, location, type, description || ""]
+      [category, title, location, type, description || ""],
     );
 
     const categories = await getCareerJobsFromDb();
     res.status(201).json({ success: true, categories });
   } catch (err) {
     console.error("Failed to save career job:", err);
-    res.status(500).json({ error: "Failed to save career job", details: err.message });
+    res
+      .status(500)
+      .json({ error: "Failed to save career job", details: err.message });
   }
 });
 
@@ -1218,10 +1394,14 @@ app.delete("/api/admin/careers", authMiddleware, async (req, res) => {
   try {
     const { id } = req.body;
     if (!id) {
-      return res.status(400).json({ error: "Job id is required to delete a role." });
+      return res
+        .status(400)
+        .json({ error: "Job id is required to delete a role." });
     }
 
-    const [result] = await db.query("DELETE FROM career_jobs WHERE id = ?", [id]);
+    const [result] = await db.query("DELETE FROM career_jobs WHERE id = ?", [
+      id,
+    ]);
     if (result.affectedRows === 0) {
       return res.status(404).json({ error: "Role not found." });
     }
@@ -1230,7 +1410,9 @@ app.delete("/api/admin/careers", authMiddleware, async (req, res) => {
     res.json({ success: true, categories });
   } catch (err) {
     console.error("Failed to delete career job:", err);
-    res.status(500).json({ error: "Failed to delete career job", details: err.message });
+    res
+      .status(500)
+      .json({ error: "Failed to delete career job", details: err.message });
   }
 });
 
@@ -1239,7 +1421,12 @@ app.get("/api/admin/activity", authMiddleware, (req, res) => {
 });
 
 app.get("/api/admin/settings", authMiddleware, (req, res) => {
-  res.json(readJSON("settings.json", { siteName: "Adway", contactEmail: "hello@adway.com" }));
+  res.json(
+    readJSON("settings.json", {
+      siteName: "Adway",
+      contactEmail: "hello@adway.com",
+    }),
+  );
 });
 
 app.patch("/api/admin/settings", authMiddleware, (req, res) => {
@@ -1258,19 +1445,22 @@ const careerJobs = [
         title: "Senior Brand Designer",
         location: "Remote / New York",
         type: "Full-time",
-        description: "Lead brand systems, motion assets, and campaign design for flagship clients.",
+        description:
+          "Lead brand systems, motion assets, and campaign design for flagship clients.",
       },
       {
         title: "Digital Product Designer",
         location: "Remote / New York",
         type: "Full-time",
-        description: "Design product experiences for web and mobile that elevate brand storytelling.",
+        description:
+          "Design product experiences for web and mobile that elevate brand storytelling.",
       },
       {
         title: "Motion Designer",
         location: "Remote",
         type: "Full-time",
-        description: "Create motion content for digital campaigns, presentations, and immersive launches.",
+        description:
+          "Create motion content for digital campaigns, presentations, and immersive launches.",
       },
     ],
   },
@@ -1282,13 +1472,15 @@ const careerJobs = [
         title: "Brand Strategist",
         location: "Remote / London",
         type: "Full-time",
-        description: "Shape long-term positioning and brand storytelling across client portfolios.",
+        description:
+          "Shape long-term positioning and brand storytelling across client portfolios.",
       },
       {
         title: "Operations Manager",
         location: "New York",
         type: "Full-time",
-        description: "Support growth operations, team coordination, and process optimization.",
+        description:
+          "Support growth operations, team coordination, and process optimization.",
       },
     ],
   },
@@ -1300,13 +1492,15 @@ const careerJobs = [
         title: "Content Writer",
         location: "Remote",
         type: "Part-time",
-        description: "Write persuasive copy for brand campaigns, pitch decks, and editorial content.",
+        description:
+          "Write persuasive copy for brand campaigns, pitch decks, and editorial content.",
       },
       {
         title: "Marketing Analyst",
         location: "Remote",
         type: "Full-time",
-        description: "Analyze campaign performance and marketing data to drive growth decisions.",
+        description:
+          "Analyze campaign performance and marketing data to drive growth decisions.",
       },
     ],
   },
@@ -1347,7 +1541,9 @@ const careerPerks = [
 ];
 
 async function getCareerJobsFromDb() {
-  const [jobs] = await db.query("SELECT * FROM career_jobs ORDER BY category ASC, created_at ASC");
+  const [jobs] = await db.query(
+    "SELECT * FROM career_jobs ORDER BY category ASC, created_at ASC",
+  );
 
   const categories = [];
   jobs.forEach((job) => {
@@ -1372,7 +1568,9 @@ async function getCareerJobsFromDb() {
 }
 
 async function seedCareerJobsIfEmpty() {
-  const [[{ count }]] = await db.query("SELECT COUNT(*) as count FROM career_jobs");
+  const [[{ count }]] = await db.query(
+    "SELECT COUNT(*) as count FROM career_jobs",
+  );
   if (count > 0) return;
 
   const entries = careerJobs.flatMap((category) =>
@@ -1388,13 +1586,21 @@ async function seedCareerJobsIfEmpty() {
   for (const entry of entries) {
     await db.query(
       "INSERT INTO career_jobs (category, title, location, type, description, created_at, updated_at) VALUES (?, ?, ?, ?, ?, NOW(), NOW())",
-      [entry.category, entry.title, entry.location, entry.type, entry.description]
+      [
+        entry.category,
+        entry.title,
+        entry.location,
+        entry.type,
+        entry.description,
+      ],
     );
   }
 }
 
 async function seedProjectsIfEmpty() {
-  const [[{ count }]] = await db.query("SELECT COUNT(*) as count FROM projects");
+  const [[{ count }]] = await db.query(
+    "SELECT COUNT(*) as count FROM projects",
+  );
   if (count > 0) return;
 
   const backupProjects = readJSON("portfolio.json", []);
@@ -1416,7 +1622,7 @@ async function seedProjectsIfEmpty() {
         project.challenge || "",
         project.result || "",
         Array.isArray(project.images) ? JSON.stringify(project.images) : "[]",
-      ]
+      ],
     );
   }
 }
@@ -1430,17 +1636,23 @@ async function seedClientsIfEmpty() {
     const id = client.id || crypto.randomUUID();
     await db.query(
       "INSERT INTO clients (id, name, logo, position, created_at, updated_at) VALUES (?, ?, ?, ?, NOW(), NOW())",
-      [id, client.name || "Client", client.logo || "", client.position || 0]
+      [id, client.name || "Client", client.logo || "", client.position || 0],
     );
   }
 }
 
 app.get("/api/careers", async (req, res) => {
   try {
-    res.json({ categories: await getCareerJobsFromDb(), stats: careerStats, perks: careerPerks });
+    res.json({
+      categories: await getCareerJobsFromDb(),
+      stats: careerStats,
+      perks: careerPerks,
+    });
   } catch (err) {
     console.error("Failed to load public career jobs:", err);
-    res.status(500).json({ error: "Failed to load career jobs", details: err.message });
+    res
+      .status(500)
+      .json({ error: "Failed to load career jobs", details: err.message });
   }
 });
 
@@ -1451,21 +1663,24 @@ app.post("/api/chatbot", async (req, res) => {
   }
 
   try {
-    const reply = await getChatbotReply(message, Array.isArray(history) ? history : []);
+    const reply = await getChatbotReply(
+      message,
+      Array.isArray(history) ? history : [],
+    );
     res.json({ reply });
   } catch (err) {
     console.error("Chatbot request failed:", err);
-    res.status(500).json({ error: "Failed to generate chatbot reply.", details: err.message });
+    res
+      .status(500)
+      .json({
+        error: "Failed to generate chatbot reply.",
+        details: err.message,
+      });
   }
 });
 
 app.post("/api/chat-enquiries", async (req, res) => {
-  const {
-    service,
-    projectType,
-    timeline,
-    contact,
-  } = req.body || {};
+  const { service, projectType, timeline, contact } = req.body || {};
 
   if (
     !service ||
@@ -1510,7 +1725,7 @@ app.post("/api/chat-enquiries", async (req, res) => {
         contact.email,
         contact.phone,
         contact.requirements || "",
-      ]
+      ],
     );
 
     res.status(201).json({
@@ -1544,11 +1759,15 @@ app.post("/api/chat-enquiries", async (req, res) => {
 
 app.get("/api/categories", async (req, res) => {
   try {
-    const [rows] = await db.query("SELECT DISTINCT category FROM projects WHERE category IS NOT NULL");
+    const [rows] = await db.query(
+      "SELECT DISTINCT category FROM projects WHERE category IS NOT NULL",
+    );
     const dbCategories = rows.map((row) => row.category);
     res.json(["All", ...dbCategories]);
   } catch (error) {
-    res.status(500).json({ error: "Failed to fetch categories", details: error.message });
+    res
+      .status(500)
+      .json({ error: "Failed to fetch categories", details: error.message });
   }
 });
 
@@ -1558,7 +1777,10 @@ app.get("/api/projects", async (req, res) => {
     let rows;
 
     if (category && category !== "All") {
-      [rows] = await db.query("SELECT * FROM projects WHERE category = ? ORDER BY id DESC", [category]);
+      [rows] = await db.query(
+        "SELECT * FROM projects WHERE category = ? ORDER BY id DESC",
+        [category],
+      );
     } else {
       [rows] = await db.query("SELECT * FROM projects ORDER BY id DESC");
     }
@@ -1571,28 +1793,40 @@ app.get("/api/projects", async (req, res) => {
 
     res.json(formattedProjects);
   } catch (error) {
-    res.status(500).json({ error: "Failed to fetch projects", details: error.message });
+    res
+      .status(500)
+      .json({ error: "Failed to fetch projects", details: error.message });
   }
 });
 
 app.get("/api/projects/:slug", async (req, res) => {
   try {
     const { slug } = req.params;
-    const [rows] = await db.query("SELECT * FROM projects WHERE slug = ? OR id = ?", [slug, slug]);
+    const [rows] = await db.query(
+      "SELECT * FROM projects WHERE slug = ? OR id = ?",
+      [slug, slug],
+    );
     if (rows.length === 0) {
       return res.status(404).json({ error: "Project not found" });
     }
 
     const project = rows[0];
     // Parse tags and images properly
-    project.tags = project.tags ? project.tags.split(",").map((t) => t.trim()).filter(Boolean) : [];
+    project.tags = project.tags
+      ? project.tags
+          .split(",")
+          .map((t) => t.trim())
+          .filter(Boolean)
+      : [];
     project.images = project.images ? JSON.parse(project.images) : [];
 
     // Get all projects for navigation
     const [allProjects] = await db.query(
-      "SELECT slug, title FROM projects ORDER BY id DESC"
+      "SELECT slug, title FROM projects ORDER BY id DESC",
     );
-    const currentIndex = allProjects.findIndex((item) => item.slug === slug || item.id == slug);
+    const currentIndex = allProjects.findIndex(
+      (item) => item.slug === slug || item.id == slug,
+    );
 
     let prevProject = null;
     let nextProject = null;
@@ -1607,7 +1841,12 @@ app.get("/api/projects/:slug", async (req, res) => {
     res.json({ project, prevProject, nextProject });
   } catch (error) {
     console.error("Error fetching project details:", error);
-    res.status(500).json({ error: "Failed to fetch project details", details: error.message });
+    res
+      .status(500)
+      .json({
+        error: "Failed to fetch project details",
+        details: error.message,
+      });
   }
 });
 
@@ -1625,7 +1864,9 @@ app.get("/api/projects/:slug", async (req, res) => {
 // });
 
 if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
-  console.warn("⚠️  EMAIL_USER or EMAIL_PASS is not configured. Candidate confirmation emails will not be sent.");
+  console.warn(
+    "⚠️  EMAIL_USER or EMAIL_PASS is not configured. Candidate confirmation emails will not be sent.",
+  );
 }
 
 console.log("📎 Mail config:", {
@@ -1641,39 +1882,53 @@ console.log("📎 Mail config:", {
 //   }
 // });
 
-app.post("/api/applications", apiLimiter, resumeUpload.single("resume"), async (req, res) => {
-  console.log("🔥 Application endpoint hit");
-  console.log("Body:", req.body);
+app.post(
+  "/api/applications",
+  apiLimiter,
+  resumeUpload.single("resume"),
+  async (req, res) => {
+    console.log("🔥 Application endpoint hit");
+    console.log("Body:", req.body);
 
-  const { name, email, position, phone, portfolio, linkedin, experience, startDate, coverNote } = req.body;
+    const {
+      name,
+      email,
+      position,
+      phone,
+      portfolio,
+      linkedin,
+      experience,
+      startDate,
+      coverNote,
+    } = req.body;
 
-  if (!name || !email || !position) {
-    return res.status(400).json({
-      error: "Name, email, and position are required"
-    });
-  }
+    if (!name || !email || !position) {
+      return res.status(400).json({
+        error: "Name, email, and position are required",
+      });
+    }
 
-  let resumePath = "";
+    let resumePath = "";
 
-  if (req.file) {
-    const safeName = `${Date.now()}-${req.file.originalname.replace(
-      /[^a-zA-Z0-9.\-_]/g,
-      "-"
-    )}`;
+    if (req.file) {
+      const safeName = `${Date.now()}-${req.file.originalname.replace(
+        /[^a-zA-Z0-9.\-_]/g,
+        "-",
+      )}`;
 
-    const filePath = path.join(RESUME_DIR, safeName);
+      const filePath = path.join(RESUME_DIR, safeName);
 
-    fs.writeFileSync(filePath, req.file.buffer);
+      fs.writeFileSync(filePath, req.file.buffer);
 
-    resumePath = `/uploads/resumes/${safeName}`;
-  }
+      resumePath = `/uploads/resumes/${safeName}`;
+    }
 
-  try {
-    // Save application to MySQL
-    const appId = crypto.randomUUID();
+    try {
+      // Save application to MySQL
+      const appId = crypto.randomUUID();
 
-    await db.query(
-      `INSERT INTO applications
+      await db.query(
+        `INSERT INTO applications
     (
       id, 
       name, 
@@ -1691,35 +1946,35 @@ app.post("/api/applications", apiLimiter, resumeUpload.single("resume"), async (
       updated_at
     )
     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'new', NOW(), NOW())`,
-      [
-        appId,
-        name,
-        email,
-        position,
-        phone || "",
-        portfolio || "",
-        linkedin || "",
-        experience || "",     // 1-to-1 match with experience_years
-        startDate || null,    // 1-to-1 match with earliest_start_date
-        coverNote || "",      // 1-to-1 match with coverNote
-        resumePath            // 1-to-1 match with resume
-      ]
-    );
-
-    // Background sync
-    syncApplicationRecords().catch((syncErr) => {
-      console.error(
-        "Background spreadsheet synchronization failed:",
-        syncErr.message
+        [
+          appId,
+          name,
+          email,
+          position,
+          phone || "",
+          portfolio || "",
+          linkedin || "",
+          experience || "", // 1-to-1 match with experience_years
+          startDate || null, // 1-to-1 match with earliest_start_date
+          coverNote || "", // 1-to-1 match with coverNote
+          resumePath, // 1-to-1 match with resume
+        ],
       );
-    });
 
-    // Email template
-    const confirmationEmail = {
-      from: "Adway Careers <onboarding@resend.dev>",
-      to: email,
-      subject: `Application Received — ${position}`,
-      html: `
+      // Background sync
+      syncApplicationRecords().catch((syncErr) => {
+        console.error(
+          "Background spreadsheet synchronization failed:",
+          syncErr.message,
+        );
+      });
+
+      // Email template
+      const confirmationEmail = {
+        from: "Adway Careers <onboarding@resend.dev>",
+        to: email,
+        subject: `Application Received — ${position}`,
+        html: `
         <div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;max-width:550px;margin:0 auto;padding:40px 32px;color:#111;background:#fff;border:1px solid #e5e7eb;border-radius:12px;">
 
           <h2 style="font-size:20px;font-weight:600;margin-bottom:16px;">
@@ -1746,68 +2001,66 @@ app.post("/api/applications", apiLimiter, resumeUpload.single("resume"), async (
           </p>
 
         </div>
-      `
-    };
+      `,
+      };
 
-    console.log("🔔 Email attempt details:", {
-      to: email,
-      subject: confirmationEmail.subject
-    });
-
-    // Send email using Resend
-    let mailResult = null;
-
-    try {
-      console.log("📤 Sending confirmation email via Resend...");
-
-      const data = await resend.emails.send({
-        from: confirmationEmail.from,
-        to: confirmationEmail.to,
+      console.log("🔔 Email attempt details:", {
+        to: email,
         subject: confirmationEmail.subject,
-        html: confirmationEmail.html
       });
 
-      mailResult = {
+      // Send email using Resend
+      let mailResult = null;
+
+      try {
+        console.log("📤 Sending confirmation email via Resend...");
+
+        const data = await resend.emails.send({
+          from: confirmationEmail.from,
+          to: confirmationEmail.to,
+          subject: confirmationEmail.subject,
+          html: confirmationEmail.html,
+        });
+
+        mailResult = {
+          success: true,
+          id: data.data?.id || data.id,
+        };
+
+        console.log("✅ Confirmation email sent:", data);
+      } catch (mailError) {
+        mailResult = {
+          success: false,
+          error: mailError.message,
+        };
+
+        console.error("❌ Resend failure:", mailError);
+      }
+
+      console.log("📣 Application response mail result:", mailResult);
+
+      return res.status(201).json({
         success: true,
-        id: data.data?.id || data.id
-      };
+        id: appId,
+        mail: mailResult,
+      });
+    } catch (err) {
+      console.error("Application routing system encountered an issue:", err);
 
-      console.log("✅ Confirmation email sent:", data);
-
-    } catch (mailError) {
-      mailResult = {
-        success: false,
-        error: mailError.message
-      };
-
-      console.error("❌ Resend failure:", mailError);
+      return res.status(500).json({
+        error: "Failed to save application",
+        details: err.message,
+      });
     }
-
-    console.log("📣 Application response mail result:", mailResult);
-
-    return res.status(201).json({
-      success: true,
-      id: appId,
-      mail: mailResult
-    });
-
-  } catch (err) {
-    console.error(
-      "Application routing system encountered an issue:",
-      err
-    );
-
-    return res.status(500).json({
-      error: "Failed to save application",
-      details: err.message
-    });
-  }
-});
+  },
+);
 
 app.post("/api/messages", apiLimiter, (req, res) => {
   const { name, email, subject, message } = req.body;
   if (!name || !email || !message)
-    return res.status(400).json({ error: "Name, email, and message are required" });
+    return res
+      .status(400)
+      .json({ error: "Name, email, and message are required" });
 
   const msgs = readJSON("messages.json", []);
   const msg = {
@@ -1830,7 +2083,9 @@ app.listen(PORT, async () => {
   console.log(`\n🚀 Adway Admin Server running on port ${PORT}`);
   console.log(`📧 Admin email: ${ADMIN_EMAIL}`);
   console.log(`🔑 JWT Secret: ${JWT_SECRET.substring(0, 12)}...`);
-  console.log(`\n⚠️  Change ADMIN_EMAIL, ADMIN_PASS, JWT_SECRET in .env for production!\n`);
+  console.log(
+    `\n⚠️  Change ADMIN_EMAIL, ADMIN_PASS, JWT_SECRET in .env for production!\n`,
+  );
 
   try {
     // Verify MySQL connection
@@ -1858,17 +2113,27 @@ app.listen(PORT, async () => {
     const ensureColumn = async (table, column, definition) => {
       const [columns] = await db.query(
         "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = ? AND COLUMN_NAME = ?",
-        [table, column]
+        [table, column],
       );
       if (columns.length === 0) {
-        await db.query(`ALTER TABLE \`${table}\` ADD COLUMN \`${column}\` ${definition}`);
+        await db.query(
+          `ALTER TABLE \`${table}\` ADD COLUMN \`${column}\` ${definition}`,
+        );
       }
     };
 
     await ensureColumn("applications", "experience", "VARCHAR(50) DEFAULT ''");
     await ensureColumn("applications", "startDate", "DATE DEFAULT NULL");
-    await ensureColumn("applications", "experience_years", "VARCHAR(50) DEFAULT ''");
-    await ensureColumn("applications", "earliest_start_date", "DATE DEFAULT NULL");
+    await ensureColumn(
+      "applications",
+      "experience_years",
+      "VARCHAR(50) DEFAULT ''",
+    );
+    await ensureColumn(
+      "applications",
+      "earliest_start_date",
+      "DATE DEFAULT NULL",
+    );
 
     await db.query(`CREATE TABLE IF NOT EXISTS career_jobs (
       id INT AUTO_INCREMENT PRIMARY KEY,
@@ -1961,18 +2226,27 @@ app.listen(PORT, async () => {
   }
 });
 
-
 app.post("/api/contact-enquiries", async (req, res) => {
   try {
     const { name, email, company, service, budget, message } = req.body;
     if (!name || !email || !message) {
-      return res.status(400).json({ success: false, message: "Name, email and message are required" });
+      return res
+        .status(400)
+        .json({
+          success: false,
+          message: "Name, email and message are required",
+        });
     }
     await db.query(
       `INSERT INTO contact_enquiries (name, email, company, service, budget, message) VALUES (?, ?, ?, ?, ?, ?)`,
-      [name, email, company || null, service || null, budget || null, message]
+      [name, email, company || null, service || null, budget || null, message],
     );
-    res.status(201).json({ success: true, message: "Contact enquiry submitted successfully" });
+    res
+      .status(201)
+      .json({
+        success: true,
+        message: "Contact enquiry submitted successfully",
+      });
   } catch (error) {
     console.error("CONTACT ENQUIRY ERROR:", error);
     res.status(500).json({ success: false, message: error.message });
@@ -1984,10 +2258,14 @@ app.get("/api/contact-enquiries", async (req, res) => {
     let rows = [];
 
     try {
-      [rows] = await db.query(`SELECT * FROM contact_enquiries ORDER BY createdAt DESC, id DESC`);
+      [rows] = await db.query(
+        `SELECT * FROM contact_enquiries ORDER BY createdAt DESC, id DESC`,
+      );
     } catch (columnError) {
       if (String(columnError.message).includes("createdAt")) {
-        [rows] = await db.query(`SELECT * FROM contact_enquiries ORDER BY created_at DESC, id DESC`);
+        [rows] = await db.query(
+          `SELECT * FROM contact_enquiries ORDER BY created_at DESC, id DESC`,
+        );
       } else {
         throw columnError;
       }
@@ -2000,16 +2278,24 @@ app.get("/api/contact-enquiries", async (req, res) => {
   }
 });
 
-app.delete("/api/admin/contact-enquiries/:id", authMiddleware, async (req, res) => {
-  try {
-    const [result] = await db.query("DELETE FROM contact_enquiries WHERE id = ?", [req.params.id]);
-    if (result.affectedRows === 0) return res.status(404).json({ error: "Not found" });
-    res.json({ success: true });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: error.message });
-  }
-});
+app.delete(
+  "/api/admin/contact-enquiries/:id",
+  authMiddleware,
+  async (req, res) => {
+    try {
+      const [result] = await db.query(
+        "DELETE FROM contact_enquiries WHERE id = ?",
+        [req.params.id],
+      );
+      if (result.affectedRows === 0)
+        return res.status(404).json({ error: "Not found" });
+      res.json({ success: true });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: error.message });
+    }
+  },
+);
 
 app.get("/api/admin/stats/history", authMiddleware, async (req, res) => {
   try {
@@ -2034,13 +2320,13 @@ app.get("/api/admin/stats/history", authMiddleware, async (req, res) => {
 
       const [[{ count: appCount }]] = await db.query(
         "SELECT COUNT(*) as count FROM applications WHERE created_at BETWEEN ? AND ?",
-        [from, to]
+        [from, to],
       );
       applications.push(appCount);
 
       const [[{ count: chatCount }]] = await db.query(
         "SELECT COUNT(*) as count FROM chat_enquiries WHERE created_at BETWEEN ? AND ?",
-        [from, to]
+        [from, to],
       );
       chat.push(chatCount);
 
@@ -2052,17 +2338,18 @@ app.get("/api/admin/stats/history", authMiddleware, async (req, res) => {
 
       const [[{ count: contactCount }]] = await db.query(
         "SELECT COUNT(*) AS count FROM contact_enquiries WHERE createdAt BETWEEN ? AND ?",
-        [from, to]
+        [from, to],
       );
       contact.push(Number(contactCount));
     }
 
     res.json({ labels, applications, messages, chat, contact });
   } catch (err) {
-    res.status(500).json({ error: "Failed to fetch history", details: err.message });
+    res
+      .status(500)
+      .json({ error: "Failed to fetch history", details: err.message });
   }
 });
-
 
 app.post("/api/admin/send-email", authMiddleware, async (req, res) => {
   try {
@@ -2117,7 +2404,6 @@ app.post("/api/admin/send-email", authMiddleware, async (req, res) => {
       success: true,
       email: data,
     });
-
   } catch (err) {
     console.error("Send email error:", err);
 
@@ -2126,7 +2412,6 @@ app.post("/api/admin/send-email", authMiddleware, async (req, res) => {
     });
   }
 });
-
 
 /* ═══ BLOG API ═══ */
 
@@ -2156,7 +2441,9 @@ app.get("/api/blogs", async (req, res) => {
     res.json(rows);
   } catch (err) {
     console.error("Blog list error:", err);
-    res.status(500).json({ error: "Failed to fetch blogs", details: err.message });
+    res
+      .status(500)
+      .json({ error: "Failed to fetch blogs", details: err.message });
   }
 });
 
@@ -2164,26 +2451,32 @@ app.get("/api/blogs", async (req, res) => {
 app.get("/api/blogs/categories", async (req, res) => {
   try {
     const [rows] = await db.query(
-      "SELECT DISTINCT category FROM blogs WHERE published = 1 AND category IS NOT NULL AND category != ''"
+      "SELECT DISTINCT category FROM blogs WHERE published = 1 AND category IS NOT NULL AND category != ''",
     );
     const cats = rows.map((r) => r.category);
     res.json(["All", ...cats]);
   } catch (err) {
-    res.status(500).json({ error: "Failed to fetch blog categories", details: err.message });
+    res
+      .status(500)
+      .json({ error: "Failed to fetch blog categories", details: err.message });
   }
 });
 
 // Public: single blog by slug
 app.get("/api/blogs/:slug", async (req, res) => {
   try {
-    const [rows] = await db.query("SELECT * FROM blogs WHERE slug = ? AND published = 1", [req.params.slug]);
-    if (rows.length === 0) return res.status(404).json({ error: "Blog post not found" });
+    const [rows] = await db.query(
+      "SELECT * FROM blogs WHERE slug = ? AND published = 1",
+      [req.params.slug],
+    );
+    if (rows.length === 0)
+      return res.status(404).json({ error: "Blog post not found" });
 
     const blog = rows[0];
 
     // Navigation
     const [allBlogs] = await db.query(
-      "SELECT slug, title FROM blogs WHERE published = 1 ORDER BY created_at DESC"
+      "SELECT slug, title FROM blogs WHERE published = 1 ORDER BY created_at DESC",
     );
     const idx = allBlogs.findIndex((b) => b.slug === req.params.slug);
     const prevBlog = idx > 0 ? allBlogs[idx - 1] : null;
@@ -2192,113 +2485,175 @@ app.get("/api/blogs/:slug", async (req, res) => {
     res.json({ blog, prevBlog, nextBlog });
   } catch (err) {
     console.error("Blog detail error:", err);
-    res.status(500).json({ error: "Failed to fetch blog", details: err.message });
+    res
+      .status(500)
+      .json({ error: "Failed to fetch blog", details: err.message });
   }
 });
 
 // Admin: list all blogs (including drafts)
 app.get("/api/admin/blogs", authMiddleware, async (req, res) => {
   try {
-    const [rows] = await db.query("SELECT * FROM blogs ORDER BY created_at DESC");
+    const [rows] = await db.query(
+      "SELECT * FROM blogs ORDER BY created_at DESC",
+    );
     res.json(rows);
   } catch (err) {
-    res.status(500).json({ error: "Failed to fetch blogs", details: err.message });
+    res
+      .status(500)
+      .json({ error: "Failed to fetch blogs", details: err.message });
   }
 });
 
 // Admin: create blog
-app.post("/api/admin/blogs", authMiddleware, upload.single("coverImage"), async (req, res) => {
-  try {
-    const { title, excerpt, content, author, category, tags, published } = req.body;
-    if (!title || !content) {
-      return res.status(400).json({ error: "Title and content are required" });
-    }
+app.post(
+  "/api/admin/blogs",
+  authMiddleware,
+  upload.single("coverImage"),
+  async (req, res) => {
+    try {
+      const { title, excerpt, content, author, category, tags, published } =
+        req.body;
+      if (!title || !content) {
+        return res
+          .status(400)
+          .json({ error: "Title and content are required" });
+      }
 
-    const slug =
-      title
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g, "-")
-        .replace(/(^-|-$)/g, "") + "-" + Date.now();
+      const slug =
+        title
+          .toLowerCase()
+          .replace(/[^a-z0-9]+/g, "-")
+          .replace(/(^-|-$)/g, "") +
+        "-" +
+        Date.now();
 
-    let coverImagePath = "";
-    if (req.file) {
-      const fileName = `${Date.now()}-blog.webp`;
-      await sharp(req.file.buffer)
-        .resize({ width: 1200, fit: "inside", withoutEnlargement: true })
-        .webp({ quality: 78 })
-        .toFile(path.join(BLOG_DIR, fileName));
-      coverImagePath = `/uploads/blogs/${fileName}`;
-    }
+      let coverImagePath = "";
+      if (req.file) {
+        const fileName = `${Date.now()}-blog.webp`;
+        await sharp(req.file.buffer)
+          .resize({ width: 1200, fit: "inside", withoutEnlargement: true })
+          .webp({ quality: 78 })
+          .toFile(path.join(BLOG_DIR, fileName));
+        coverImagePath = `/uploads/blogs/${fileName}`;
+      }
 
-    const wordCount = content.split(/\s+/).length;
-    const readingTime = Math.max(1, Math.ceil(wordCount / 200));
+      const wordCount = content.split(/\s+/).length;
+      const readingTime = Math.max(1, Math.ceil(wordCount / 200));
 
-    const [result] = await db.query(
-      `INSERT INTO blogs (title, slug, excerpt, content, coverImage, author, category, tags, readingTime, published, created_at, updated_at)
+      const [result] = await db.query(
+        `INSERT INTO blogs (title, slug, excerpt, content, coverImage, author, category, tags, readingTime, published, created_at, updated_at)
        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())`,
-      [title, slug, excerpt || content.substring(0, 200), content, coverImagePath, author || "Adway Team", category || "", tags || "", readingTime, published ? 1 : 0]
-    );
+        [
+          title,
+          slug,
+          excerpt || content.substring(0, 200),
+          content,
+          coverImagePath,
+          author || "Adway Team",
+          category || "",
+          tags || "",
+          readingTime,
+          published ? 1 : 0,
+        ],
+      );
 
-    const [newBlog] = await db.query("SELECT * FROM blogs WHERE id = ?", [result.insertId]);
-    res.status(201).json(newBlog[0]);
-  } catch (err) {
-    console.error("Blog create error:", err);
-    res.status(500).json({ error: "Failed to create blog", details: err.message });
-  }
-});
+      const [newBlog] = await db.query("SELECT * FROM blogs WHERE id = ?", [
+        result.insertId,
+      ]);
+      res.status(201).json(newBlog[0]);
+    } catch (err) {
+      console.error("Blog create error:", err);
+      res
+        .status(500)
+        .json({ error: "Failed to create blog", details: err.message });
+    }
+  },
+);
 
 // Admin: update blog
-app.patch("/api/admin/blogs/:id", authMiddleware, upload.single("coverImage"), async (req, res) => {
-  try {
-    const [rows] = await db.query("SELECT * FROM blogs WHERE id = ?", [req.params.id]);
-    if (rows.length === 0) return res.status(404).json({ error: "Blog not found" });
+app.patch(
+  "/api/admin/blogs/:id",
+  authMiddleware,
+  upload.single("coverImage"),
+  async (req, res) => {
+    try {
+      const [rows] = await db.query("SELECT * FROM blogs WHERE id = ?", [
+        req.params.id,
+      ]);
+      if (rows.length === 0)
+        return res.status(404).json({ error: "Blog not found" });
 
-    const blog = rows[0];
-    const { title, excerpt, content, author, category, tags, published } = req.body;
+      const blog = rows[0];
+      const { title, excerpt, content, author, category, tags, published } =
+        req.body;
 
-    let coverImagePath = blog.coverImage;
-    if (req.file) {
-      const fileName = `${Date.now()}-blog.webp`;
-      await sharp(req.file.buffer)
-        .resize({ width: 1200, fit: "inside", withoutEnlargement: true })
-        .webp({ quality: 78 })
-        .toFile(path.join(BLOG_DIR, fileName));
-      coverImagePath = `/uploads/blogs/${fileName}`;
+      let coverImagePath = blog.coverImage;
+      if (req.file) {
+        const fileName = `${Date.now()}-blog.webp`;
+        await sharp(req.file.buffer)
+          .resize({ width: 1200, fit: "inside", withoutEnlargement: true })
+          .webp({ quality: 78 })
+          .toFile(path.join(BLOG_DIR, fileName));
+        coverImagePath = `/uploads/blogs/${fileName}`;
+      }
+
+      const finalTitle = title !== undefined ? title : blog.title;
+      const finalExcerpt = excerpt !== undefined ? excerpt : blog.excerpt;
+      const finalContent = content !== undefined ? content : blog.content;
+      const finalAuthor = author !== undefined ? author : blog.author;
+      const finalCategory = category !== undefined ? category : blog.category;
+      const finalTags = tags !== undefined ? tags : blog.tags;
+      const finalPublished =
+        published !== undefined ? (published ? 1 : 0) : blog.published;
+      const finalReadingTime =
+        content !== undefined
+          ? Math.max(1, Math.ceil(finalContent.split(/\s+/).length / 200))
+          : blog.readingTime;
+
+      await db.query(
+        `UPDATE blogs SET title=?, excerpt=?, content=?, coverImage=?, author=?, category=?, tags=?, readingTime=?, published=?, updated_at=NOW() WHERE id=?`,
+        [
+          finalTitle,
+          finalExcerpt,
+          finalContent,
+          coverImagePath,
+          finalAuthor,
+          finalCategory,
+          finalTags,
+          finalReadingTime,
+          finalPublished,
+          req.params.id,
+        ],
+      );
+
+      const [updated] = await db.query("SELECT * FROM blogs WHERE id = ?", [
+        req.params.id,
+      ]);
+      res.json(updated[0]);
+    } catch (err) {
+      console.error("Blog update error:", err);
+      res
+        .status(500)
+        .json({ error: "Failed to update blog", details: err.message });
     }
-
-    const finalTitle = title !== undefined ? title : blog.title;
-    const finalExcerpt = excerpt !== undefined ? excerpt : blog.excerpt;
-    const finalContent = content !== undefined ? content : blog.content;
-    const finalAuthor = author !== undefined ? author : blog.author;
-    const finalCategory = category !== undefined ? category : blog.category;
-    const finalTags = tags !== undefined ? tags : blog.tags;
-    const finalPublished = published !== undefined ? (published ? 1 : 0) : blog.published;
-    const finalReadingTime = content !== undefined
-      ? Math.max(1, Math.ceil(finalContent.split(/\s+/).length / 200))
-      : blog.readingTime;
-
-    await db.query(
-      `UPDATE blogs SET title=?, excerpt=?, content=?, coverImage=?, author=?, category=?, tags=?, readingTime=?, published=?, updated_at=NOW() WHERE id=?`,
-      [finalTitle, finalExcerpt, finalContent, coverImagePath, finalAuthor, finalCategory, finalTags, finalReadingTime, finalPublished, req.params.id]
-    );
-
-    const [updated] = await db.query("SELECT * FROM blogs WHERE id = ?", [req.params.id]);
-    res.json(updated[0]);
-  } catch (err) {
-    console.error("Blog update error:", err);
-    res.status(500).json({ error: "Failed to update blog", details: err.message });
-  }
-});
+  },
+);
 
 // Admin: delete blog
 app.delete("/api/admin/blogs/:id", authMiddleware, async (req, res) => {
   try {
-    const [result] = await db.query("DELETE FROM blogs WHERE id = ?", [req.params.id]);
-    if (result.affectedRows === 0) return res.status(404).json({ error: "Blog not found" });
+    const [result] = await db.query("DELETE FROM blogs WHERE id = ?", [
+      req.params.id,
+    ]);
+    if (result.affectedRows === 0)
+      return res.status(404).json({ error: "Blog not found" });
     res.json({ success: true });
   } catch (err) {
     console.error("Blog delete error:", err);
-    res.status(500).json({ error: "Failed to delete blog", details: err.message });
+    res
+      .status(500)
+      .json({ error: "Failed to delete blog", details: err.message });
   }
 });
 
@@ -2309,100 +2664,143 @@ module.exports = app;
 // Public: fetch all clients ordered by position
 app.get("/api/clients", async (req, res) => {
   try {
-    const [rows] = await db.query("SELECT * FROM clients ORDER BY position ASC, created_at ASC");
+    const [rows] = await db.query(
+      "SELECT * FROM clients ORDER BY position ASC, created_at ASC",
+    );
     res.json(rows);
   } catch (err) {
     console.error("Failed to fetch clients:", err);
-    res.status(500).json({ error: "Failed to fetch clients", details: err.message });
+    res
+      .status(500)
+      .json({ error: "Failed to fetch clients", details: err.message });
   }
 });
 
 // Admin: fetch all clients (auth required)
 app.get("/api/admin/clients", authMiddleware, async (req, res) => {
   try {
-    const [rows] = await db.query("SELECT * FROM clients ORDER BY position ASC, created_at ASC");
+    const [rows] = await db.query(
+      "SELECT * FROM clients ORDER BY position ASC, created_at ASC",
+    );
     res.json(rows);
   } catch (err) {
     console.error("Failed to fetch admin clients:", err);
-    res.status(500).json({ error: "Failed to fetch clients", details: err.message });
+    res
+      .status(500)
+      .json({ error: "Failed to fetch clients", details: err.message });
   }
 });
 
 // Admin: create client with optional logo upload
-app.post("/api/admin/clients", authMiddleware, upload.single("logo"), async (req, res) => {
-  try {
-    const { name, position } = req.body;
-    if (!name) return res.status(400).json({ error: "Client name is required" });
+app.post(
+  "/api/admin/clients",
+  authMiddleware,
+  upload.single("logo"),
+  async (req, res) => {
+    try {
+      const { name, position } = req.body;
+      if (!name)
+        return res.status(400).json({ error: "Client name is required" });
 
-    let logoPath = "";
-    if (req.file) {
-      const fileName = `${Date.now()}-${Math.random().toString(36).substring(2, 8)}.webp`;
-      await sharp(req.file.buffer)
-        .resize({ width: 400, fit: "inside", withoutEnlargement: true })
-        .webp({ quality: 85 })
-        .toFile(path.join(LOGO_DIR, fileName));
-      logoPath = `/uploads/logos/${fileName}`;
+      let logoPath = "";
+      if (req.file) {
+        const fileName = `${Date.now()}-${Math.random().toString(36).substring(2, 8)}.webp`;
+        await sharp(req.file.buffer)
+          .resize({ width: 400, fit: "inside", withoutEnlargement: true })
+          .webp({ quality: 85 })
+          .toFile(path.join(LOGO_DIR, fileName));
+        logoPath = `/uploads/logos/${fileName}`;
+      }
+
+      const [[{ max: maxPos }]] = await db.query(
+        "SELECT MAX(position) as max FROM clients",
+      );
+      const finalPosition =
+        position !== undefined && position !== ""
+          ? Number(position)
+          : (maxPos || 0) + 1;
+
+      const [result] = await db.query(
+        "INSERT INTO clients (name, logo, position, created_at, updated_at) VALUES (?, ?, ?, NOW(), NOW())",
+        [name, logoPath, finalPosition],
+      );
+
+      const [newClient] = await db.query("SELECT * FROM clients WHERE id = ?", [
+        result.insertId,
+      ]);
+      res.status(201).json(newClient[0]);
+    } catch (err) {
+      console.error("Create client error:", err);
+      res
+        .status(500)
+        .json({ error: "Failed to create client", details: err.message });
     }
-
-    const [[{ max: maxPos }]] = await db.query("SELECT MAX(position) as max FROM clients");
-    const finalPosition = position !== undefined && position !== "" ? Number(position) : (maxPos || 0) + 1;
-
-    const [result] = await db.query(
-      "INSERT INTO clients (name, logo, position, created_at, updated_at) VALUES (?, ?, ?, NOW(), NOW())",
-      [name, logoPath, finalPosition]
-    );
-
-    const [newClient] = await db.query("SELECT * FROM clients WHERE id = ?", [result.insertId]);
-    res.status(201).json(newClient[0]);
-  } catch (err) {
-    console.error("Create client error:", err);
-    res.status(500).json({ error: "Failed to create client", details: err.message });
-  }
-});
+  },
+);
 
 // Admin: update client
-app.patch("/api/admin/clients/:id", authMiddleware, upload.single("logo"), async (req, res) => {
-  try {
-    const [rows] = await db.query("SELECT * FROM clients WHERE id = ?", [req.params.id]);
-    if (rows.length === 0) return res.status(404).json({ error: "Client not found" });
+app.patch(
+  "/api/admin/clients/:id",
+  authMiddleware,
+  upload.single("logo"),
+  async (req, res) => {
+    try {
+      const [rows] = await db.query("SELECT * FROM clients WHERE id = ?", [
+        req.params.id,
+      ]);
+      if (rows.length === 0)
+        return res.status(404).json({ error: "Client not found" });
 
-    const client = rows[0];
-    const { name, position } = req.body;
-    let logoPath = client.logo;
+      const client = rows[0];
+      const { name, position } = req.body;
+      let logoPath = client.logo;
 
-    if (req.file) {
-      const fileName = `${Date.now()}-${Math.random().toString(36).substring(2, 8)}.webp`;
-      await sharp(req.file.buffer)
-        .resize({ width: 400, fit: "inside", withoutEnlargement: true })
-        .webp({ quality: 85 })
-        .toFile(path.join(LOGO_DIR, fileName));
-      logoPath = `/uploads/logos/${fileName}`;
+      if (req.file) {
+        const fileName = `${Date.now()}-${Math.random().toString(36).substring(2, 8)}.webp`;
+        await sharp(req.file.buffer)
+          .resize({ width: 400, fit: "inside", withoutEnlargement: true })
+          .webp({ quality: 85 })
+          .toFile(path.join(LOGO_DIR, fileName));
+        logoPath = `/uploads/logos/${fileName}`;
+      }
+
+      const finalName = name !== undefined ? name : client.name;
+      const finalPosition =
+        position !== undefined && position !== ""
+          ? Number(position)
+          : client.position;
+
+      await db.query(
+        "UPDATE clients SET name = ?, logo = ?, position = ?, updated_at = NOW() WHERE id = ?",
+        [finalName, logoPath, finalPosition, req.params.id],
+      );
+
+      const [updated] = await db.query("SELECT * FROM clients WHERE id = ?", [
+        req.params.id,
+      ]);
+      res.json(updated[0]);
+    } catch (err) {
+      console.error("Update client error:", err);
+      res
+        .status(500)
+        .json({ error: "Failed to update client", details: err.message });
     }
-
-    const finalName = name !== undefined ? name : client.name;
-    const finalPosition = position !== undefined && position !== "" ? Number(position) : client.position;
-
-    await db.query(
-      "UPDATE clients SET name = ?, logo = ?, position = ?, updated_at = NOW() WHERE id = ?",
-      [finalName, logoPath, finalPosition, req.params.id]
-    );
-
-    const [updated] = await db.query("SELECT * FROM clients WHERE id = ?", [req.params.id]);
-    res.json(updated[0]);
-  } catch (err) {
-    console.error("Update client error:", err);
-    res.status(500).json({ error: "Failed to update client", details: err.message });
-  }
-});
+  },
+);
 
 // Admin: delete client
 app.delete("/api/admin/clients/:id", authMiddleware, async (req, res) => {
   try {
-    const [result] = await db.query("DELETE FROM clients WHERE id = ?", [req.params.id]);
-    if (result.affectedRows === 0) return res.status(404).json({ error: "Client not found" });
+    const [result] = await db.query("DELETE FROM clients WHERE id = ?", [
+      req.params.id,
+    ]);
+    if (result.affectedRows === 0)
+      return res.status(404).json({ error: "Client not found" });
     res.json({ success: true });
   } catch (err) {
     console.error("Delete client error:", err);
-    res.status(500).json({ error: "Failed to delete client", details: err.message });
+    res
+      .status(500)
+      .json({ error: "Failed to delete client", details: err.message });
   }
 });
